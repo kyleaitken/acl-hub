@@ -1,0 +1,19 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  coach: one
+  first_name: MyString
+  last_name: MyString
+  birth_date: 2024-10-19
+  email: MyString
+  phone: MyString
+  active: false
+
+two:
+  coach: two
+  first_name: MyString
+  last_name: MyString
+  birth_date: 2024-10-19
+  email: MyString
+  phone: MyString
+  active: false
