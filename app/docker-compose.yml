@@ -1,0 +1,50 @@
+services:
+  # Backend Rails app
+  api:
+    build: 
+      context: ./api
+      dockerfile: Dockerfile
+    environment:
+      RAILS_ENV: development
+      POSTGRES_USER: aclhub
+      POSTGRES_PASSWORD: 23422
+      POSTGRES_DB: api_development
+      DATABASE_URL: postgresql://aclhub:23422@db:5432/api_development
+      RAILS_MASTER_KEY: 3c753d18c827c9707d5ba9edc8f03bbc
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+    networks:
+      - app-network
+  
+  # Frontend React app
+  frontend:
+    build: 
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    networks:
+      - app-network
+
+  # PostgreSQL database
+  db:
+    image: postgres
+    environment:
+      POSTGRES_USER: aclhub
+      POSTGRES_PASSWORD: 23422
+      POSTGRES_DB: api_development
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  db-data:

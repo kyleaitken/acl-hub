@@ -15,9 +15,12 @@
 default: &default
   adapter: postgresql
   encoding: unicode
+  host: db
+  port: 5432
   # For details on connection pooling, see Rails configuration guide
   # https://guides.rubyonrails.org/configuring.html#database-pooling
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  url: postgresql://aclhub:23422@db:5432/api_development
   username: aclhub
   password: <%= ENV['ACLHUB_DB_PASS'] %>
 
