@@ -13,3 +13,11 @@ end
 Rails.application.routes.draw do
   get '/health', to: 'health#check'
 end
+
+Rails.application.routes.draw do
+  resources :users
+end
+
+Rails.application.routes.draw do
+  resources :coaches
+end

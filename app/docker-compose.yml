@@ -17,6 +17,8 @@ services:
       - db
     networks:
       - app-network
+    volumes:
+      - ./api:/rails
   
   # Frontend React app
   frontend:
