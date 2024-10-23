@@ -1,5 +1,6 @@
 class Coach < ApplicationRecord
     has_many :users, dependent: :nullify 
+    has_many :programs, dependent: :destroy
 
     # Ensure the email is unique and present
     validates :email, presence: true, uniqueness: true
