@@ -21,6 +21,11 @@ docker compose exec api bin/rails db:schema:dump    : make sure schema matches w
 docker compose exec api bin/rails generate migration
 docker compose exec api bin/rails db:migrate:status 
 docker compose exec api bin/rails console 
+
+## make model/controller:
+docker compose exec api bin/rails generate model <modelName> field1:type field2:type 
+docker compose exec api bin/rails generate controller <model>s
+
 docker compose restart api/frontend
 docker compose logs api/frontend
 docker compose exec db psql -U aclhub -d api_development  : log into db console, can then run "\d users" for example

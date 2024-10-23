@@ -21,3 +21,23 @@ end
 Rails.application.routes.draw do
   resources :coaches
 end
+
+Rails.application.routes.draw do
+  resources :programs
+end
+
+Rails.application.routes.draw do
+  resources :program_workouts
+end
+
+Rails.application.routes.draw do
+  resources :program_workout_exercises
+end
+
+Rails.application.routes.draw do
+  resources :exercises
+end
+
+Rails.application.routes.draw do
+  resources :exercise_images
+end
