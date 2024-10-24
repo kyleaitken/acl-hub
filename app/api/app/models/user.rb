@@ -1,5 +1,6 @@
 class User < ApplicationRecord
-  belongs_to :coach, optional: true  
+  belongs_to :coach, optional: true 
+  has_many :user_outcome_measures, dependent: :destroy
 
   # Ensure the email is unique and present
   validates :email, presence: true, uniqueness: true

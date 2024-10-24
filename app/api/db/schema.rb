@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_10_23_202116) do
+ActiveRecord::Schema[7.2].define(version: 2024_10_24_013538) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -41,6 +41,12 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_23_202116) do
     t.string "category"
     t.string "muscle_group"
     t.string "video_url"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "outcome_measures", force: :cascade do |t|
+    t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
@@ -80,6 +86,25 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_23_202116) do
     t.index ["coach_id"], name: "index_programs_on_coach_id"
   end
 
+  create_table "user_outcome_measure_recordings", force: :cascade do |t|
+    t.bigint "user_outcome_measure_id", null: false
+    t.string "value"
+    t.date "date"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_outcome_measure_id"], name: "idx_on_user_outcome_measure_id_3a41ca920e"
+  end
+
+  create_table "user_outcome_measures", force: :cascade do |t|
+    t.bigint "outcome_measure_id", null: false
+    t.bigint "user_id", null: false
+    t.string "target_value"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["outcome_measure_id"], name: "index_user_outcome_measures_on_outcome_measure_id"
+    t.index ["user_id"], name: "index_user_outcome_measures_on_user_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.bigint "coach_id"
     t.string "first_name", null: false
@@ -99,5 +124,8 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_23_202116) do
   add_foreign_key "program_workout_exercises", "program_workouts"
   add_foreign_key "program_workouts", "programs"
   add_foreign_key "programs", "coaches"
+  add_foreign_key "user_outcome_measure_recordings", "user_outcome_measures", on_delete: :cascade
+  add_foreign_key "user_outcome_measures", "outcome_measures", on_delete: :cascade
+  add_foreign_key "user_outcome_measures", "users", on_delete: :cascade
   add_foreign_key "users", "coaches"
 end

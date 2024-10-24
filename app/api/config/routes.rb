@@ -7,7 +7,11 @@ Rails.application.routes.draw do
   # root "posts#index"
 
   # Users
-  resources :users 
+  resources :users do
+    resources :user_outcome_measures do
+      resources :user_outcome_measure_recordings
+    end
+  end
 
   # Coaches
   resources :coaches do
@@ -20,7 +24,11 @@ Rails.application.routes.draw do
     end
   end
 
+  # Exercises
   resources :exercises do
     resources :exercise_images
   end
+
+  # Outcome Measures
+  resources :outcome_measures
 end
