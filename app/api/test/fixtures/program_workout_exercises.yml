@@ -1,0 +1,23 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  program_workout: one
+  exercise: one
+  order: MyString
+  instructions: MyString
+  sets: 1
+  reps: 1
+  weight: 1.5
+  duration: MyString
+  hold: MyString
+
+two:
+  program_workout: two
+  exercise: two
+  order: MyString
+  instructions: MyString
+  sets: 1
+  reps: 1
+  weight: 1.5
+  duration: MyString
+  hold: MyString

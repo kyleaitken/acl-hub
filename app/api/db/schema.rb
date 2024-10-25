@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_10_19_142456) do
+ActiveRecord::Schema[7.2].define(version: 2024_10_24_013538) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -22,6 +22,87 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_19_142456) do
     t.string "bio"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["email"], name: "index_coaches_on_email", unique: true
+  end
+
+  create_table "exercise_images", force: :cascade do |t|
+    t.bigint "exercise_id", null: false
+    t.integer "order"
+    t.string "url"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["exercise_id", "order"], name: "index_exercise_images_on_exercise_id_and_order", unique: true
+    t.index ["exercise_id"], name: "index_exercise_images_on_exercise_id"
+  end
+
+  create_table "exercises", force: :cascade do |t|
+    t.string "name"
+    t.string "description"
+    t.string "category"
+    t.string "muscle_group"
+    t.string "video_url"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "outcome_measures", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "program_workout_exercises", force: :cascade do |t|
+    t.bigint "program_workout_id", null: false
+    t.bigint "exercise_id", null: false
+    t.string "order"
+    t.string "instructions"
+    t.integer "sets"
+    t.integer "reps"
+    t.float "weight"
+    t.string "duration"
+    t.string "hold"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["exercise_id"], name: "index_program_workout_exercises_on_exercise_id"
+    t.index ["program_workout_id"], name: "index_program_workout_exercises_on_program_workout_id"
+  end
+
+  create_table "program_workouts", force: :cascade do |t|
+    t.bigint "program_id", null: false
+    t.integer "day"
+    t.integer "week"
+    t.integer "order"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["program_id"], name: "index_program_workouts_on_program_id"
+  end
+
+  create_table "programs", force: :cascade do |t|
+    t.bigint "coach_id", null: false
+    t.integer "num_weeks"
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["coach_id"], name: "index_programs_on_coach_id"
+  end
+
+  create_table "user_outcome_measure_recordings", force: :cascade do |t|
+    t.bigint "user_outcome_measure_id", null: false
+    t.string "value"
+    t.date "date"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_outcome_measure_id"], name: "idx_on_user_outcome_measure_id_3a41ca920e"
+  end
+
+  create_table "user_outcome_measures", force: :cascade do |t|
+    t.bigint "outcome_measure_id", null: false
+    t.bigint "user_id", null: false
+    t.string "target_value"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["outcome_measure_id"], name: "index_user_outcome_measures_on_outcome_measure_id"
+    t.index ["user_id"], name: "index_user_outcome_measures_on_user_id"
   end
 
   create_table "users", force: :cascade do |t|
@@ -35,7 +116,16 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_19_142456) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["coach_id"], name: "index_users_on_coach_id"
+    t.index ["email"], name: "index_users_on_email", unique: true
   end
 
+  add_foreign_key "exercise_images", "exercises"
+  add_foreign_key "program_workout_exercises", "exercises"
+  add_foreign_key "program_workout_exercises", "program_workouts"
+  add_foreign_key "program_workouts", "programs"
+  add_foreign_key "programs", "coaches"
+  add_foreign_key "user_outcome_measure_recordings", "user_outcome_measures", on_delete: :cascade
+  add_foreign_key "user_outcome_measures", "outcome_measures", on_delete: :cascade
+  add_foreign_key "user_outcome_measures", "users", on_delete: :cascade
   add_foreign_key "users", "coaches"
 end
