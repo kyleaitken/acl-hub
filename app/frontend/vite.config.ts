@@ -22,4 +22,15 @@ export default defineConfig({
           }
       }
   },
+  server: {
+    port: 5173,
+    proxy: {
+      '/api': {
+        // target: 'http://api:3000', // use this when running frontend in a cotainer
+        target: 'http://localhost:3000', // Docker service name and port for backend API
+        changeOrigin: true,
+        rewrite: path => path.replace(/^\/api/, ''),
+      },
+    },
+  }
 })
