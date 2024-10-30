@@ -4,7 +4,9 @@ const TestComponent = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('/api/coaches/1/programs');
+        const apiBaseUrl = import.meta.env.VITE_API_BASE_URL; 
+        console.log('base url: ', apiBaseUrl)
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/coaches/1/programs`);
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }

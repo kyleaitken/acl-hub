@@ -1,12 +1,14 @@
-# Specify the base image
-FROM node:alpine
+# Use a Node.js base image
+FROM node:latest AS build-stage
 
 # Set the working directory in the container
 WORKDIR /app
 
-# Install dependencies
+# Copy package.json and package-lock.json first to leverage Docker cache
 COPY package*.json ./
-RUN npm install
+
+# Install dependencies
+RUN npm ci
 
 # Copy the rest of the app's code
 COPY . .
@@ -14,11 +16,18 @@ COPY . .
 # Build the React app
 RUN npm run build
 
-# Expose the port the app runs on
-EXPOSE 5173
+# Production Stage
+FROM nginx:latest
 
-# Serve the React app
-# CMD ["npx", "serve", "-s", "build"]
+# Copy the NGINX configuration file
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# Run the app
-CMD ["npm", "run", "dev"]
+# Copy the build artifacts from the build stage to NGINX web server
+COPY --from=build-stage /app/dist/ /usr/share/nginx/html
+
+
+# Expose port 80 for the Nginx server
+EXPOSE 80
+
+# Start Nginx
+CMD ["nginx", "-g", "daemon off;"]

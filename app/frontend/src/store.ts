@@ -1,6 +1,16 @@
 // src/store.ts
 import { configureStore, combineReducers } from '@reduxjs/toolkit';
-import { persistStore, persistReducer, PersistConfig } from 'redux-persist';
+import {
+  persistStore,
+  persistReducer,
+  PersistConfig,
+  FLUSH,
+  REHYDRATE,
+  PAUSE,
+  PERSIST,
+  PURGE,
+  REGISTER,
+} from 'redux-persist'
 import { useDispatch } from 'react-redux';
 import storage from 'redux-persist/lib/storage'; // defaults to localStorage for web
 
@@ -17,14 +27,23 @@ const rootReducer = combineReducers({
 const persistConfig: PersistConfig<ReturnType<typeof rootReducer>> = {
   key: 'root',
   storage,
-  whitelist: ['preferences'], // persist only the preferences slice
+  whitelist: [], // persist only the preferences slice
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
+// Fix for persist non-serializable data error https://redux-toolkit.js.org/usage/usage-guide#use-with-redux-persist
 const store = configureStore({
-  reducer: persistedReducer
+  reducer: persistedReducer,
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        // Ignoring only redux-persist actions
+        ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+      },
+    }),
 });
+
 export const persistor = persistStore(store);
 
 
