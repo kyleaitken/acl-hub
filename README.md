@@ -33,3 +33,17 @@ docker compose exec db psql -U aclhub -d api_development -c '\dt' : check data t
 
 rails generate controller <controllername>
 rails db:migrate
+
+
+# Frontend/Api Prod Docker Container:
+- Build: docker build --no-cache -t frontend .
+- Run: docker run -p 8080:80 frontend
+- Tag: docker tag frontend aclhubcr.azurecr.io/frontend:latest
+- Push: docker push aclhubcr.azurecr.io/frontend:latest
+- Login to Az CR: az acr login --name aclhubcr
+
+# API Prod Docker Container:
+- Build: docker build --no-cache -t api-test .
+- Run: docker run -p 3001:3000 api-test 
+- Tag: docker tag api-test aclhubcr.azurecr.io/api:latest
+- Push: docker push aclhubcr.azurecr.io/api:latest

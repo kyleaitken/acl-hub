@@ -3,7 +3,8 @@ services:
   api:
     build: 
       context: ./api
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
+    command: bash -c "rm -f /rails/tmp/pids/server.pid && bin/rails server -b 0.0.0.0 -p 3000"
     environment:
       RAILS_ENV: development
       POSTGRES_USER: aclhub
@@ -24,7 +25,7 @@ services:
   frontend:
     build: 
       context: ./frontend
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     ports:
       - "5173:5173"
     networks:
