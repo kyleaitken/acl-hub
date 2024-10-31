@@ -1,9 +1,9 @@
-on:
-  push:
-    branches:
-      - main
+name: Build and Push PR Images to ACR
 
-name: Build and Push Prod Docker Images to ACR
+on:
+  pull_request:
+    branches:
+      - '*'
 
 jobs:
     build-and-deploy:
@@ -25,17 +25,17 @@ jobs:
             username: ${{ secrets.REGISTRY_USERNAME }}
             password: ${{ secrets.REGISTRY_PASSWORD }}
 
-        - name: 'Build and push api image'
+        - name: 'Build and push PR api image'
           run: |
-            docker build ./app/api -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/api:latest
-            docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/api:latest
+            docker build ./app/api -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/api:${{ github.event.pull_request.number }}
+            docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/api:${{ github.event.pull_request.number }}
 
         - name: 'Deploy api to Azure Container Instances'
           uses: 'azure/aci-deploy@v1'
           with:
             resource-group: ${{ secrets.RESOURCE_GROUP }}
             dns-name-label: "${{ secrets.RESOURCE_GROUP }}-api-${{ github.run_number }}"
-            image: ${{ secrets.REGISTRY_LOGIN_SERVER }}/api:latest
+            image: ${{ secrets.REGISTRY_LOGIN_SERVER }}/api:${{ github.event.pull_request.number }}
             registry-login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
             registry-username: ${{ secrets.REGISTRY_USERNAME }}
             registry-password: ${{ secrets.REGISTRY_PASSWORD }}
@@ -44,15 +44,15 @@ jobs:
     
         - name: 'Build and push frontend image'
           run: |
-            docker build ./app/frontend -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/frontend:latest
-            docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/frontend:latest
+            docker build ./app/frontend -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/frontend:${{ github.event.pull_request.number }}
+            docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/frontend:${{ github.event.pull_request.number }}
 
         - name: 'Deploy frontend to Azure Container Instances'
           uses: 'azure/aci-deploy@v1'
           with:
             resource-group: ${{ secrets.RESOURCE_GROUP }}
             dns-name-label: "${{ secrets.RESOURCE_GROUP }}-frontend-${{ github.run_number }}"
-            image: ${{ secrets.REGISTRY_LOGIN_SERVER }}/frontend:latest
+            image: ${{ secrets.REGISTRY_LOGIN_SERVER }}/frontend:${{ github.event.pull_request.number }}
             registry-login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
             registry-username: ${{ secrets.REGISTRY_USERNAME }}
             registry-password: ${{ secrets.REGISTRY_PASSWORD }}
