@@ -34,6 +34,8 @@ docker compose exec db psql -U aclhub -d api_development -c '\dt' : check data t
 rails generate controller <controllername>
 rails db:migrate
 
+If developing frontend, can switch viteconfig proxy to localhost:3000 and just run npm run dev to not run the frontend in the container. You 
+would still run the api/db in a container, but access it thru local host, not from container networking
 
 # Frontend/Api Prod Docker Container:
 - Build: docker build --no-cache -t frontend .
