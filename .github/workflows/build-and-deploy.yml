@@ -2,6 +2,8 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    types: [closed] 
 
 name: Build and Push Prod Docker Images to ACR
 
@@ -30,31 +32,31 @@ jobs:
             docker build ./app/api -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/api:latest
             docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/api:latest
 
-        - name: 'Deploy api to Azure Container Instances'
-          uses: 'azure/aci-deploy@v1'
-          with:
-            resource-group: ${{ secrets.RESOURCE_GROUP }}
-            dns-name-label: "${{ secrets.RESOURCE_GROUP }}-api-${{ github.run_number }}"
-            image: ${{ secrets.REGISTRY_LOGIN_SERVER }}/api:latest
-            registry-login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
-            registry-username: ${{ secrets.REGISTRY_USERNAME }}
-            registry-password: ${{ secrets.REGISTRY_PASSWORD }}
-            name: api-instance
-            location: 'canadacentral' 
+        # - name: 'Deploy api to Azure Container Instances'
+        #   uses: 'azure/aci-deploy@v1'
+        #   with:
+        #     resource-group: ${{ secrets.RESOURCE_GROUP }}
+        #     dns-name-label: "${{ secrets.RESOURCE_GROUP }}-api-${{ github.run_number }}"
+        #     image: ${{ secrets.REGISTRY_LOGIN_SERVER }}/api:latest
+        #     registry-login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
+        #     registry-username: ${{ secrets.REGISTRY_USERNAME }}
+        #     registry-password: ${{ secrets.REGISTRY_PASSWORD }}
+        #     name: api-instance
+        #     location: 'canadacentral' 
     
         - name: 'Build and push frontend image'
           run: |
-            docker build ./app/frontend -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/frontend:latest
+            docker build ./app/frontend --build-arg VITE_API_BASE_URL=${{ secrets.VITE_API_BASE_URL }} -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/frontend:latest
             docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/frontend:latest
 
-        - name: 'Deploy frontend to Azure Container Instances'
-          uses: 'azure/aci-deploy@v1'
-          with:
-            resource-group: ${{ secrets.RESOURCE_GROUP }}
-            dns-name-label: "${{ secrets.RESOURCE_GROUP }}-frontend-${{ github.run_number }}"
-            image: ${{ secrets.REGISTRY_LOGIN_SERVER }}/frontend:latest
-            registry-login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
-            registry-username: ${{ secrets.REGISTRY_USERNAME }}
-            registry-password: ${{ secrets.REGISTRY_PASSWORD }}
-            name: frontend-instance
-            location: 'canadacentral'
+        # - name: 'Deploy frontend to Azure Container Instances'
+        #   uses: 'azure/aci-deploy@v1'
+        #   with:
+        #     resource-group: ${{ secrets.RESOURCE_GROUP }}
+        #     dns-name-label: "${{ secrets.RESOURCE_GROUP }}-frontend-${{ github.run_number }}"
+        #     image: ${{ secrets.REGISTRY_LOGIN_SERVER }}/frontend:latest
+        #     registry-login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
+        #     registry-username: ${{ secrets.REGISTRY_USERNAME }}
+        #     registry-password: ${{ secrets.REGISTRY_PASSWORD }}
+        #     name: frontend-instance
+        #     location: 'canadacentral'

@@ -27,7 +27,7 @@ module Api
     # CORS Middleware
     config.middleware.insert_before 0, Rack::Cors do
       allow do
-        origins '*'
+        origins 'https://aclhub-frontend.azurewebsites.net'
         resource '*',
           headers: :any,
           methods: [:get, :post, :put, :patch, :delete, :options, :head]

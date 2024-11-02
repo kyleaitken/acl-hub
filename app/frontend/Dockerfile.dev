@@ -4,6 +4,8 @@ FROM node:alpine
 # Set the working directory in the container
 WORKDIR /app
 
+# COPY .env.development .env
+
 # Install dependencies
 COPY package*.json ./
 RUN npm install
