@@ -6,7 +6,7 @@ const TestComponent = () => {
       try {
         const apiBaseUrl = import.meta.env.VITE_API_BASE_URL; 
         console.log('base url: ', apiBaseUrl)
-        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/coaches/1/programs`);
+        const response = await fetch(`${apiBaseUrl}/coaches/1/programs`);
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
