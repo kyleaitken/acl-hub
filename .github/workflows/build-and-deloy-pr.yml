@@ -44,7 +44,7 @@ jobs:
     
         - name: 'Build and push frontend image'
           run: |
-            docker build ./app/frontend -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/frontend:${{ github.event.pull_request.number }}
+            docker build ./app/frontend --build-arg VITE_API_BASE_URL=${{ secrets.VITE_API_BASE_URL }} -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/frontend:latest
             docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/frontend:${{ github.event.pull_request.number }}
 
         - name: 'Deploy frontend to Azure Container Instances'

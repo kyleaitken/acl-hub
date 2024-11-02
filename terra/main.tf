@@ -42,7 +42,7 @@ resource "azurerm_linux_web_app" "api_app" {
 
     cors {
       allowed_origins = [
-        "http://aclhub-frontend.azurewebsites.net"
+        "https://aclhub-frontend.azurewebsites.net"
       ]
       support_credentials = true  # Enable Access-Control-Allow-Credentials
     }
@@ -187,6 +187,11 @@ data "azurerm_key_vault_secret" "postgres_password" {
   key_vault_id = azurerm_key_vault.main.id       # ID of the Key Vault
 }
 
+# Data source to retrieve the Key Vault secret
+data "azurerm_key_vault_secret" "rails_master_key" {
+  name         = "rails-master-key"             # Name of the secret in Key Vault
+  key_vault_id = azurerm_key_vault.main.id       # ID of the Key Vault
+}
 
 resource "azurerm_role_assignment" "acr_pull_api" {
   principal_id   = azurerm_linux_web_app.api_app.identity[0].principal_id
