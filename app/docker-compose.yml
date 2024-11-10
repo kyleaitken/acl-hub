@@ -1,3 +1,4 @@
+
 services:
   # Backend Rails app
   api:
@@ -10,11 +11,11 @@ services:
       POSTGRES_USER: aclhub
       POSTGRES_PASSWORD: 23422
       POSTGRES_DB: api_development
-      DATABASE_URL: postgresql://aclhub:23422@db:5432/api_development
+      DATABASE_URL: postgresql://aclhub:23422@test-db:5432/api_development
     ports:
       - "3000:3000"
     depends_on:
-      - db
+      - test-db
     networks:
       - app-network
     volumes:
@@ -44,9 +45,24 @@ services:
     networks:
       - app-network
 
+  # PostgreSQL database for testing purposes
+  test-db:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: aclhub
+      POSTGRES_PASSWORD: 23422
+      POSTGRES_DB: api_development
+    ports:
+      - "5433:5432"  # Use a different port to avoid conflict
+    volumes:
+      - test-db-data:/var/lib/postgresql/data  # Separate volume for test-db
+    networks:
+      - app-network
+
 networks:
   app-network:
     driver: bridge
 
 volumes:
   db-data:
+  test-db-data:

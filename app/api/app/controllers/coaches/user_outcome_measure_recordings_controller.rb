@@ -1,19 +1,21 @@
-class UserOutcomeMeasureRecordingsController < ApplicationController
-    before_action :set_user_outcome_measure
+class Coaches::UserOutcomeMeasureRecordingsController < ApplicationController
+    before_action -> { doorkeeper_authorize! :coach }
+    before_action :set_user_outcome_measure 
+    before_action :authorize_coach_for_user
 
-    # GET /user_outcome_measures/:user_outcome_measure_id/user_outcome_measure_recordings
+    # GET coaches/users/:user_id/user_outcome_measures/:user_outcome_measure_id/user_outcome_measure_recordings
     def index
         @user_outcome_measure_recordings = @user_outcome_measure.user_outcome_measure_recordings
         render json: @user_outcome_measure_recordings
     end
     
-    # GET /user_outcome_measures/:user_outcome_measure_id/user_outcome_measure_recordings/:id
+    # GET coaches/users/:user_id/user_outcome_measures/:user_outcome_measure_id/user_outcome_measure_recordings/:id
     def show
         @user_outcome_measure_recording = @user_outcome_measure.user_outcome_measure_recordings.find(params[:id])
         render json: @user_outcome_measure_recording
     end
 
-    # POST /user_outcome_measures/:user_outcome_measure_id/user_outcome_measure_recordings
+    # POST coaches/users/:user_id/user_outcome_measures/:user_outcome_measure_id/user_outcome_measure_recordings
     def create
         @user_outcome_measure_recording = @user_outcome_measure.user_outcome_measure_recordings.build(user_outcome_measure_recording_params)
         if @user_outcome_measure_recording.save
@@ -23,7 +25,7 @@ class UserOutcomeMeasureRecordingsController < ApplicationController
         end
     end
 
-    # PATCH/PUT /user_outcome_measures/:user_outcome_measure_id/user_outcome_measure_recordings/:id
+    # PATCH/PUT coaches/users/:user_id/user_outcome_measures/:user_outcome_measure_id/user_outcome_measure_recordings/:id
     def update
         @user_outcome_measure_recording = @user_outcome_measure.user_outcome_measure_recordings.find(params[:id])
         if @user_outcome_measure_recording.update(user_outcome_measure_recording_params)
@@ -33,7 +35,7 @@ class UserOutcomeMeasureRecordingsController < ApplicationController
         end
     end
 
-    # DELETE /user_outcome_measures/:user_outcome_measure_id/user_outcome_measure_recordings/:id
+    # DELETE coaches/users/:user_id/user_outcome_measures/:user_outcome_measure_id/user_outcome_measure_recordings/:id
     def destroy
         @user_outcome_measure_recording = @user_outcome_measure.user_outcome_measure_recordings.find(params[:id])
         @user_outcome_measure_recording.destroy
@@ -42,11 +44,18 @@ class UserOutcomeMeasureRecordingsController < ApplicationController
 
     private
 
-    def set_user_outcome_measure
-        @user_outcome_measure = UserOutcomeMeasure.find(params[:user_outcome_measure_id])
-    end
-
     def user_outcome_measure_recording_params
         params.require(:user_outcome_measure_recording).permit(:value, :date)
+    end
+    
+    def set_user_outcome_measure
+        @user = User.find(params[:user_id])
+        @user_outcome_measure = @user.user_outcome_measures.find(params[:user_outcome_measure_id])
+    end
+
+    def authorize_coach_for_user
+        unless @user.coach == current_coach
+          render json: { error: 'You are not authorized to access this user\'s outcome measures' }, status: :forbidden
+        end
     end
 end

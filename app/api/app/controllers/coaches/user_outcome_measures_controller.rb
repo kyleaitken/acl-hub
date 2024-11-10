@@ -1,19 +1,21 @@
-class UserOutcomeMeasuresController < ApplicationController
+class Coaches::UserOutcomeMeasuresController < ApplicationController
+    before_action -> { doorkeeper_authorize! :coach }
     before_action :set_user
+    before_action :authorize_coach_for_user
 
-    # GET /user/:user_id/user_outcome_measures
+    # GET /coaches/users/:user_id/user_outcome_measures
     def index
         @user_outcome_measures = @user.user_outcome_measures.includes(:outcome_measure)
         render json: @user_outcome_measures.as_json(include: :outcome_measure)
     end
     
-    # GET /user/:user_id/user_outcome_measures/:id
-    def show
+    # GET /coaches/users/:user_id/user_outcome_measures/:id
+    def show    
         @user_outcome_measure = @user.user_outcome_measures.find(params[:id])
         render json: @user_outcome_measure.as_json(include: :outcome_measure)
     end
 
-    # POST /user/:user_id/user_outcome_measures
+    # POST /coaches/users/:user_id/user_outcome_measures
     def create
         @user_outcome_measure = @user.user_outcome_measures.build(user_outcome_measure_params)
         if @user_outcome_measure.save
@@ -23,7 +25,7 @@ class UserOutcomeMeasuresController < ApplicationController
         end
     end
 
-    # PATCH/PUT /user/:user_id/user_outcome_measures/:id
+    # PATCH/PUT /coaches/users/:user_id/user_outcome_measures/:id
     def update
         @user_outcome_measure = @user.user_outcome_measures.find(params[:id])
         if @user_outcome_measure.update(user_outcome_measure_params)
@@ -33,7 +35,7 @@ class UserOutcomeMeasuresController < ApplicationController
         end
     end
 
-    # DELETE /user/:user_id/user_outcome_measures/:id
+    # DELETE /coaches/users/:user_id/user_outcome_measures/:id
     def destroy
         @user_outcome_measure = @user.user_outcome_measures.find(params[:id])
         @user_outcome_measure.destroy
@@ -48,5 +50,12 @@ class UserOutcomeMeasuresController < ApplicationController
 
     def user_outcome_measure_params
         params.require(:user_outcome_measure).permit(:outcome_measure_id, :target_value)
+    end
+
+    def authorize_coach_for_user
+        # Check if the user belongs to the coach
+        unless @user.coach == current_coach
+          render json: { error: 'You are not authorized to access this user\'s outcome measures' }, status: :forbidden
+        end
     end
 end
