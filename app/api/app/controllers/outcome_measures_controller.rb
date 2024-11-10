@@ -1,4 +1,6 @@
 class OutcomeMeasuresController < ApplicationController
+    # Possibly limit this to coaches
+    
     # GET /outcome_measures
     def index
         @outcome_measures = OutcomeMeasure.all
