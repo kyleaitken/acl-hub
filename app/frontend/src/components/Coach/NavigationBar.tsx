@@ -85,11 +85,7 @@ const NavBarView = styled(Box)(({ theme }) => ({
     display: 'flex',
     alignItems: 'center',
     backgroundColor: theme.palette.secondary.main,
-    width: '200px',
     flexDirection: 'column',
-    maxHeight: '100vh',
-    position: 'sticky',
-    top: 0
 }));
 
 const StyledLink = styled(Link)(({ theme }) => ({

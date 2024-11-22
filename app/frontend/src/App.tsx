@@ -31,7 +31,11 @@ function App() {
     <ThemeProvider theme={isDarkMode ? darkTheme : lightTheme}>
       <CssBaseline />
       <AppContainer>
-        {role == 'coach' && <NavigationBar toggleTheme={handleToggleTheme}/>}
+        {role == 'coach' && 
+          <NavBarView id="nav_bar_view">
+            <NavigationBar toggleTheme={handleToggleTheme}/>
+          </NavBarView>
+        }
         <MainView>
             <Routes>
               <Route path="/login" element={<LoginPage />} />
@@ -48,9 +52,18 @@ export default App;
 const MainView = styled(Box)(({ theme }) => ({
   display: 'flex',
   backgroundColor: theme.palette.background.default,
-  flexGrow: 1
+  flexGrow: 1,
+  marginLeft: '220px'
 }));
 
 const AppContainer = styled(Box)`
   display: flex;
+`
+const NavBarView = styled(Box)`
+  display: flex;
+  width: 220px;
+  min-height: 100vh;
+  position: fixed;
+  top: 0;
+  z-index: 1000;
 `
