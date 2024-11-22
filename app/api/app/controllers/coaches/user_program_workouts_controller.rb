@@ -50,7 +50,7 @@ class Coaches::UserProgramWorkoutsController < ApplicationController
     end
 
     def user_program_workout_params
-        params.require(:user_program_workout).permit(:date, :day, :week, :comment, :completed, :order)
+        params.require(:user_program_workout).permit(:date, :day, :week, :comment, :completed, :order, :name, :warmup)
     end
 
     def authorize_coach_for_user

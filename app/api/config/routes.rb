@@ -38,12 +38,17 @@ Rails.application.routes.draw do
   end
 
   # Coaches
-  resources :coaches, only: [:index]
+  resources :coaches, only: [:index, :destroy]
 
   namespace :coaches do
-
     # Coaches have access to users and their outcome measures/programs
     resources :users, only: [:index, :show, :update] do
+      collection do
+        get 'detailed', to: 'users#detailed_index'
+        get 'todayWorkouts', to: 'users#all_user_workouts_today_index'
+        get 'updates', to: 'users#all_user_updates'
+      end
+
       resources :user_outcome_measures do
         resources :user_outcome_measure_recordings
       end

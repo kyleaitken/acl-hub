@@ -1,5 +1,11 @@
 class Coaches::RegistrationsController < Devise::RegistrationsController
   respond_to :json
+  # before_action -> { 
+  #   Rails.logger.debug("Token: #{doorkeeper_token}")
+  #   Rails.logger.debug("Scopes: #{doorkeeper_token.scopes}")
+  #   Rails.logger.debug("Owner ID: #{doorkeeper_token.resource_owner_id}")
+  #   doorkeeper_authorize! :coach 
+  # }, only: [:update]
 
   # POST /coaches
   def create
@@ -12,16 +18,6 @@ class Coaches::RegistrationsController < Devise::RegistrationsController
     end
   end
 
-  # PUT /resource
-  def update
-    self.resource = resource_class.to_adapter.get!(current_coach.id)
-    if resource.update(account_update_params)
-      render json: { coach: resource, message: 'Account updated successfully.' }, status: :ok
-    else
-      render json: { errors: resource.errors.full_messages }, status: :unprocessable_entity
-    end
-  end
-
   private
 
   # Define parameters permitted for sign up
@@ -29,8 +25,4 @@ class Coaches::RegistrationsController < Devise::RegistrationsController
     params.require(:coach).permit(:first_name, :last_name, :email, :phone, :bio, :password, :password_confirmation)
   end
 
-  # Define parameters permitted for account update
-  def account_update_params
-    params.require(:coach).permit(:first_name, :last_name, :email, :phone, :bio, :password, :password_confirmation, :current_password)
-  end
 end

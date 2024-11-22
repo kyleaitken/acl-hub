@@ -1,4 +1,3 @@
-// src/store.ts
 import { configureStore, combineReducers } from '@reduxjs/toolkit';
 import {
   persistStore,
@@ -12,22 +11,24 @@ import {
   REGISTER,
 } from 'redux-persist'
 import { useDispatch } from 'react-redux';
-import storage from 'redux-persist/lib/storage'; // defaults to localStorage for web
-
-// Import Reducers
-// import preferencesReducer from './features/preferences/preferencesSlice';
-// import programReducer from './features/programs/programSlice';
+import storage from 'redux-persist/lib/storage'; 
+import authReducer from './slices/auth/authSlice';
+import preferencesReducer from './slices/preferences/preferencesSlice'
+import usersReducer from './slices/coach/usersSlice'
+import workoutsReducer from './slices/coach/workoutsSlice'
 
 const rootReducer = combineReducers({
-  // programs: programReducer,
-  // preferences: preferencesReducer, // slice for theme and other preferences
+  auth: authReducer,
+  preferences: preferencesReducer,
+  users: usersReducer,
+  workouts: workoutsReducer
 });
 
 
 const persistConfig: PersistConfig<ReturnType<typeof rootReducer>> = {
   key: 'root',
   storage,
-  whitelist: [], // persist only the preferences slice
+  whitelist: ['auth', 'preferences', 'users', 'workouts'],
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
@@ -45,7 +46,6 @@ const store = configureStore({
 });
 
 export const persistor = persistStore(store);
-
 
 
 // Type for Redux state and dispatch

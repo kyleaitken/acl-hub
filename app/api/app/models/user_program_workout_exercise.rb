@@ -3,6 +3,7 @@ class UserProgramWorkoutExercise < ApplicationRecord
   belongs_to :exercise
 
   before_validation :set_next_available_order, on: :create
+  after_save :notify_parent_workout
 
   validates :user_program_workout_id, :exercise_id, presence: true
 
@@ -17,5 +18,9 @@ class UserProgramWorkoutExercise < ApplicationRecord
   
     # Set order to "1" if max_order is nil; otherwise, increment by 1
     self.order = (max_order ? max_order + 1 : 1).to_s
+  end
+
+  def notify_parent_workout
+    user_program_workout.update(updated: true)
   end
 end

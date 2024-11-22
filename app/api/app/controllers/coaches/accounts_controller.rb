@@ -12,9 +12,9 @@ module Coaches
         def update
             # Attempt to update the coach's account information
             if current_coach.update(account_params)
-            render json: { coach: current_coach, message: 'Account updated successfully.' }, status: :ok
+                render json: { coach: current_coach, message: 'Account updated successfully.' }, status: :ok
             else
-            render json: { errors: current_coach.errors.full_messages }, status: :unprocessable_entity
+                render json: { errors: current_coach.errors.full_messages }, status: :unprocessable_entity
             end
         end
   

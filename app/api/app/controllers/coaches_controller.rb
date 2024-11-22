@@ -1,5 +1,4 @@
 class CoachesController < ApplicationController
-    before_action -> { doorkeeper_authorize! :coach }
 
     # GET /coaches
     def index
@@ -7,4 +6,23 @@ class CoachesController < ApplicationController
         render json: @coaches
     end
     
+    # DELETE /coaches/:id
+    def destroy
+        @coach = Coach.find(params[:id])
+        if @coach.destroy
+            render json: { message: 'Account deleted successfully.' }, status: :no_content
+        else
+            render json: @coach.errors, status: :unprocessable_entity
+        end
+    end
+
+    # Update /coaches/:id
+    # def update
+    #     @coach = Coach.find(params[:id])
+    #     if @coach.destroy
+    #         render json: { message: 'Account deleted successfully.' }, status: :no_content
+    #     else
+    #         render json: @coach.errors, status: :unprocessable_entity
+    #     end
+    # end
 end
