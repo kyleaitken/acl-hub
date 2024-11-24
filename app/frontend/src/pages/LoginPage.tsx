@@ -19,13 +19,13 @@ interface LoginData {
 const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [isCoach, setIsCoach] = useState(false);  // state to track the role
+  const [isCoach, setIsCoach] = useState(false); 
   const { role, token } = useSelector((state: RootState) => state.auth);
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (token && role) {
+    if (token) {
       if (role === "coach") {
         navigate("/coach")
       } else {

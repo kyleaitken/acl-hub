@@ -1,8 +1,10 @@
-import { Box, Button, Divider, IconButton, Input, OutlinedInput, Stack, styled, Tooltip, Typography } from "@mui/material";
+import { Box, Button, Divider, IconButton, Input, OutlinedInput, Popover, Stack, styled, Tooltip, Typography } from "@mui/material";
 import ProfilePictureBubble from "./ProfilePictureBubble";
 import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 import { WorkoutComment } from "../types/types";
 import { formatDateToStringWithTime } from "../utils/dateUtils";
+import { useEffect, useRef, useState } from "react";
 
 interface WorkoutCommentBoxProps {
     coachId: number;
@@ -13,14 +15,23 @@ interface WorkoutCommentBoxProps {
     userFirstName: string;
     userLastName: string;
     workoutComments: WorkoutComment[];
-    handleEditComment: (commentId: number, comment: string) => void;
+    addComment: (comment: string) => void;
+    deleteComment: (commentId: number) => void;
+    updateComment: (commentId: number, newComment: string) => void;
 }
 
 const WorkoutCommentBox = (props: WorkoutCommentBoxProps) => {
+    const [editCommentId, setEditCommentId] = useState<number | null>(null);
+    const [editCommentContent, setEditCommentContent] = useState<string>('');
+    const [newComment, setNewComment] = useState<string>('');
+    const [commentToDelete, setCommentToDelete] = useState<number | null>(null);
+    const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null); 
+    const inputRef = useRef<HTMLInputElement>(null);
+    
     const { 
         coachId, userId, coachFirstName, coachLastName,
         userFirstName, userLastName, workoutComments, role,
-        handleEditComment
+        addComment, deleteComment, updateComment
     } = props;
 
     function getCommentUserId(comment_user_type: string) {
@@ -38,100 +49,176 @@ const WorkoutCommentBox = (props: WorkoutCommentBoxProps) => {
         return formatDateToStringWithTime(date);
     }
 
+    const handleEditComment = (commentId: number, commentContent: string) => {
+        setEditCommentId(commentId);
+        setEditCommentContent(commentContent);
+    };
+
+    const handleCancelEdit = () => {
+        setEditCommentId(null);
+        setEditCommentContent('');
+    };
+
+    const handleAddComment = () => {
+        addComment(newComment);
+        setNewComment('');
+    }
+
+    const handleUpdateComment = async (commentId: number) => {
+        if (!editCommentContent.trim()) return;
+
+        await updateComment(commentId, editCommentContent);
+        setEditCommentId(null)
+    };
+
+    const handleDeleteComment = async () => {
+        if (commentToDelete) {
+            setAnchorEl(null);
+            await deleteComment(commentToDelete);
+            setEditCommentId(null);
+            setCommentToDelete(null);
+        }
+    };
+
+    const handleDeleteClick = (event: React.MouseEvent<HTMLElement>, commentId: number) => {
+        setAnchorEl(event.currentTarget);
+        setCommentToDelete(commentId);
+    }
+
+    const handleClosePopover = () => {
+        setAnchorEl(null);
+        setCommentToDelete(null);
+    }
+
+    useEffect(() => {
+        if (inputRef.current) {
+            const length = editCommentContent.length;
+            inputRef.current.focus();
+            inputRef.current.setSelectionRange(length, length);
+        }
+    }, [editCommentContent]);
+
     return (
         <Box sx={{mb: '20px'}}>
             {workoutComments.map((comment, index) => (
-                <Box sx={{display: 'flex', ml: '20px', padding: '10px 0px'}} key={index}>
+                <Box className="commentBox" sx={{display: 'flex', ml: '20px', padding: '10px 0px'}} key={index}>
                     <Box sx={{mr: '20px'}}>
                         <ProfilePictureBubble userId={getCommentUserId(comment.user_type)} name={getCommentName(comment.user_type)} height={28}/>
                     </Box>
-                    <Stack sx={{flexGrow: '1', mr: '20px'}}>
+                    <Stack className="commentStack" sx={{flexGrow: '1', mr: '20px'}}>
                         <CommentHeader>
-                            <Typography sx={{fontWeight: '600', fontSize: '15px'}}>{getCommentName(comment.user_type) }</Typography>
-                            <Typography sx={{fontSize: '13px', ml: '10px', color: 'grey', flexGrow: 1}}>{getCommentDateString(comment.timestamp)}</Typography>
+                            <Typography className="commentUserName" sx={{fontWeight: '600', fontSize: '15px'}}>{getCommentName(comment.user_type) }</Typography>
+                            <Typography className="commentDate" sx={{fontSize: '13px', ml: '10px', color: 'grey', flexGrow: 1}}>{getCommentDateString(comment.timestamp)}</Typography>
                             {role === comment.user_type && 
                                 <IconButton sx={{padding: 0}} onClick={() => handleEditComment(comment.id, comment.content)}>
                                     <EditIcon sx={{color: 'black', fontSize: 20}}/>
                                 </IconButton>
                             }
                         </CommentHeader>
-                        {editCommentId === comment.id 
-                        ? 
+                        {editCommentId === comment.id ? 
                         (
-                        <Stack sx={{mr: '30px', mt: '10px'}}>
-                            <OutlinedInput
-                                inputRef={inputRef} 
-                                value={editCommentContent}
-                                onChange={(e) => setEditCommentContent(e.target.value)}
-                                multiline
-                                sx={{ mt: '5px', fontSize: '14px', width: '100%', padding: '15px 15px', minHeight: '70px', alignItems: 'flex-start', 
-                                }}
-                            >
-                            </OutlinedInput>
-                            <Box sx={{display: 'flex', alignItems: 'center', mt: '5px', flexGrow: 1}}>
-                                <Button
-                                    onClick={handleCancelEdit} 
-                                    sx={{
-                                        fontSize: '13px',
-                                        mr: '10px',
-                                        padding: '4px 0px',
-                                        '&:hover': {
-                                            background: 'lightgrey'
-                                        }
+                            <Stack className="editCommentStack" sx={{mr: '30px', mt: '10px'}}>
+                                <OutlinedInput
+                                    inputRef={inputRef} 
+                                    value={editCommentContent}
+                                    onChange={(e) => setEditCommentContent(e.target.value)}
+                                    multiline
+                                    sx={{ mt: '5px', fontSize: '14px', width: '100%', padding: '15px 15px', minHeight: '70px', alignItems: 'flex-start', 
                                     }}
                                 >
-                                    Cancel
-                                </Button>
-                                <Button
-                                    onClick={() => handleSaveComment(comment.id)}
-                                    sx={{
-                                        background: '#4e4eff', 
-                                        color: 'white',
-                                        mr: '10px',
-                                        fontSize: '13px',
-                                        padding: '4px 0px',
-                                        '&:hover': {
-                                            backgroundColor: 'blue'
-                                        }
-                                    }}
-                                >
-                                    Save
-                                </Button>
-                                <Tooltip title="Delete comment" placement="top"
-                                    componentsProps={{
-                                        tooltip: {
-                                        sx: {
-                                            backgroundColor: '#FF4D4D', 
-                                            color: 'white', 
-                                            fontSize: '14px', 
-                                            boxShadow: 2, 
-                                        },
-                                        },
-                                    }}
-                                >
-                                    <IconButton
-                                        onClick={() => handleDeleteComment(comment.id)}
+                                </OutlinedInput>
+                                <Box className="editCommentButtons" sx={{display: 'flex', alignItems: 'center', mt: '5px', flexGrow: 1}}>
+                                    <Button
+                                        onClick={handleCancelEdit} 
                                         sx={{
+                                            fontSize: '13px',
+                                            mr: '10px',
+                                            padding: '4px 0px',
                                             '&:hover': {
-                                                background: 'transparent'
+                                                background: 'lightgrey'
                                             }
                                         }}
                                     >
-                                        <DeleteIcon sx={{color: 'red'}}/>
-                                    </IconButton>
-                                </Tooltip>
-                            </Box>
-                        </Stack>
+                                        Cancel
+                                    </Button>
+                                    <Button
+                                        onClick={() => handleUpdateComment(comment.id)}
+                                        sx={{
+                                            background: '#4e4eff', 
+                                            color: 'white',
+                                            mr: '10px',
+                                            fontSize: '13px',
+                                            padding: '4px 0px',
+                                            '&:hover': {
+                                                backgroundColor: 'blue'
+                                            }
+                                        }}
+                                    >
+                                        Save
+                                    </Button>
+                                    <Tooltip title="Delete comment" placement="top"
+                                        componentsProps={{
+                                            tooltip: {
+                                            sx: {
+                                                backgroundColor: '#FF4D4D', 
+                                                color: 'white', 
+                                                fontSize: '14px', 
+                                                boxShadow: 2, 
+                                            },
+                                            },
+                                        }}
+                                    >
+                                        <IconButton
+                                            onClick={(e) => handleDeleteClick(e, comment.id)}
+                                            sx={{
+                                                '&:hover': {
+                                                    background: 'transparent'
+                                                }
+                                            }}
+                                        >
+                                            <DeleteIcon sx={{color: 'red'}}/>
+                                        </IconButton>
+                                    </Tooltip>
+                                </Box>
+                            </Stack>
                         )
                         : (<Typography sx={{mt: '5px', fontSize: '14px'}}>{comment.content}</Typography>)}
                     </Stack>
                 </Box>
             ))}
-            {updatedWorkout.workout.comments.length > 0 && <Divider sx={{mt: '10px'}}/>}
+            <Popover
+                open={Boolean(anchorEl)}
+                anchorEl={anchorEl}
+                onClose={handleClosePopover}
+                anchorOrigin={{
+                    vertical: "top",
+                    horizontal: "center",
+                }}
+                transformOrigin={{
+                    vertical: "bottom",
+                    horizontal: "center",
+                }}
+            >
+                <Box sx={{ p: 2, textAlign: "center" }}>
+                    <Typography sx={{ mb: 1 }}>Delete this comment?</Typography>
+                    <Button
+                        variant="contained"
+                        color="error"
+                        onClick={handleDeleteComment}
+                        sx={{ mr: 1 }}
+                    >
+                        Delete
+                    </Button>
+                    <Button variant="outlined" onClick={handleClosePopover}>
+                        Cancel
+                    </Button>
+                </Box>
+            </Popover>
+            {workoutComments.length > 0 && <Divider sx={{mt: '10px'}}/>}
             <form     
                 onSubmit={(e) => {
                     e.preventDefault();
-                    handleSubmitComment();
+                    handleAddComment();
                 }}
             >
                 <Input 
@@ -150,7 +237,7 @@ const WorkoutCommentBox = (props: WorkoutCommentBoxProps) => {
                     onKeyDown={(e) => {
                         if (e.key === "Enter" && !e.shiftKey) {
                             e.preventDefault();
-                            handleSubmitComment(); 
+                            handleAddComment(); 
                         }
                     }}
                 />

@@ -31,7 +31,7 @@ function App() {
     <ThemeProvider theme={isDarkMode ? darkTheme : lightTheme}>
       <CssBaseline />
       <AppContainer>
-        {role == 'coach' && 
+        {role == 'coach' && token && 
           <NavBarView id="nav_bar_view">
             <NavigationBar toggleTheme={handleToggleTheme}/>
           </NavBarView>

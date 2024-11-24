@@ -124,7 +124,7 @@ const TodayWorkoutBox = styled(Box)`
     align-items: center;
 `
 
-const UpdatedWorkoutFeedBox = styled(Box)(({ theme }) => ({
+const UpdatedWorkoutFeedBox = styled(Box)(({ }) => ({
     background: '#F3F4F6',
     flexGrow: 1
 }));
