@@ -1,13 +1,21 @@
 class UserProgramWorkout < ApplicationRecord
   belongs_to :user_program
   has_many :user_program_workout_exercises, dependent: :destroy
+  has_many :workout_comments, dependent: :destroy
 
   before_validation :set_next_available_order, on: :create
+  after_save :mark_updated_on_changes
 
   validates :date, :day, :week, presence: true
   validates :order, uniqueness: { scope: [:user_program_id, :date] }
 
   private
+
+  def mark_updated_on_changes
+    if saved_change_to_comment? || saved_change_to_completed?
+      update_column(:updated, true) # Directly updates the database without running validations
+    end
+  end
 
   def set_next_available_order
     return if order.present? 

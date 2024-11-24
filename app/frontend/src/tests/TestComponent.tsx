@@ -6,7 +6,14 @@ const TestComponent = () => {
       try {
         const apiBaseUrl = import.meta.env.VITE_API_BASE_URL; 
         console.log('base url: ', apiBaseUrl)
-        const response = await fetch(`${apiBaseUrl}/coaches`);
+        const token = "PQj1g-HvR43VMbp_pQs8m-e8AHYr-huh6de4OwR-f90"
+        const response = await fetch(`${apiBaseUrl}/coaches`, {
+          method: 'GET', // or 'POST' if you're making a POST request
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
