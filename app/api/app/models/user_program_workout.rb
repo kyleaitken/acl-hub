@@ -1,6 +1,7 @@
 class UserProgramWorkout < ApplicationRecord
   belongs_to :user_program
   has_many :user_program_workout_exercises, dependent: :destroy
+  has_many :workout_comments, dependent: :destroy
 
   before_validation :set_next_available_order, on: :create
   after_save :mark_updated_on_changes

@@ -1,14 +1,19 @@
-import { Box, Button, Divider, Paper, Stack, styled, Typography } from "@mui/material";
+import { Box, Button, Divider, IconButton, Input, OutlinedInput, Paper, Stack, styled, Tooltip, Typography } from "@mui/material";
 import { UpdatedWorkout } from "../../types/types";
+import { AppDispatch, RootState } from '../../store'; // Adjust the path to your store
 import ProfilePictureBubble from "../ProfilePictureBubble";
 import { capitalize } from "../../utils/utils";
-import { formatDateString } from "../../utils/dateUtils";
+import { formatDateString, formatDateToStringWithTime } from "../../utils/dateUtils";
 import LocalFireDepartmentIcon from '@mui/icons-material/LocalFireDepartment';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
-import { useState } from "react";
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { useEffect, useRef, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { addCommentToWorkout, deleteWorkoutComment, updateWorkoutComment } from "../../slices/thunks/workoutThunks";
 
 interface UpdatedWorkoutProps {
     updatedWorkout: UpdatedWorkout
@@ -17,6 +22,16 @@ interface UpdatedWorkoutProps {
 const UpdatedWorkoutPaper = ({ updatedWorkout }: UpdatedWorkoutProps) => {
     const formattedDate = formatDateString(updatedWorkout.workout.date)
     const [warmupExpanded, setWarmupExpanded] = useState(false);
+    const [newComment, setNewComment] = useState<string>('');
+    const [editCommentId, setEditCommentId] = useState<number | null>(null);
+    const [editCommentContent, setEditCommentContent] = useState<string>('');
+    const { first_name, last_name, id, token, role } = useSelector((state: RootState) => state.auth);
+    const dispatch = useDispatch<AppDispatch>();
+    const inputRef = useRef<HTMLInputElement>(null);
+
+    const userId = updatedWorkout.user_id;
+    const workoutId = updatedWorkout.workout.id;
+    const programId = updatedWorkout.workout.programId;
 
     const getStatusColor = (completed: boolean) => {
         if (completed) return "green";
@@ -29,8 +44,105 @@ const UpdatedWorkoutPaper = ({ updatedWorkout }: UpdatedWorkoutProps) => {
         return "Not Completed"; 
     };
 
+    function getCommentId(user_type: string) {
+        if (user_type === "coach" && id) {
+            return id;
+        }
+        return updatedWorkout.user_id;
+    }
+
+    function getCommentName(user_type: string): string {
+        if (user_type === "coach") {
+            return `${first_name} ${last_name}`;
+        } 
+        const userFirstName = updatedWorkout.first_name.replace(/^./, (char) => char.toUpperCase());
+        const userLastName = updatedWorkout.last_name.replace(/^./, (char) => char.toUpperCase());
+        return `${userFirstName} ${userLastName}`
+    }
+
+    function getCommentDateString(timestamp: Date): string {
+        const date = new Date(timestamp)
+        return formatDateToStringWithTime(date);
+    }
+
+    const handleSubmitComment = () => {
+        if (!newComment.trim()) return;
+
+        if (token) {
+            dispatch(
+                addCommentToWorkout({
+                    token,
+                    userId,
+                    programId,
+                    workoutId,
+                    comment: newComment.trim(),
+                })
+            );
+        }
+    
+        setNewComment('');
+    };
+
+    const handleEditComment = (commentId: number, commentContent: string) => {
+        setEditCommentId(commentId);
+        setEditCommentContent(commentContent);
+    };
+
+    const handleSaveComment = async (commentId: number) => {
+        if (!editCommentContent.trim()) return;
+        console.log("in save comment")
+
+        if (token) {
+            try {
+                await dispatch(updateWorkoutComment({ 
+                    token, 
+                    commentId,
+                    userId,
+                    programId, 
+                    workoutId, 
+                    comment: editCommentContent.trim() 
+                }));
+                setEditCommentId(null); 
+            } catch (error) {
+                console.error('Failed to update comment:', error);
+            }
+        }   
+    };
+
+    const handleDeleteComment = async (commentId: number) => {
+        console.log("in delete comment")
+
+        if (token) {
+            try {
+                await dispatch(deleteWorkoutComment({ 
+                    token, 
+                    commentId,
+                    userId,
+                    programId, 
+                    workoutId, 
+                }));
+                setEditCommentId(null); 
+            } catch (error) {
+                console.error('Failed to delete comment:', error);
+            }
+        }   
+    };
+
+    const handleCancelEdit = () => {
+        setEditCommentId(null);
+        setEditCommentContent('');
+    };
+
+    useEffect(() => {
+        if (inputRef.current) {
+            const length = editCommentContent.length;
+            inputRef.current.focus();
+            inputRef.current.setSelectionRange(length, length);
+        }
+    }, [editCommentContent]);
+
     return (
-        <Paper sx={{width: '100%', mb: '50px'}}>
+        <Paper sx={{width: '850px', mb: '50px'}}>
             <Stack>
                 <HeaderBox>
                     {/* TODO: Make profile pictre/name clickable link to user page*/}
@@ -95,6 +207,139 @@ const UpdatedWorkoutPaper = ({ updatedWorkout }: UpdatedWorkoutProps) => {
                         </ResultsPaper>
                     </ExerciseBox>
                 ))}
+                <Divider sx={{mb: updatedWorkout.workout.comments.length > 0 ? '10px' : '0px'}}/>
+                <CommentSection sx={{mb: '20px'}}>
+                    {updatedWorkout.workout.comments && updatedWorkout.workout.comments.map((comment, index) => (
+                        <Box sx={{display: 'flex', ml: '20px', padding: '10px 0px'}} key={index}>
+                            <Box sx={{mr: '20px'}}>
+                                <ProfilePictureBubble userId={getCommentId(comment.user_type)} name={getCommentName(comment.user_type)} height={28}/>
+                            </Box>
+                            <Stack sx={{flexGrow: '1', mr: '20px'}}>
+                                <CommentHeader>
+                                    <Typography sx={{fontWeight: '600', fontSize: '15px'}}>{getCommentName(comment.user_type) }</Typography>
+                                    <Typography sx={{fontSize: '13px', ml: '10px', color: 'grey', flexGrow: 1}}>{getCommentDateString(comment.timestamp)}</Typography>
+                                    {role === comment.user_type && 
+                                        <IconButton sx={{padding: 0}} onClick={() => handleEditComment(comment.id, comment.content)}>
+                                            <EditIcon sx={{color: 'black', fontSize: 20}}/>
+                                        </IconButton>
+                                    }
+                                </CommentHeader>
+                                {editCommentId === comment.id 
+                                ? 
+                                (
+                                <Stack sx={{mr: '30px', mt: '10px'}}>
+                                    <OutlinedInput
+                                        inputRef={inputRef} 
+                                        value={editCommentContent}
+                                        onChange={(e) => setEditCommentContent(e.target.value)}
+                                        multiline
+                                        sx={{ mt: '5px', fontSize: '14px', width: '100%', padding: '15px 15px', minHeight: '70px', alignItems: 'flex-start', 
+                                         }}
+                                    >
+                                    </OutlinedInput>
+                                    <Box sx={{display: 'flex', alignItems: 'center', mt: '5px', flexGrow: 1}}>
+                                         <Button
+                                            onClick={handleCancelEdit} 
+                                            sx={{
+                                                fontSize: '13px',
+                                                mr: '10px',
+                                                padding: '4px 0px',
+                                                '&:hover': {
+                                                    background: 'lightgrey'
+                                                }
+                                            }}
+                                         >
+                                            Cancel
+                                         </Button>
+                                         <Button
+                                            onClick={() => handleSaveComment(comment.id)}
+                                            sx={{
+                                                background: '#4e4eff', 
+                                                color: 'white',
+                                                mr: '10px',
+                                                fontSize: '13px',
+                                                padding: '4px 0px',
+                                                '&:hover': {
+                                                    backgroundColor: 'blue'
+                                                }
+                                            }}
+                                         >
+                                            Save
+                                         </Button>
+                                         <Tooltip title="Delete comment" placement="top"
+                                            componentsProps={{
+                                                tooltip: {
+                                                sx: {
+                                                    backgroundColor: '#FF4D4D', 
+                                                    color: 'white', 
+                                                    fontSize: '14px', 
+                                                    boxShadow: 2, 
+                                                },
+                                                },
+                                            }}
+                                         >
+                                            <IconButton
+                                                onClick={() => handleDeleteComment(comment.id)}
+                                                sx={{
+                                                    '&:hover': {
+                                                        background: 'transparent'
+                                                    }
+                                                }}
+                                            >
+                                                <DeleteIcon sx={{color: 'red'}}/>
+                                            </IconButton>
+                                        </Tooltip>
+                                    </Box>
+                                </Stack>
+                                )
+                                : (<Typography sx={{mt: '5px', fontSize: '14px'}}>{comment.content}</Typography>)}
+                            </Stack>
+                        </Box>
+                    ))}
+                    {updatedWorkout.workout.comments.length > 0 && <Divider sx={{mt: '10px'}}/>}
+                    <form     
+                        onSubmit={(e) => {
+                            e.preventDefault();
+                            handleSubmitComment();
+                        }}
+                    >
+                        <Input 
+                            placeholder="Write a comment..." 
+                            disableUnderline 
+                            multiline
+                            sx={{
+                                margin: '20px 0px 20px 20px',
+                                width: '90%',
+                                minHeight: '80px',
+                                alignItems: 'flex-start', 
+                                lineHeight: '1.5' 
+                            }}
+                            value={newComment}
+                            onChange={(e) => setNewComment(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key === "Enter" && !e.shiftKey) {
+                                    e.preventDefault();
+                                    handleSubmitComment(); 
+                                }
+                            }}
+                        />
+                        <Box sx={{display: 'flex', justifyContent: 'flex-end', mr: '20px'}}>
+                            <Button type="submit" variant="contained" 
+                                sx={{
+                                    backgroundColor: '#4e4eff',
+                                    color: 'white',
+                                    fontSize: '13px',
+                                    padding: '4px 0px',
+                                    '&:hover':{
+                                        backgroundColor: 'blue'
+                                    }
+                                }}
+                            >
+                                Send
+                            </Button>
+                        </Box>
+                    </form>
+                </CommentSection>
             </Stack>
         </Paper>
     )
@@ -152,3 +397,12 @@ const ResultsPaper = styled(Paper)(({ statusColor }: { statusColor: string }) =>
     marginRight: "50px",
     padding: "15px 15px",
 }));
+
+const CommentSection = styled(Box)`
+`
+
+const CommentHeader = styled(Box)`
+    display: flex;
+    align-items: center;
+`
+

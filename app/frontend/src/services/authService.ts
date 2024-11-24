@@ -22,7 +22,13 @@ const loginUser = async (email: string, password: string, role: string) => {
     
         const data = await response.json();
         console.log("LOGIN DATA: ", data)
-        return data.token;  
+        return {
+            token: data.token,
+            first_name: data[role].first_name,
+            last_name: data[role].last_name,
+            id: data[role].id,
+            role: role as 'coach' | 'user'
+        };  
     } catch (error) {
         throw error;  
     }

@@ -29,6 +29,14 @@ export interface UserProgramWorkout {
     updated: boolean;
     order: number;
     exercises: UserProgramWorkoutExercise[]
+    comments: WorkoutComment[]
+}
+
+export interface WorkoutComment {
+    id: number;
+    content: string;
+    timestamp: Date,
+    user_type: string;
 }
 
 export interface UserProgramWorkoutExercise {

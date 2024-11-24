@@ -53,13 +53,18 @@ class Coaches::UsersController < ApplicationController
     # GET /coaches/users/updates
     def all_user_updates
         @users = current_coach.users.includes(
-            user_programs: { user_program_workouts: :user_program_workout_exercises }
+            user_programs: {
+                user_program_workouts: [
+                    :workout_comments, 
+                    :user_program_workout_exercises
+                ]
+            }        
         )   
 
         response_data = format_updated_user_workouts(@users)
         render json: response_data
 
-        rescue => e
+    rescue => e
         Rails.logger.error("Error in all_user_updates: #{e.message}")
         render json: { error: e.message }, status: :internal_server_error
     end

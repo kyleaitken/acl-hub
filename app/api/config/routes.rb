@@ -31,6 +31,7 @@ Rails.application.routes.draw do
 
     resources :user_programs do
       resources :user_program_workouts do
+        resources :workout_comments
         resources :user_program_workout_exercises
       end
     end
@@ -55,6 +56,7 @@ Rails.application.routes.draw do
 
       resources :user_programs do
         resources :user_program_workouts do
+          resources :workout_comments
           resources :user_program_workout_exercises
         end
       end

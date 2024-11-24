@@ -1,7 +1,7 @@
 import { Box, Divider, List, styled, Typography, Collapse, Button, ListItem, Stack } from "@mui/material";
 import { useSelector, useDispatch } from "react-redux";
 import { AppDispatch, RootState } from "../../store";
-import { getDaySuffix } from "../../utils/dateUtils";
+import { getDaySuffix, getTimeOfDay } from "../../utils/dateUtils";
 import { useEffect, useState } from "react";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
@@ -13,6 +13,7 @@ import UpdatedWorkoutPaper from "../../components/Coach/UpdatedWorkoutPaper";
 const CoachHomePage = () => {
     const dispatch = useDispatch<AppDispatch>();
     const workoutsData = useSelector((state: RootState) => state.workouts);
+    const coachName = useSelector((state: RootState) => state.auth.first_name);
     const todayWorkouts = workoutsData.todaysWorkouts;
     const updatedWorkouts = workoutsData.updatedWorkouts;
     const [collapseOpen, setCollapseOpen] = useState(false);
@@ -37,6 +38,7 @@ const CoachHomePage = () => {
         }    
     }, [])
 
+    const timeOfDay = getTimeOfDay(currentDate);
     const dayOfWeek = currentDate.toLocaleString('en-US', { weekday: 'long' });
     const dayOfMonth = currentDate.getDate();
     const month = currentDate.toLocaleString('en-US', { month: 'long' });
@@ -91,7 +93,7 @@ const CoachHomePage = () => {
             </LeftCoachDashboardBox>
             <UpdatedWorkoutFeedBox id="updatedWorkoutsBox">
                 <Stack sx={{padding: '25px 400px 40px 100px', overflowY: 'auto'}}>
-                    <Typography sx={{mb: '40px'}}>Good afternoon, Kyle!</Typography>
+                    <Typography sx={{mb: '40px', fontSize: '24px', fontWeight: '600'}}>Good {timeOfDay}, {coachName}!</Typography>
                     {updatedWorkouts.map((workout) => (
                         <UpdatedWorkoutPaper updatedWorkout={workout} />
                     ))}
@@ -123,7 +125,7 @@ const TodayWorkoutBox = styled(Box)`
 `
 
 const UpdatedWorkoutFeedBox = styled(Box)(({ theme }) => ({
-    background: theme.palette.grey[100],
+    background: '#F3F4F6',
     flexGrow: 1
 }));
 

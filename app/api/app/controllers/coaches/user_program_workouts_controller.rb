@@ -5,14 +5,26 @@ class Coaches::UserProgramWorkoutsController < ApplicationController
 
     # GET /coaches/users/:user_id/user_programs/:user_program_id/user_program_workouts
     def index
-        @user_program_workouts = @user_program.user_program_workouts
-        render json: @user_program_workouts
+        @user_program_workouts = @user_program.user_program_workouts.includes(:workout_comments)
+        render json: @user_program_workouts.as_json(
+            include: {
+              workout_comments: {
+                only: [:id, :content, :timestamp, :user_type] 
+              }
+            }
+          )    
     end
     
     # GET /coaches/users/:user_id/user_programs/:user_program_id/user_program_workouts/:id
     def show    
         @user_program_workout = @user_program.user_program_workouts.find(params[:id])
-        render json: @user_program_workout
+        render json: @user_program_workout.as_json(
+            include: {
+              workout_comments: {
+                only: [:id, :content, :timestamp, :user_type] 
+              }
+            }
+          )     
     end
 
     # POST /coaches/users/:user_id/user_programs/:user_program_id/user_program_workouts
@@ -50,7 +62,7 @@ class Coaches::UserProgramWorkoutsController < ApplicationController
     end
 
     def user_program_workout_params
-        params.require(:user_program_workout).permit(:date, :day, :week, :comment, :completed, :order, :name, :warmup)
+        params.require(:user_program_workout).permit(:date, :day, :week, :completed, :order, :name, :warmup)
     end
 
     def authorize_coach_for_user

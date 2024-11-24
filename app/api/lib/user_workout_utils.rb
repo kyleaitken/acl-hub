@@ -14,6 +14,18 @@ module UserWorkoutUtils
     end
   end
 
+
+  def format_comments(comments)
+    comments.map do |comment|
+      {
+        id: comment.id,
+        content: comment.content,
+        timestamp: comment.created_at,
+        user_type: comment.user_type
+      }
+    end
+  end
+
   def format_workout(workout)
     {
       id: workout.id,
@@ -22,11 +34,11 @@ module UserWorkoutUtils
       day: workout.day,
       week: workout.week,
       name: workout.name,
-      comment: workout.comment,
       warmup: workout.warmup,
       completed: workout.completed,
       updated: workout.updated,
       order: workout.order,
+      comments: format_comments(workout.workout_comments),
       exercises: format_exercises(workout.user_program_workout_exercises.includes(:exercise))
     }
   end

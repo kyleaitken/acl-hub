@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_11_18_015958) do
+ActiveRecord::Schema[7.2].define(version: 2024_11_23_030311) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -176,7 +176,6 @@ ActiveRecord::Schema[7.2].define(version: 2024_11_18_015958) do
     t.date "date"
     t.integer "day"
     t.integer "week"
-    t.text "comment"
     t.boolean "completed", default: false
     t.integer "order"
     t.datetime "created_at", null: false
@@ -219,6 +218,16 @@ ActiveRecord::Schema[7.2].define(version: 2024_11_18_015958) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  create_table "workout_comments", force: :cascade do |t|
+    t.bigint "user_program_workout_id", null: false
+    t.text "content"
+    t.datetime "timestamp"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "user_type", null: false
+    t.index ["user_program_workout_id"], name: "index_workout_comments_on_user_program_workout_id"
+  end
+
   add_foreign_key "exercise_images", "exercises"
   add_foreign_key "oauth_access_grants", "oauth_applications", column: "application_id"
   add_foreign_key "oauth_access_grants", "users", column: "resource_owner_id"
@@ -235,4 +244,5 @@ ActiveRecord::Schema[7.2].define(version: 2024_11_18_015958) do
   add_foreign_key "user_program_workouts", "user_programs"
   add_foreign_key "user_programs", "users"
   add_foreign_key "users", "coaches"
+  add_foreign_key "workout_comments", "user_program_workouts"
 end

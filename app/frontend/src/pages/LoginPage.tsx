@@ -8,6 +8,14 @@ import { fetchUsers } from '../slices/thunks/userThunks';
 import { AppDispatch, RootState } from '../store';
 import { fetchTodayWorkouts, fetchUpdatedWorkouts } from '../slices/thunks/workoutThunks';
 
+interface LoginData {
+  token: string;
+  first_name: string;
+  last_name: string;
+  id: number;
+  role: 'coach' | 'user';
+}
+
 const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -20,15 +28,18 @@ const LoginPage = () => {
     if (token && role) {
       if (role === "coach") {
         navigate("/coach")
+      } else {
+        navigate("/user")
       }
     }
   }, [])
 
   const handleLogin = async () => {
     try {
-      const role = isCoach ? 'coach' : 'user';  // determine the role based on the toggle
-      const token: string = await authService.loginUser(email, password, role);
-      dispatch(login({ token, role }));
+      const role = isCoach ? 'coach' : 'user'; 
+      const loginData: LoginData = await authService.loginUser(email, password, role);
+      const token = loginData.token;
+      dispatch(login({...loginData}));
       if (role === 'coach') {
         dispatch(fetchUsers(token));  
         dispatch(fetchTodayWorkouts());
