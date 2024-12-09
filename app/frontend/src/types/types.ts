@@ -97,6 +97,7 @@ export interface User {
     user_outcome_measures: UserOutcomeMeasure[];
 }
 
+
 export interface TodayWorkout {
     user_id: User["id"],
     first_name: User["first_name"],

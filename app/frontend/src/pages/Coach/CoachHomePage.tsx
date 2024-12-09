@@ -1,4 +1,4 @@
-import { Box, Divider, List, styled, Typography, Collapse, Button, ListItem, Stack } from "@mui/material";
+import { Box, Divider, List, styled, Typography, Collapse, Button, ListItem, Stack, Paper } from "@mui/material";
 import { useSelector, useDispatch } from "react-redux";
 import { AppDispatch, RootState } from "../../store";
 import { getDaySuffix, getTimeOfDay } from "../../utils/dateUtils";
@@ -97,7 +97,11 @@ const CoachHomePage = () => {
                     {updatedWorkouts.map((workout) => (
                         <UpdatedWorkoutPaper updatedWorkout={workout} />
                     ))}
+                    {updatedWorkouts.length === 0 &&
+                    <Typography>No updates to show.</Typography>
+                    }
                 </Stack>
+
             </UpdatedWorkoutFeedBox>
         </CoachHomePageView>
     )
@@ -129,7 +133,10 @@ const UpdatedWorkoutFeedBox = styled(Box)(({ }) => ({
     flexGrow: 1
 }));
 
-const CoachHomePageView = styled(Box)`
-    display: flex;
-    flex-grow: 1;
-`
+const CoachHomePageView = styled(Box)(({ theme }) => ({
+    display: 'flex',
+    backgroundColor: theme.palette.background.default,
+    flexGrow: 1,
+    marginLeft: '220px',
+    minHeight: '100vh'
+}));
