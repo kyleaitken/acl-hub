@@ -3,6 +3,7 @@ import { Route, Routes } from "react-router-dom";
 import LoginPage from './pages/LoginPage';
 import { RootState } from "./store";
 import CoachHomePage from './pages/Coach/CoachHomePage';
+import CoachPrograms from './pages/Coach/CoachPrograms';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import NavigationBar from './components/Coach/NavigationBar';
@@ -40,6 +41,7 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/coach" element={<CoachHomePage />} />
+          <Route path="/coach/programs" element={<CoachPrograms />} />
         </Routes>
     </ThemeProvider>
   );
