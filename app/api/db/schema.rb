@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_11_23_030311) do
+ActiveRecord::Schema[7.2].define(version: 2025_01_01_163911) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -131,6 +131,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_11_23_030311) do
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "description"
     t.index ["coach_id"], name: "index_programs_on_coach_id"
   end
 
@@ -195,6 +196,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_11_23_030311) do
     t.date "end_date"
     t.integer "num_weeks"
     t.string "name"
+    t.string "description"
     t.index ["user_id"], name: "index_user_programs_on_user_id"
   end
 

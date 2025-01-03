@@ -66,6 +66,16 @@ export interface UserProgram {
     user_program_workouts: UserProgramWorkout[];
 }
 
+export interface CoachProgram {
+    id: number;
+    coach_id: number;
+    num_weeks: number;
+    name: string;
+    created_at: string;
+    updated_at: string;
+    description?: string;
+}
+
 export interface UserOutcomeMeasureRecording {
     id: number;
     user_outcome_measure_id: number;
