@@ -45,7 +45,7 @@ module Coaches
     private
 
     def program_params
-      params.require(:program).permit(:name, :num_weeks)
+      params.require(:program).permit(:name, :num_weeks, :description)
     end
 
     # def ensure_current_coach
