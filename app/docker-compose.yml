@@ -5,7 +5,9 @@ services:
     build: 
       context: ./api
       dockerfile: Dockerfile.dev
-    command: bash -c "rm -f /rails/tmp/pids/server.pid && bin/rails server -b 0.0.0.0 -p 3000"
+    # command: bash -c "rm -f /rails/tmp/pids/server.pid && bin/rails server -b 0.0.0.0 -p 3000"
+    command: bash -c "rm -f /rails/tmp/pids/server.pid && bin/rails db:migrate && bin/rails server -b 0.0.0.0 -p 3000"
+
     environment:
       RAILS_ENV: development
       POSTGRES_USER: aclhub
@@ -32,18 +34,18 @@ services:
       - app-network
 
   # PostgreSQL database
-  db:
-    image: postgres
-    environment:
-      POSTGRES_USER: aclhub
-      POSTGRES_PASSWORD: 23422
-      POSTGRES_DB: api_development
-    ports:
-      - "5432:5432"
-    volumes:
-      - db-data:/var/lib/postgresql/data
-    networks:
-      - app-network
+  # db:
+  #   image: postgres
+  #   environment:
+  #     POSTGRES_USER: aclhub
+  #     POSTGRES_PASSWORD: 23422
+  #     POSTGRES_DB: api_development
+  #   ports:
+  #     - "5432:5432"
+  #   volumes:
+  #     - db-data:/var/lib/postgresql/data
+  #   networks:
+  #     - app-network
 
   # PostgreSQL database for testing purposes
   test-db:
