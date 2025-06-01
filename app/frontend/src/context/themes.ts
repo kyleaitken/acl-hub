@@ -6,6 +6,8 @@ const lightTheme = createTheme({
         fontFamily: [
             'Poppins',
             'Lora',
+            'Montserrat',
+            'Nunito',
             '-apple-system',
             'BlinkMacSystemFont',
             '"Segoe UI"',
