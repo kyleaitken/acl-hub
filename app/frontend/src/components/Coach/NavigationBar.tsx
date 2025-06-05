@@ -5,12 +5,10 @@ import PeopleIcon from '@mui/icons-material/People';
 import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
 import ForumIcon from '@mui/icons-material/Forum';
 import AssignmentIcon from '@mui/icons-material/Assignment';
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../../store";
-import authService from "../../services/authService";
-import { logout } from "../../slices/auth/authSlice";
 import LogoutIcon from '@mui/icons-material/Logout';
 import { persistor } from '../../store';
+import { useLogin } from "../../features/auth/hooks/useLogin";
+import { useAuthStore } from "../../features/auth/store/authStore";
 
 interface NavigationBarProps {
     toggleTheme: () => void;
@@ -18,24 +16,23 @@ interface NavigationBarProps {
 
 const NavigationBar = (props: NavigationBarProps) => {
     const { toggleTheme } = props;
-    const dispatch = useDispatch();
     const navigate = useNavigate();
-    const { token } = useSelector((state: RootState) => state.auth);
+
+    const { isLoggedIn, token, role } = useAuthStore();
+    const { logoutUser } = useLogin();
 
     const handleLogout = async () => {
-        if (token) {
-            try {
-                await authService.logoutUser("coach", token);
-            } catch (error) {
-                console.error("Failed to log out:", error);
-            } 
-            dispatch(logout()); 
-            navigate('/login');
-            persistor.purge();
-        } else {
-            navigate('/login');
+        if (isLoggedIn && token && role) {
+          const success = await logoutUser(role, token);
+          if (!success) {
+            console.error("Backend logout failed — fallback to manual clear");
+          }
         }
-    }
+      
+        navigate('/login');
+        persistor.purge(); 
+      };
+      
 
     return (
         <NavBarView>

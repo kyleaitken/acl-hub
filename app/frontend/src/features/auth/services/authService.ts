@@ -43,7 +43,6 @@ const loginUser = async (email: string, password: string, role: string) => {
 };
   
 const logoutUser = async (role: string, token: string) => {
-    console.log('in logoutUser')
     try {
         const baseUrl = `${import.meta.env.VITE_API_BASE_URL}/${role === 'coach' ? 'coaches' : 'users'}/sign_out`;
 

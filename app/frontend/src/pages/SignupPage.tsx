@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Box, styled, Paper, Stack, Button, Typography, OutlinedInput } from '@mui/material';
-import {CoachSignupData, signupCoach} from '../services/authService';
+import {CoachSignupData, signupCoach} from '../features/auth/services/authService';
 import signup from '../assets/images/signup.jpg'; 
 
 const SignupPage = () => {
@@ -21,8 +21,25 @@ const SignupPage = () => {
   const [notAllInputsValid, setNotAllInputsValid] = useState(true);
   const navigate = useNavigate();
 
+  const [form, setForm] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    password: '',
+    confirmPassword: '',
+  });
+
+  const [validation, setValidation] = useState({
+    email: true,
+    password: true,
+    confirmPassword: true,
+    firstName: true,
+    lastName: true,
+    phone: true,
+  });
+
   const handleSignup = async () => {
-    console.log("handle signup")
     try {
         const coachData: CoachSignupData = {
             firstName,
@@ -32,11 +49,10 @@ const SignupPage = () => {
             password,
             confirmPassword,
         };
-        const response = await signupCoach(coachData);
-        console.log('Signup successful:', response);
+        await signupCoach(coachData);
         navigate('/login');
     } catch (error) {
-      console.error('Signup error:', error);
+      console.log("Error processing signup: ", error)
     }
   };
 
@@ -45,13 +61,11 @@ const SignupPage = () => {
   
     // Remove all non-numeric characters
     const digitsOnly = input.replace(/\D/g, '');
-    console.log(digitsOnly.length)
   
     let formattedPhone = digitsOnly;
     if (digitsOnly.length > 6 && digitsOnly.length < 10) {
       formattedPhone = `${digitsOnly.slice(0, 3)}-${digitsOnly.slice(3, 6)}-${digitsOnly.slice(6)}`;
     } else if (digitsOnly.length === 10) {
-      console.log('10 digits')
       formattedPhone = `(${digitsOnly.slice(0, 3)}) ${digitsOnly.slice(3, 6)}-${digitsOnly.slice(6)}`;
     } else if (digitsOnly.length > 10) {
         return;
@@ -59,6 +73,8 @@ const SignupPage = () => {
   
     setPhone(formattedPhone);
     setIsValidPhone(digitsOnly.length === 10 || digitsOnly.length === 0);
+    setForm({...form, phone: formattedPhone});
+    setValidation({...validation, phone: (digitsOnly.length === 10 || digitsOnly.length === 0)})
   };
 
   const handleChangeFirstName = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -269,3 +285,13 @@ const SignupView = styled(Box)(({ theme }) => ({
   justifyContent: 'center',
   backgroundColor: theme.palette.grey[100],
 }));
+
+const ValidatedInput = () => {
+  return (
+    <>
+      <Typography></Typography>
+      <OutlinedInput />
+      <Typography></Typography>
+    </>
+  )
+}

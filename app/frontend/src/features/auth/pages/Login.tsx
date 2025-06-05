@@ -1,30 +1,24 @@
 import { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { login } from '../slices/auth/authSlice';
-import logo from '../assets/images/Logo.png'; 
+import logo from '../../../assets/images/Logo.png'; 
 import { useNavigate } from 'react-router-dom';
 import { Box, styled, Paper, Stack, Button, Typography, OutlinedInput } from '@mui/material';
-import authService from '../services/authService';
-import { fetchUsers } from '../slices/thunks/userThunks';
-import { AppDispatch, RootState } from '../store';
-import { fetchTodayWorkouts, fetchUpdatedWorkouts } from '../slices/thunks/workoutThunks';
-
-interface LoginData {
-  token: string;
-  first_name: string;
-  last_name: string;
-  id: number;
-  role: 'coach' | 'user';
-}
+import { fetchTodayWorkouts, fetchUpdatedWorkouts } from '../../../slices/thunks/workoutThunks';
+import { useAuthStore } from '../store/authStore';
+import { useLogin } from '../hooks/useLogin';
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '../../../store';
+import { fetchUsers } from '../../../slices/thunks/userThunks';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isCoach, setIsCoach] = useState(true); 
   const [showFailedLogin, setShowFailedLogin] = useState(false);
-  const { role, token } = useSelector((state: RootState) => state.auth);
-  const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
+
+  const { loginUser } = useLogin();
+  const { token, role } = useAuthStore();
 
   const handleSignUp = () => {
     navigate("/signup")
@@ -42,21 +36,20 @@ const LoginPage = () => {
 
   const handleLogin = async () => {
     try {
-      const role = isCoach ? 'coach' : 'user'; 
-      const loginData: LoginData = await authService.loginUser(email, password, role);
-      const token = loginData.token;
-      dispatch(login({...loginData}));
-      if (role === 'coach') {
+      const userRole = await loginUser(email, password, isCoach);
+      const token = useAuthStore.getState().token;
+
+      if (userRole === 'coach' && token) {
+        navigate('/coach');
         dispatch(fetchUsers(token));  
         dispatch(fetchTodayWorkouts());
         dispatch(fetchUpdatedWorkouts());
-        navigate('/coach');
       } else {
         navigate('/user');
       }
-    } catch (error) {
-      console.error('Login error:', error);
+    } catch (err) {
       setShowFailedLogin(true);
+      console.error(err);
     }
   };
 
