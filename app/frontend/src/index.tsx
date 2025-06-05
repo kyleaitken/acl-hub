@@ -5,6 +5,7 @@ import { PersistGate } from 'redux-persist/integration/react';
 import store, { persistor } from './store';
 import { BrowserRouter as Router } from 'react-router-dom';
 import App from './App';
+import './styles/styles.css'
 
 const link = document.createElement('link');
 link.rel = 'stylesheet';

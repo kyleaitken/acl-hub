@@ -11,7 +11,7 @@ import { Box, CssBaseline, styled, ThemeProvider } from '@mui/material';
 import { lightTheme, darkTheme } from './context/themes';
 import { toggleTheme } from './slices/preferences/preferencesSlice';
 import SignupPage from './pages/SignupPage';
-import './styles/index.css';
+import './styles/styles.css';
 import { useAuthStore } from './features/auth/store/authStore';
 
 function App() {
