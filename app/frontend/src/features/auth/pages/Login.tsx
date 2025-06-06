@@ -16,21 +16,14 @@ const LoginPage = () => {
   const [showFailedLogin, setShowFailedLogin] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
-
   const { loginUser } = useLogin();
   const { token, role } = useAuthStore();
 
-  const handleSignUp = () => {
-    navigate("/signup")
-  }
+  const handleSignUp = () => { navigate("/signup") };
 
   useEffect(() => {
     if (token) {
-      if (role === "coach") {
-        navigate("/coach")
-      } else {
-        navigate("/user")
-      }
+        navigate(role === "coach" ? "/coach" : "/user")
     }
   }, [])
 
