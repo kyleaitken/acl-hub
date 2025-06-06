@@ -7,7 +7,7 @@ import CoachPrograms from './pages/Coach/CoachPrograms';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import NavigationBar from './components/Coach/NavigationBar';
-import { Box, CssBaseline, styled, ThemeProvider } from '@mui/material';
+import { CssBaseline, ThemeProvider } from '@mui/material';
 import { lightTheme, darkTheme } from './context/themes';
 import { toggleTheme } from './slices/preferences/preferencesSlice';
 import SignupPage from './pages/SignupPage';
@@ -35,9 +35,9 @@ function App() {
     <ThemeProvider theme={isDarkMode ? darkTheme : lightTheme}>
       <CssBaseline />
       {role == 'coach' && isLoggedIn && 
-        <NavBarView id="nav_bar_view">
+        <div className='flex w-[220px] min-h-screen fixed top-0 z-[1000]'>
           <NavigationBar toggleTheme={handleToggleTheme}/>
-        </NavBarView>
+        </div>
       }
         <Routes>
           <Route path="/login" element={<Login />} />
@@ -50,12 +50,3 @@ function App() {
 }
 
 export default App;
-
-const NavBarView = styled(Box)`
-  display: flex;
-  width: 220px;
-  min-height: 100vh;
-  position: fixed;
-  top: 0;
-  z-index: 1000;
-`

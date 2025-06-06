@@ -1,4 +1,4 @@
-import { Box, Divider, List, styled, Typography, Collapse, Button, ListItem, Stack, Paper } from "@mui/material";
+import { Box, Divider, List, styled, Typography, Collapse, Button, ListItem, Stack } from "@mui/material";
 import { useSelector, useDispatch } from "react-redux";
 import { AppDispatch, RootState } from "../../store";
 import { getDaySuffix, getTimeOfDay } from "../../utils/dateUtils";
@@ -9,14 +9,15 @@ import ProfilePictureBubble from "../../components/ProfilePictureBubble";
 import { fetchTodayWorkouts, fetchUpdatedWorkouts } from "../../slices/thunks/workoutThunks";
 import { capitalize } from "../../utils/utils";
 import UpdatedWorkoutPaper from "../../components/Coach/UpdatedWorkoutPaper";
+import { useAuthStore } from "../../features/auth/store/authStore";
 
 const CoachHomePage = () => {
     const dispatch = useDispatch<AppDispatch>();
     const workoutsData = useSelector((state: RootState) => state.workouts);
-    const coachName = useSelector((state: RootState) => state.auth.first_name);
     const todayWorkouts = workoutsData.todaysWorkouts;
     const updatedWorkouts = workoutsData.updatedWorkouts;
     const [collapseOpen, setCollapseOpen] = useState(false);
+    const { firstName } = useAuthStore();
 
     console.log("Today workouts loaded from store: ", todayWorkouts); // needs to be re-fetched if new day
     console.log("Updated workouts loaded from store: ", updatedWorkouts);
@@ -93,7 +94,7 @@ const CoachHomePage = () => {
             </LeftCoachDashboardBox>
             <UpdatedWorkoutFeedBox id="updatedWorkoutsBox">
                 <Stack sx={{padding: '25px 400px 40px 100px', overflowY: 'auto'}}>
-                    <Typography sx={{mb: '40px', fontSize: '24px', fontWeight: '600'}}>Good {timeOfDay}, {coachName}!</Typography>
+                    <Typography sx={{mb: '40px', fontSize: '24px', fontWeight: '600'}}>Good {timeOfDay}, {firstName.charAt(0).toUpperCase() + firstName.slice(1)}!</Typography>
                     {updatedWorkouts.map((workout) => (
                         <UpdatedWorkoutPaper updatedWorkout={workout} />
                     ))}
