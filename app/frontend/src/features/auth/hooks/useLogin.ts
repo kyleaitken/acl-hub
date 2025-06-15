@@ -5,8 +5,12 @@ export const useLogin = () => {
   const login = useAuthStore((state) => state.login);
   const logout = useAuthStore((state) => state.logout);
 
-  const loginUser = async (email: string, password: string, isCoach: boolean) => {
-    const role = isCoach ? 'coach' : 'user';
+  const loginUser = async (
+    email: string,
+    password: string,
+    isCoach: boolean,
+  ) => {
+    const role = isCoach ? 'coach' : 'client';
 
     const loginData = await authService.loginUser(email, password, role);
 
@@ -23,14 +27,14 @@ export const useLogin = () => {
 
   const logoutUser = async (role: string, token: string) => {
     try {
-        await authService.logoutUser(role, token);
-        logout(); 
-        return true;
+      await authService.logoutUser(role, token);
+      logout();
+      return true;
     } catch (error) {
-        console.error('Logout failed:', error);
-        return false;
+      console.error('Logout failed:', error);
+      return false;
     }
-  }
+  };
 
   return { loginUser, logoutUser };
 };

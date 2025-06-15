@@ -1,44 +1,49 @@
 import { useEffect, useState } from 'react';
-import logo from '../../../assets/images/Logo.png'; 
+import logo from '../../../assets/images/Logo.png';
 import { useNavigate } from 'react-router-dom';
-import { Box, styled, Paper, Stack, Button, Typography, OutlinedInput } from '@mui/material';
-import { fetchTodayWorkouts, fetchUpdatedWorkouts } from '../../../slices/thunks/workoutThunks';
+import { Paper } from '@mui/material';
+import {
+  fetchTodayWorkouts,
+  fetchUpdatedWorkouts,
+} from '../../../slices/thunks/workoutThunks';
 import { useAuthStore } from '../store/authStore';
 import { useLogin } from '../hooks/useLogin';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '../../../store';
-import { fetchUsers } from '../../../slices/thunks/userThunks';
+import { fetchClients } from '../../../slices/thunks/clientThunks';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [isCoach, setIsCoach] = useState(true); 
+  const [coachSelected, setCoachSelected] = useState(true);
   const [showFailedLogin, setShowFailedLogin] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
   const { loginUser } = useLogin();
   const { token, role } = useAuthStore();
 
-  const handleSignUp = () => { navigate("/signup") };
+  const handleSignUp = () => {
+    navigate('/signup');
+  };
 
   useEffect(() => {
     if (token) {
-        navigate(role === "coach" ? "/coach" : "/user")
+      navigate(role === 'coach' ? '/coach' : '/client');
     }
-  }, [])
+  }, []);
 
   const handleLogin = async () => {
     try {
-      const userRole = await loginUser(email, password, isCoach);
+      const userRole = await loginUser(email, password, coachSelected);
       const token = useAuthStore.getState().token;
 
       if (userRole === 'coach' && token) {
         navigate('/coach');
-        dispatch(fetchUsers(token));  
+        dispatch(fetchClients(token));
         dispatch(fetchTodayWorkouts());
         dispatch(fetchUpdatedWorkouts());
       } else {
-        navigate('/user');
+        navigate('/client');
       }
     } catch (err) {
       setShowFailedLogin(true);
@@ -47,125 +52,91 @@ const LoginPage = () => {
   };
 
   return (
-    <LoginView className="loginBox">
-      <Paper sx={{minHeight: '580px', width: '450px'}}>
-        <Stack >
-          <img 
-            style={{ width: '90px', height: '90px', marginTop: '30px', marginBottom: '20px', alignSelf: 'center' }} 
-            src={logo} 
-            alt="Logo" 
+    <div className="flex h-screen items-center justify-center bg-gray-100">
+      <Paper className="min-h-[580px] w-[450px]">
+        <div className="flex flex-col">
+          <img
+            className="mt-7 mb-5 h-22 w-22 self-center"
+            src={logo}
+            alt="Logo"
           />
-          <Typography sx={{alignSelf: 'center', fontSize: '20px', fontWeight: '600', color: 'violet'}}>Choose Account Type</Typography>
-          <Box sx={{alignSelf: 'center', display: 'flex', mt: '10px'}}>
-            <Button 
-              disableRipple
-              sx={{
-                textTransform: 'none', mr: '10px', 
-                backgroundColor: isCoach ? '#4e4eff' : 'none', 
-                width: '90px', 
-                '&:hover': {
-                  background: isCoach ? '#4e4eff' : 'none'
-
-                } 
-              }}
-              onClick={() => setIsCoach(true)}
+          <h2 className="mb-2 self-center text-xl font-bold text-blue-700">
+            Choose Account Type
+          </h2>
+          <div className="mt-3 flex self-center">
+            <button
+              className={`mr-4 w-[100px] cursor-pointer rounded-md ${
+                coachSelected && 'bg-[#4e4eff]'
+              }`}
+              onClick={() => setCoachSelected(true)}
             >
-              <Typography sx={{color: isCoach ? 'white' : 'black'}}>Coach</Typography>
-            </Button>
-            <Button 
-              disableRipple
-              sx={{
-                textTransform: 'none', mr: '10px', 
-                backgroundColor: !isCoach ? '#4e4eff' : 'none', 
-                width: '90px', 
-                '&:hover': {
-                  background: !isCoach ? '#4e4eff' : 'none'
-
-                } 
-              }}
-              onClick={() => setIsCoach(false)}
+              <p className={` ${coachSelected ? 'text-white' : 'text-black'}`}>
+                Coach
+              </p>
+            </button>
+            <button
+              className={`mr-4 h-8 w-[100px] cursor-pointer rounded-md ${
+                !coachSelected && 'bg-[#4e4eff]'
+              }`}
+              onClick={() => setCoachSelected(false)}
             >
-              <Typography sx={{color: isCoach ? 'black' : 'white'}}>Client</Typography>
-            </Button>          
-          </Box>
+              <p className={` ${coachSelected ? 'text-black' : 'text-white'}`}>
+                Client
+              </p>
+            </button>
+          </div>
           <form
             onSubmit={(e) => {
-                e.preventDefault();
-                handleLogin();
+              e.preventDefault();
+              handleLogin();
             }}
           >
-            <Stack sx={{margin: '20px 40px'}}>
-              <Typography sx={{fontSize: '14px', fontWeight: '600', mb: '2px'}}>Email</Typography>
-              <OutlinedInput value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" autoComplete='username'/>
-              <Typography sx={{fontSize: '14px', fontWeight: '600', marginTop: '20px', mb: '2px'}}>Password</Typography>
-              <OutlinedInput
+            <div className="mx-8 my-5 flex flex-col">
+              <p className="mb-1 text-sm font-bold">Email</p>
+              <input
+                type="text"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Email"
+                className="h-15 w-95 rounded-md border border-gray-300 p-3 text-lg focus:border-blue-400 focus:outline-none"
+              />
+              <p className="mt-5 mb-1 text-sm font-bold">Password</p>
+              <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Password"
-                autoComplete='current-password'
+                className="h-15 w-95 rounded-md border border-gray-300 p-3 text-lg focus:border-blue-400 focus:outline-none"
               />
               {showFailedLogin && (
-                <Paper sx={{backgroundColor: '#ffd3d3', mt: '20px'}}>
-                  <Typography sx={{padding: '20px 10px', textAlign: 'center'}}>Incorrect email/password combination</Typography>
-                </Paper>
+                <div className="mt-5 rounded-md bg-[#ffd3d3] px-5 py-5 text-center shadow-sm">
+                  <p>Incorrect email/password combination</p>
+                </div>
               )}
-              <Button 
+              <button
                 type="submit"
-                sx={{
-                  backgroundColor: '#4e4eff', 
-                  color: 'white',
-                  textTransform: 'none',
-                  fontSize: '16px',
-                  mt: '20px',
-                  '&:hover':{
-                    backgroundColor: 'blue'
-                  }
-                }} 
+                className="mt-5 h-10 cursor-pointer rounded-md bg-[#4e4eff] text-lg text-white hover:bg-blue-700"
                 onClick={handleLogin}
               >
                 Log In
-              </Button>
-            </Stack>
+              </button>
+            </div>
           </form>
-          <Box sx={{display: 'flex', alignItems: 'center', my: '2px', marginX: '30px'}}>
-            <Box
-              sx={{
-                flex: 1, 
-                height: '1px', 
-                backgroundColor: '#ccc',
-              }}
-            />
-            <Typography 
-              sx={{
-                mx: 2, // Adds horizontal margin around the text
-                color: '#888', // Text color
-                fontSize: '14px',
-              }}
-            >
-              or
-            </Typography>
-            <Box 
-              sx={{
-                flex: 1, 
-                height: '1px', 
-                backgroundColor: '#ccc',
-              }}
-            />           
-          </Box>
-          <Button sx={{textTransform: 'none', alignSelf: 'center', mt: '10px', color: 'blue', '&:hover': {textDecoration: 'underline', background: 'transparent'}}} onClick={handleSignUp}>Don't have a coach account? Sign up</Button>
-        </Stack>
+          <div className="mx-6 my-1 flex items-center justify-items-center">
+            <div className="h-[1px] flex-1 bg-[#ccc]" />
+            <p className="mx-3 text-sm text-[#888]">or</p>
+            <div className="h-[1px] flex-1 bg-[#ccc]" />
+          </div>
+          <button
+            className="my-4 cursor-pointer align-middle text-blue-700 hover:underline"
+            onClick={handleSignUp}
+          >
+            Don't have a coach account? Sign up
+          </button>
+        </div>
       </Paper>
-    </LoginView>
+    </div>
   );
 };
 
 export default LoginPage;
-
-const LoginView = styled(Box)(({ theme }) => ({
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center', // Center the Paper vertically
-  height: '100vh',
-  backgroundColor: theme.palette.grey[100],
-}));

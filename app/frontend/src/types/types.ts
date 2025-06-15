@@ -1,126 +1,125 @@
 export interface AuthState {
-    token: string | null;
-    role: string | null;
+  token: string | null;
+  role: string | null;
 }
 
 export interface PreferencesState {
-    isDarkMode: boolean
+  isDarkMode: boolean;
 }
-  
+
 export interface RootState {
-    auth: AuthState;
-    preferences: PreferencesState
+  auth: AuthState;
+  preferences: PreferencesState;
 }
 
 /* 
-    User Types
+    Client Types
 */
 
-export interface UserProgramWorkout {
-    id: number;
-    programId: number;
-    date: string;
-    day: number;
-    week: number;
-    comment: string;
-    name: string;
-    warmup: string;
-    completed: boolean;
-    updated: boolean;
-    order: number;
-    exercises: UserProgramWorkoutExercise[]
-    comments: WorkoutComment[]
+export interface ClientProgramWorkout {
+  id: number;
+  programId: number;
+  date: string;
+  day: number;
+  week: number;
+  comment: string;
+  name: string;
+  warmup: string;
+  completed: boolean;
+  updated: boolean;
+  order: number;
+  exercises: ClientProgramWorkoutExercise[];
+  comments: WorkoutComment[];
 }
 
 export interface WorkoutComment {
-    id: number;
-    content: string;
-    timestamp: Date,
-    user_type: string;
+  id: number;
+  content: string;
+  timestamp: Date;
+  user_type: string;
 }
 
-export interface UserProgramWorkoutExercise {
-    id: number;
-    exerciseId: number;
-    order?: string;
-    instructions?: string;
-    sets?: number;
-    reps?: number;
-    weight?: number;
-    duration?: string;
-    hold?: string;
-    completed: boolean;
-    results: string;
-    name: string;
+export interface ClientProgramWorkoutExercise {
+  id: number;
+  exerciseId: number;
+  order?: string;
+  instructions?: string;
+  sets?: number;
+  reps?: number;
+  weight?: number;
+  duration?: string;
+  hold?: string;
+  completed: boolean;
+  results: string;
+  name: string;
 }
 
-export interface UserProgram {
-    id: number;
-    user_id: number;
-    created_at: string;
-    updated_at: string;
-    start_date: string;
-    end_date: string;
-    num_weeks: number;
-    name: string;
-    user_program_workouts: UserProgramWorkout[];
+export interface ClientProgram {
+  id: number;
+  client_id: number;
+  created_at: string;
+  updated_at: string;
+  start_date: string;
+  end_date: string;
+  num_weeks: number;
+  name: string;
+  client_program_workouts: ClientProgramWorkout[];
 }
 
 export interface CoachProgram {
-    id: number;
-    coach_id: number;
-    num_weeks: number;
-    name: string;
-    created_at: string;
-    updated_at: string;
-    description?: string;
+  id: number;
+  coach_id: number;
+  num_weeks: number;
+  name: string;
+  created_at: string;
+  updated_at: string;
+  description?: string;
 }
 
-export interface UserOutcomeMeasureRecording {
-    id: number;
-    user_outcome_measure_id: number;
-    value: string;
-    date: string;
+export interface ClientOutcomeMeasureRecording {
+  id: number;
+  client_outcome_measure_id: number;
+  value: string;
+  date: string;
 }
 
-export interface UserOutcomeMeasure {
-    id: number;
-    outcome_measure_id: number;
-    user_id: number;
-    target_value: string;
-    user_outcome_measure_recordings: UserOutcomeMeasureRecording[];
+export interface ClientOutcomeMeasure {
+  id: number;
+  outcome_measure_id: number;
+  client_id: number;
+  target_value: string;
+  client_outcome_measure_recordings: ClientOutcomeMeasureRecording[];
 }
 
-// Main User interface
+// Main Client interface
 
-export interface User {
-    id: number;
-    coach_id: number;
-    first_name: string;
-    last_name: string;
-    birth_date: string;
-    email: string;
-    phone: string;
-    active: boolean;
-    profile_picture_url?: string;
-    user_programs: UserProgram[];
-    user_outcome_measures: UserOutcomeMeasure[];
+export interface Client {
+  id: number;
+  coach_id: number;
+  first_name: string;
+  last_name: string;
+  birth_date: string;
+  email: string;
+  phone: string;
+  active: boolean;
+  profile_picture_url?: string;
+  client_programs: ClientProgram[];
+  client_outcome_measures: ClientOutcomeMeasure[];
 }
-
 
 export interface TodayWorkout {
-    user_id: User["id"],
-    first_name: User["first_name"],
-    last_name: User["last_name"],
-    workout_id: UserProgramWorkout["id"],
-    workout_name: UserProgramWorkout["name"],
-    workout_date: UserProgramWorkout["date"],
-    completed: UserProgramWorkout["completed"]
+  client_id: Client['id'];
+  first_name: Client['first_name'];
+  last_name: Client['last_name'];
+  workout_id: ClientProgramWorkout['id'];
+  workout_name: ClientProgramWorkout['name'];
+  workout_date: ClientProgramWorkout['date'];
+  completed: ClientProgramWorkout['completed'];
 }
 
 export interface UpdatedWorkout {
-    user_id: User["id"],
-    first_name: User["first_name"],
-    last_name: User["last_name"],
-    workout: UserProgramWorkout
+  client_id: Client['id'];
+  first_name: Client['first_name'];
+  last_name: Client['last_name'];
+  workout: ClientProgramWorkout;
 }

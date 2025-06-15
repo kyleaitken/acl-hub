@@ -2,8 +2,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-
-type Role = 'coach' | 'user';
+type Role = 'coach' | 'client';
 
 interface AuthState {
   token: string | null;
@@ -51,7 +50,7 @@ export const useAuthStore = create<AuthState>()(
         }),
     }),
     {
-      name: 'auth-storage', 
-    }
-  )
+      name: 'auth-storage',
+    },
+  ),
 );

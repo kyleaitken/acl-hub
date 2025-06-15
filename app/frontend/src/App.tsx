@@ -1,7 +1,7 @@
 import { Route, Routes } from 'react-router-dom';
 import Login from './features/auth/pages/Login';
-import CoachHomePage from './pages/Coach/CoachHomePage';
-import CoachPrograms from './pages/Coach/CoachPrograms';
+import CoachHomePage from './features/coach/pages/CoachHomePage';
+import CoachPrograms from './features/coach/pages/CoachPrograms';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import NavigationBar from './features/coach/components/NavigationBar';
@@ -15,7 +15,7 @@ function App() {
 
   useEffect(() => {
     if (!isLoggedIn) {
-      navigate('/signup');
+      navigate('/login');
     }
   }, [isLoggedIn]);
 
