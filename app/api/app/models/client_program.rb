@@ -1,6 +1,6 @@
-class UserProgram < ApplicationRecord
-  belongs_to :user
-  has_many :user_program_workouts, dependent: :destroy
+class ClientProgram < ApplicationRecord
+  belongs_to :client
+  has_many :client_program_workouts, dependent: :destroy
 
   validates :start_date, :end_date, :num_weeks, :name, presence: true
   validate :end_date_after_start_date

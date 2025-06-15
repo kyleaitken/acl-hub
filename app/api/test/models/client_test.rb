@@ -1,6 +1,6 @@
 require "test_helper"
 
-class ClientOutcomeMeasuresControllerTest < ActionDispatch::IntegrationTest
+class ClientTest < ActiveSupport::TestCase
   # test "the truth" do
   #   assert true
   # end

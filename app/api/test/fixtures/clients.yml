@@ -1,0 +1,29 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  first_name: MyString
+  last_name: MyString
+  birth_date: 2025-06-14
+  email: MyString
+  phone: MyString
+  encrypted_password: MyString
+  active: false
+  coach: one
+  profile_picture_url: MyString
+  reset_password_token: MyString
+  reset_password_sent_at: 2025-06-14 19:33:53
+  remember_created_at: 2025-06-14 19:33:53
+
+two:
+  first_name: MyString
+  last_name: MyString
+  birth_date: 2025-06-14
+  email: MyString
+  phone: MyString
+  encrypted_password: MyString
+  active: false
+  coach: two
+  profile_picture_url: MyString
+  reset_password_token: MyString
+  reset_password_sent_at: 2025-06-14 19:33:53
+  remember_created_at: 2025-06-14 19:33:53

@@ -10,8 +10,8 @@ Doorkeeper.configure do
 
   grant_flows %w[password]
 
-  default_scopes :user
-  optional_scopes :coach
+  default_scopes :coach
+  optional_scopes :client
 
   resource_owner_from_credentials do |_routes|
     if params[:scope] == 'coach'
@@ -23,10 +23,10 @@ Doorkeeper.configure do
         nil
       end
     else
-      user = User.find_for_database_authentication(email: params[:email])
-      if user&.valid_password?(params[:password])
-        @resource_owner_type = 'User'
-        user
+      client = Client.find_for_database_authentication(email: params[:email])
+      if client&.valid_password?(params[:password])
+        @resource_owner_type = 'Client'
+        client
       else
         nil
       end
@@ -37,16 +37,6 @@ Doorkeeper.configure do
     token.update(resource_owner_type: @resource_owner_type) if @resource_owner_type
   end
 
-  # resource_owner_from_credentials do |routes|
-  #   # Use the logged-in user or coach, whichever is relevant based on the scope
-  #   if @resource_owner_type == 'User'
-  #     { resource_owner_id: current_user.id, resource_owner_type: 'User' }
-  #   else
-  #     { resource_owner_id: current_coach.id, resource_owner_type: 'Coach' }
-  #   else
-  #     raise 'No resource owner found'
-  #   end
-  # end
 
   skip_authorization do
     true # or other logic based on the request or client
@@ -112,7 +102,7 @@ Doorkeeper.configure do
   # update `resource_owner_type` column in the database and fix migration template as it will
   # set NOT NULL constraint for Access Grants table.
   #
-  # use_polymorphic_resource_owner
+  use_polymorphic_resource_owner
 
   # If you are planning to use Doorkeeper in Rails 5 API-only application, then you might
   # want to use API mode that will skip all the views management and change the way how

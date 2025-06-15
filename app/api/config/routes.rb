@@ -7,11 +7,11 @@ Rails.application.routes.draw do
   # Defines the root path route ("/")
   # root "posts#index"
 
-  devise_for :users, controllers: { 
-    sessions: 'users/sessions', 
-    registrations: 'users/registrations',
-    passwords: 'users/passwords',
-    confirmations: 'users/confirmations'
+  devise_for :clients, controllers: { 
+    sessions: 'client/sessions', 
+    registrations: 'clients/registrations',
+    passwords: 'clients/passwords',
+    confirmations: 'clients/confirmations'
   }
 
   devise_for :coaches, controllers: {
@@ -21,18 +21,18 @@ Rails.application.routes.draw do
     confirmations: 'coaches/confirmations'
   }
 
-  # Users
-  resources :users, only: [:index]
+  # clients
+  resources :clients, only: [:index]
 
-  namespace :users do
-    resources :user_outcome_measures, only: [:index, :show, :create, :update, :destroy] do
-      resources :user_outcome_measure_recordings
+  namespace :clients do
+    resources :client_outcome_measures, only: [:index, :show, :create, :update, :destroy] do
+      resources :client_outcome_measure_recordings
     end
 
-    resources :user_programs do
-      resources :user_program_workouts do
+    resources :client_programs do
+      resources :client_program_workouts do
         resources :workout_comments
-        resources :user_program_workout_exercises
+        resources :client_program_workout_exercises
       end
     end
 
@@ -42,22 +42,22 @@ Rails.application.routes.draw do
   resources :coaches, only: [:index, :destroy]
 
   namespace :coaches do
-    # Coaches have access to users and their outcome measures/programs
-    resources :users, only: [:index, :show, :update] do
+    # Coaches have access to clients and their outcome measures/programs
+    resources :clients, only: [:index, :show, :update] do
       collection do
-        get 'detailed', to: 'users#detailed_index'
-        get 'todayWorkouts', to: 'users#all_user_workouts_today_index'
-        get 'updates', to: 'users#all_user_updates'
+        get 'detailed', to: 'clients#detailed_index'
+        get 'todayWorkouts', to: 'clients#all_client_workouts_today_index'
+        get 'updates', to: 'clients#all_client_updates'
       end
 
-      resources :user_outcome_measures do
-        resources :user_outcome_measure_recordings
+      resources :client_outcome_measures do
+        resources :client_outcome_measure_recordings
       end
 
-      resources :user_programs do
-        resources :user_program_workouts do
+      resources :client_programs do
+        resources :client_program_workouts do
           resources :workout_comments
-          resources :user_program_workout_exercises
+          resources :client_program_workout_exercises
         end
       end
     end

@@ -1,11 +1,11 @@
-class UserProgramWorkoutExercise < ApplicationRecord
-  belongs_to :user_program_workout
+class ClientProgramWorkoutExercise < ApplicationRecord
+  belongs_to :client_program_workout
   belongs_to :exercise
 
   before_validation :set_next_available_order, on: :create
   after_save :notify_parent_workout
 
-  validates :user_program_workout_id, :exercise_id, presence: true
+  validates :client_program_workout_id, :exercise_id, presence: true
 
   private
 
@@ -13,7 +13,7 @@ class UserProgramWorkoutExercise < ApplicationRecord
     return if order.present?
   
     # Find the maximum `order` for exercises within the same workout
-    max_order = UserProgramWorkoutExercise.where(user_program_workout_id: user_program_workout_id)
+    max_order = ClientProgramWorkoutExercise.where(client_program_workout_id: client_program_workout_id)
                                           .maximum(:order)&.to_i
   
     # Set order to "1" if max_order is nil; otherwise, increment by 1
@@ -21,6 +21,6 @@ class UserProgramWorkoutExercise < ApplicationRecord
   end
 
   def notify_parent_workout
-    user_program_workout.update(updated: true)
+    client_program_workout.update(updated: true)
   end
 end

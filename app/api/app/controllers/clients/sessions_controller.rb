@@ -1,18 +1,18 @@
 # frozen_string_literal: true
 
-class Users::SessionsController < Devise::SessionsController
+class Clients::SessionsController < Devise::SessionsController
   respond_to :json
 
   def create
     self.resource = warden.authenticate!(auth_options)
     if resource
-      # Create an access token for the user
+      # Create an access token for the client
       token = Doorkeeper::AccessToken.create!(
         resource_owner_id: resource.id,
-        resource_owner_type: 'User',
-        scopes: 'user'  
+        resource_owner_type: 'Client',
+        scopes: 'client'  
       )
-      render json: { user: resource, token: token.token }, status: :created
+      render json: { client: resource, token: token.token }, status: :created
     else
       render json: { error: 'Invalid credentials' }, status: :unauthorized
     end

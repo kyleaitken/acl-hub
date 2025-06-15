@@ -1,10 +1,10 @@
-class Users::WorkoutCommentsController < ApplicationController
-  before_action :set_user_program_workout
+class Clients::WorkoutCommentsController < ApplicationController
+  before_action :set_client_program_workout
   before_action :set_workout_comment, only: [:update, :destroy]
 
-    # POST /users/:user_id/user_programs/:user_program_id/user_program_workouts/:user_program_workout_id/workout_comments
+    # POST /clients/:client_id/client_programs/:client_program_id/client_program_workouts/:client_program_workout_id/workout_comments
     def create
-      comment = @user_program_workout.workout_comments.build(comment_params)
+      comment = @client_program_workout.workout_comments.build(comment_params)
       if comment.save
         render json: comment, status: :created
       else
@@ -12,7 +12,7 @@ class Users::WorkoutCommentsController < ApplicationController
       end
     end
 
-    # PATCH /users/:user_id/user_programs/:user_program_id/user_program_workouts/:user_program_workout_id/workout_comments/:id
+    # PATCH /clients/:client_id/client_programs/:client_program_id/client_program_workouts/:client_program_workout_id/workout_comments/:id
     def update
       if @workout_comment.update(comment_params)
         render json: @workout_comment, status: :ok
@@ -21,7 +21,7 @@ class Users::WorkoutCommentsController < ApplicationController
       end
     end
 
-    # DELETE /users/:user_id/user_programs/:user_program_id/user_program_workouts/:user_program_workout_id/workout_comments/:id
+    # DELETE /clients/:client_id/client_programs/:client_program_id/client_program_workouts/:client_program_workout_id/workout_comments/:id
     def destroy
       @workout_comment.destroy
       render json: { message: "Workout comment deleted successfully" }, status: :ok    
@@ -29,12 +29,12 @@ class Users::WorkoutCommentsController < ApplicationController
 
   private
 
-  def set_user_program_workout
-    @user_program_workout = UserProgramWorkout.find(params[:user_program_workout_id])
+  def set_client_program_workout
+    @client_program_workout = ClientProgramWorkout.find(params[:client_program_workout_id])
   end
 
   def set_workout_comment
-    @workout_comment = @user_program_workout.workout_comments.find(params[:id])
+    @workout_comment = @client_program_workout.workout_comments.find(params[:id])
   end
 
   def comment_params

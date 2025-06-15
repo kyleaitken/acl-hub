@@ -1,12 +1,12 @@
-module UserWorkoutUtils
-  def format_updated_user_workouts(users)
-    users.flat_map do |user|
-      user.user_programs.flat_map do |program|
-        program.user_program_workouts.filter(&:updated).map do |workout|
+module ClientWorkoutUtils
+  def format_updated_client_workouts(clients)
+    clients.flat_map do |client|
+      client.client_programs.flat_map do |program|
+        program.client_program_workouts.filter(&:updated).map do |workout|
           {
-            user_id: user.id,
-            first_name: user.first_name,
-            last_name: user.last_name,
+            client_id: client.id,
+            first_name: client.first_name,
+            last_name: client.last_name,
             workout: format_workout(workout)
           }
         end
@@ -29,7 +29,7 @@ module UserWorkoutUtils
   def format_workout(workout)
     {
       id: workout.id,
-      programId: workout.user_program_id,
+      programId: workout.client_program_id,
       date: workout.date,
       day: workout.day,
       week: workout.week,
@@ -39,7 +39,7 @@ module UserWorkoutUtils
       updated: workout.updated,
       order: workout.order,
       comments: format_comments(workout.workout_comments),
-      exercises: format_exercises(workout.user_program_workout_exercises.includes(:exercise))
+      exercises: format_exercises(workout.client_program_workout_exercises.includes(:exercise))
     }
   end
 

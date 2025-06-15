@@ -1,11 +1,11 @@
-class User < ApplicationRecord
+class Client < ApplicationRecord
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable
   belongs_to :coach
-  has_many :user_outcome_measures, dependent: :destroy
-  has_many :user_programs, dependent: :destroy
+  has_many :client_outcome_measures, dependent: :destroy
+  has_many :client_programs, dependent: :destroy
 
   # Ensure the email is unique and present
   validates :email, presence: true, uniqueness: true

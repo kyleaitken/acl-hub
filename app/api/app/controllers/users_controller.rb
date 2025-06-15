@@ -1,15 +1,15 @@
-class UsersController < ApplicationController
+class ClientsController < ApplicationController
 
     def index
-        Rails.logger.info("Doorkeeper Token in UsersController Index: #{doorkeeper_token.inspect}")
-        @users = User.all
-        render json: @users
+        Rails.logger.info("Doorkeeper Token in ClientsController Index: #{doorkeeper_token.inspect}")
+        @clients = Client.all
+        render json: @clients
     end
     
     # def show
-    #     Rails.logger.info("Doorkeeper Token in UsersController Show: #{doorkeeper_token.inspect}")
-    #     @user = User.find(params[:id])
-    #     render json: @user
+    #     Rails.logger.info("Doorkeeper Token in ClientsController Show: #{doorkeeper_token.inspect}")
+    #     @client = Client.find(params[:id])
+    #     render json: @client
     # end
 
 end

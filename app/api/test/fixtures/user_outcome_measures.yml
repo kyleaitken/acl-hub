@@ -2,10 +2,10 @@
 
 one:
   outcome_measure: one
-  user: one
+  client: one
   target_value: MyString
 
 two:
   outcome_measure: two
-  user: two
+  client: two
   target_value: MyString
