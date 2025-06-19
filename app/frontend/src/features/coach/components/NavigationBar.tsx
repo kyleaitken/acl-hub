@@ -5,7 +5,6 @@ import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
 import ForumIcon from '@mui/icons-material/Forum';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import LogoutIcon from '@mui/icons-material/Logout';
-import { persistor } from '../../../store';
 import { useLogin } from '../../../features/auth/hooks/useLogin';
 import { useAuthStore } from '../../../features/auth/store/authStore';
 import { useThemeStore } from '../../../store/themeStore';
@@ -26,7 +25,6 @@ const NavigationBar = () => {
       }
     }
     navigate('/login');
-    persistor.purge();
   };
 
   return (

@@ -256,6 +256,5 @@ const WorkoutCommentBox = (props: WorkoutCommentBoxProps) => {
     </div>
   );
 };
-// WorkoutCommentBox.whyDidYouRender = true;
 
 export default React.memo(WorkoutCommentBox);

@@ -5,7 +5,6 @@ import { Paper } from '@mui/material';
 import { useAuthStore } from '../store/authStore';
 import { useLogin } from '../hooks/useLogin';
 import { useClientData } from '../../coach/hooks/useClientData';
-import { useCoachWorkoutActions } from '../../coach/hooks/useCoachWorkoutActions';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
@@ -16,7 +15,6 @@ const LoginPage = () => {
   const { loginUser } = useLogin();
   const { token, role } = useAuthStore();
   const { fetchClients } = useClientData();
-  const workoutActions = useCoachWorkoutActions();
 
   const handleSignUp = () => {
     navigate('/signup');
@@ -35,9 +33,6 @@ const LoginPage = () => {
 
       if (userRole === 'coach' && token) {
         await fetchClients(token);
-        await workoutActions.fetchTodayWorkouts();
-        await workoutActions.fetchUpdatedWorkouts();
-
         navigate('/coach');
       } else {
         navigate('/client');

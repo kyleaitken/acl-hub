@@ -14,17 +14,16 @@ import TuneIcon from '@mui/icons-material/Tune';
 import SearchIcon from '@mui/icons-material/Search';
 import { useEffect, useMemo, useState } from 'react';
 import { CoachProgram } from '../types/models';
-import { RootState } from '../../../types/types';
 import {
   fetchCoachPrograms,
   addCoachProgram,
   deleteCoachProgram,
   updateCoachProgram,
 } from '../../../services/programsService';
-import { useSelector } from 'react-redux';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import SendIcon from '@mui/icons-material/Send';
 import React from 'react';
+import { useAuthenticatedUser } from '../../auth/hooks/useAuthenticatedUser';
 
 const CoachPrograms = () => {
   const [programs, setPrograms] = useState<CoachProgram[]>([]);
@@ -44,7 +43,7 @@ const CoachPrograms = () => {
   const [optionsOpenIndex, setOptionsOpenIndex] = useState<number>(-1);
   const open = Boolean(anchorEl);
 
-  const { token } = useSelector((state: RootState) => state.auth);
+  const { token } = useAuthenticatedUser();
 
   const handleOpenOptions = (
     event: React.MouseEvent<HTMLButtonElement>,
