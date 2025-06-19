@@ -12,31 +12,67 @@ import {
 import WorkoutHeader from './WorkoutHeader';
 import React from 'react';
 import ExerciseCard from './ExerciseCard';
-import { useCoachWorkoutData } from '../hooks/useCoachWorkoutData';
+import { UpdatedWorkout } from '../types/models';
+import { useCoachWorkoutActions } from '../hooks/useCoachWorkoutActions';
 
 interface UpdatedWorkoutProps {
-  workoutId: number;
+  workout: UpdatedWorkout;
 }
 
 interface WarmupSectionProps {
   warmup: string;
 }
 
-const UpdatedWorkoutPaper = ({ workoutId }: UpdatedWorkoutProps) => {
-  const { updatedWorkouts } = useCoachWorkoutData();
+const UpdatedWorkoutPaper = ({ workout }: UpdatedWorkoutProps) => {
+  const formattedDate = formatDateString(workout.workout.date);
+  const { firstName, lastName, role }: AuthenticatedUser =
+    useAuthenticatedUser();
+  const programId = workout.workout.programId;
+  const workoutId = workout.workout.id;
+  const clientId = workout.client_id;
 
-  const updatedWorkout = updatedWorkouts.find(
-    (w) => w.workout.id === workoutId,
-  );
+  const { addCommentToWorkout, updateWorkoutComment, deleteWorkoutComment } =
+    useCoachWorkoutActions();
 
-  if (!updatedWorkout) {
-    return null;
-  }
-  const formattedDate = formatDateString(updatedWorkout.workout.date);
-  const clientId = updatedWorkout.client_id;
-  const programId = updatedWorkout.workout.programId;
+  const addComment = async (newComment: string) => {
+    await addCommentToWorkout({
+      clientId,
+      programId,
+      workoutId,
+      content: newComment,
+      timestamp: new Date().toISOString(),
+      user_type: role,
+    });
+  };
 
-  const { firstName, lastName }: AuthenticatedUser = useAuthenticatedUser();
+  const updateComment = async (commentId: number, updatedComment: string) => {
+    try {
+      await updateWorkoutComment({
+        clientId,
+        programId,
+        workoutId,
+        commentId,
+        content: updatedComment,
+        timestamp: new Date().toISOString(),
+        user_type: role,
+      });
+    } catch (error) {
+      console.error('Failed to update comment:', error);
+    }
+  };
+
+  const deleteComment = async (commentId: number) => {
+    try {
+      await deleteWorkoutComment({
+        clientId,
+        programId,
+        workoutId,
+        commentId: commentId,
+      });
+    } catch (error) {
+      console.error('Failed to delete comment:', error);
+    }
+  };
 
   return (
     <Paper
@@ -48,44 +84,45 @@ const UpdatedWorkoutPaper = ({ workoutId }: UpdatedWorkoutProps) => {
     >
       <div className="flex flex-col">
         <WorkoutHeader
-          clientId={clientId}
-          firstName={updatedWorkout.first_name}
-          lastName={updatedWorkout.last_name}
+          clientId={workout.client_id}
+          firstName={firstName}
+          lastName={lastName}
           dueDate={formattedDate}
         />
         <div id="workout-content-container" className="mr-10 ml-6">
           <p className="m-5 ml-0 text-xl font-bold">
-            {updatedWorkout.workout.name || 'Workout'}
+            {workout.workout.name || 'Workout'}
           </p>
           <Divider />
-          {updatedWorkout.workout.warmup && (
-            <WarmupSection warmup={updatedWorkout.workout.warmup} />
+          {workout.workout.warmup && (
+            <WarmupSection warmup={workout.workout.warmup} />
           )}
           <div className="mt-5">
-            {updatedWorkout.workout.exercises.map((exercise, index) => (
+            {workout.workout.exercises.map((exercise, index) => (
               <ExerciseCard exercise={exercise} key={index} />
             ))}
           </div>
         </div>
         <Divider
           sx={{
-            mb: updatedWorkout.workout.comments.length > 0 ? '10px' : '0px',
+            mb: workout.workout.comments.length > 0 ? '10px' : '0px',
           }}
         />
         <WorkoutCommentBox
-          programId={programId}
-          workoutId={updatedWorkout.workout.id}
-          clientId={updatedWorkout.client_id}
+          workoutId={workout.workout.id}
+          clientId={clientId}
           coachFirstName={firstName}
           coachLastName={lastName}
-          clientFirstName={updatedWorkout.first_name}
-          clientLastName={updatedWorkout.last_name}
+          clientFirstName={workout.first_name}
+          clientLastName={workout.last_name}
+          onAddComment={addComment}
+          onUpdateComment={updateComment}
+          onDeleteComment={deleteComment}
         />
       </div>
     </Paper>
   );
 };
-// UpdatedWorkoutPaper.whyDidYouRender = true;
 
 export default React.memo(UpdatedWorkoutPaper);
 

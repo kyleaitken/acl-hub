@@ -9,16 +9,17 @@ import {
   AuthenticatedUser,
   useAuthenticatedUser,
 } from '../features/auth/hooks/useAuthenticatedUser';
-import { useCoachWorkoutActions } from '../features/coach/hooks/useCoachWorkoutActions';
 
 interface WorkoutCommentBoxProps {
-  clientId: number;
-  programId: number;
   workoutId: number;
+  clientId: number;
   coachFirstName: string;
   coachLastName: string;
   clientFirstName: string;
   clientLastName: string;
+  onAddComment: (newComment: string) => Promise<void>;
+  onUpdateComment: (commentId: number, updatedComment: string) => Promise<void>;
+  onDeleteComment: (commentId: number) => Promise<void>;
 }
 
 const WorkoutCommentBox = (props: WorkoutCommentBoxProps) => {
@@ -31,12 +32,14 @@ const WorkoutCommentBox = (props: WorkoutCommentBoxProps) => {
 
   const {
     workoutId,
-    programId,
     clientId,
     coachFirstName,
     coachLastName,
     clientFirstName,
     clientLastName,
+    onAddComment,
+    onUpdateComment,
+    onDeleteComment,
   } = props;
 
   const comments = useCoachWorkoutStore(
@@ -44,8 +47,6 @@ const WorkoutCommentBox = (props: WorkoutCommentBoxProps) => {
   );
 
   const { id, role }: AuthenticatedUser = useAuthenticatedUser();
-  const { addCommentToWorkout, updateWorkoutComment, deleteWorkoutComment } =
-    useCoachWorkoutActions();
 
   function getCommentUserId(comment_user_type: string) {
     return comment_user_type === 'coach' ? id : clientId;
@@ -75,53 +76,24 @@ const WorkoutCommentBox = (props: WorkoutCommentBoxProps) => {
   const handleAddComment = async () => {
     const trimmedComment = newComment.trim();
     if (!trimmedComment) return;
-    await addCommentToWorkout({
-      clientId,
-      programId,
-      workoutId,
-      content: trimmedComment,
-      timestamp: new Date().toISOString(),
-      user_type: role,
-    });
+    await onAddComment(newComment);
     setNewComment('');
   };
 
   const handleUpdateComment = async (commentId: number) => {
     const trimmedComment = editCommentContent.trim();
     if (!trimmedComment) return;
-    try {
-      await updateWorkoutComment({
-        clientId,
-        programId,
-        workoutId,
-        commentId,
-        content: trimmedComment,
-        timestamp: new Date().toISOString(),
-        user_type: role,
-      });
-      setEditCommentId(null);
-    } catch (error) {
-      console.error('Failed to update comment:', error);
-    }
+    await onUpdateComment(commentId, trimmedComment);
+    setEditCommentId(null);
   };
 
   const handleDeleteComment = async () => {
-    try {
-      if (commentToDelete) {
-        setAnchorEl(null);
-        await deleteWorkoutComment({
-          clientId,
-          programId,
-          workoutId,
-          commentId: commentToDelete,
-        });
-        setEditCommentId(null);
-        setCommentToDelete(null);
-      }
-    } catch (error) {
-      console.error('Failed to delete comment:', error);
+    if (commentToDelete) {
+      setAnchorEl(null);
+      await onDeleteComment(commentToDelete);
+      setEditCommentId(null);
+      setCommentToDelete(null);
     }
-    return;
   };
 
   const handleDeleteClick = (

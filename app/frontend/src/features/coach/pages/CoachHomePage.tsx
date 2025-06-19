@@ -111,10 +111,7 @@ const CoachHomePage = () => {
             </>
           ) : updatedWorkouts.length > 0 ? (
             updatedWorkouts.map((workout) => (
-              <UpdatedWorkoutPaper
-                key={workout.workout.id}
-                workoutId={workout.workout.id}
-              />
+              <UpdatedWorkoutPaper key={workout.workout.id} workout={workout} />
             ))
           ) : (
             <p>No updates to show.</p>
