@@ -1,12 +1,12 @@
 import { Route, Routes } from 'react-router-dom';
-import Login from './features/auth/pages/Login';
-import CoachHomePage from './features/coach/pages/CoachHomePage';
-import CoachPrograms from './features/coach/pages/CoachPrograms';
-import NavigationBar from './features/coach/components/NavigationBar';
-import SignupPage from './features/auth/pages/SignupPage';
+import Login from './domains/shared/auth/pages/Login';
+import CoachHomePage from './domains/coach/pages/CoachHomePage';
+import CoachPrograms from './domains/coach/pages/CoachPrograms';
+import NavigationBar from './domains/coach/components/NavigationBar';
+import SignupPage from './domains/shared/auth/pages/SignupPage';
 import './styles/styles.css';
-import { useAuthStore } from './features/auth/store/authStore';
-import ProtectedRoute from './features/auth/components/ProtectedRoute';
+import { useAuthStore } from './domains/shared/auth/store/authStore';
+import ProtectedRoute from './domains/shared/auth/components/ProtectedRoute';
 
 function App() {
   const { isLoggedIn, role } = useAuthStore();

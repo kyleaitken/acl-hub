@@ -1,14 +1,14 @@
 import { Divider, Popover } from '@mui/material';
 import ProfilePictureBubble from './ProfilePictureBubble';
 import EditIcon from '@mui/icons-material/Edit';
-import { formatDateToStringWithTime } from '../utils/dateUtils';
+import { formatDateToStringWithTime } from '../../../utils/dateUtils';
 import { useEffect, useRef, useState } from 'react';
 import React from 'react';
-import { useCoachWorkoutStore } from '../features/coach/store/coachWorkoutStore';
+import { useCoachWorkoutStore } from '../../coach/store/coachWorkoutStore';
 import {
   AuthenticatedUser,
   useAuthenticatedUser,
-} from '../features/auth/hooks/useAuthenticatedUser';
+} from '../auth/hooks/useAuthenticatedUser';
 
 interface WorkoutCommentBoxProps {
   workoutId: number;

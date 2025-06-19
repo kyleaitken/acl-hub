@@ -1,5 +1,5 @@
 import { Avatar } from '@mui/material';
-import { useUserProfilePictureUrl } from '../hooks/userUserProfilePictureUrl';
+import { useUserProfilePictureUrl } from '../hooks/useUserProfilePictureUrl';
 
 interface ProfilePictureBubbleProps {
   userId: number;

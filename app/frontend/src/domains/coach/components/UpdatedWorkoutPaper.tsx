@@ -4,11 +4,11 @@ import LocalFireDepartmentIcon from '@mui/icons-material/LocalFireDepartment';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { useState } from 'react';
-import WorkoutCommentBox from '../../../components/WorkoutCommentBox';
+import WorkoutCommentBox from '../../shared/components/WorkoutCommentBox';
 import {
   AuthenticatedUser,
   useAuthenticatedUser,
-} from '../../auth/hooks/useAuthenticatedUser';
+} from '../../shared/auth/hooks/useAuthenticatedUser';
 import WorkoutHeader from './WorkoutHeader';
 import React from 'react';
 import ExerciseCard from './ExerciseCard';

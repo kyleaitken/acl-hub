@@ -1,4 +1,4 @@
-import ProfilePictureBubble from '../../../components/ProfilePictureBubble';
+import ProfilePictureBubble from '../../shared/components/ProfilePictureBubble';
 import { capitalize } from '../../../utils/utils';
 
 // WorkoutHeader.tsx

@@ -1,5 +1,5 @@
-import { useCoachClientStore } from '../features/coach/store/coachClientStore';
-import { useAuthStore } from '../features/auth/store/authStore';
+import { useCoachClientStore } from '../../coach/store/coachClientStore';
+import { useAuthStore } from '../auth/store/authStore';
 
 type UserType = 'coach' | 'client';
 

@@ -3,12 +3,12 @@ import { getDaySuffix, getTimeOfDay } from '../../../utils/dateUtils';
 import { useEffect, useState } from 'react';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
-import ProfilePictureBubble from '../../../components/ProfilePictureBubble';
+import ProfilePictureBubble from '../../shared/components/ProfilePictureBubble';
 import { capitalize } from '../../../utils/utils';
 import UpdatedWorkoutPaper from '../components/UpdatedWorkoutPaper';
 import UpdatedWorkoutSkeleton from '../components/UpdatedWorkoutSkeleton';
 import React from 'react';
-import { useAuthenticatedUser } from '../../auth/hooks/useAuthenticatedUser';
+import { useAuthenticatedUser } from '../../shared/auth/hooks/useAuthenticatedUser';
 import { useCoachWorkoutActions } from '../hooks/useCoachWorkoutActions';
 import { useCoachWorkoutData } from '../hooks/useCoachWorkoutData';
 

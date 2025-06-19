@@ -1,11 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Paper } from '@mui/material';
-import {
-  CoachSignupData,
-  signupCoach,
-} from '../../../features/auth/services/authService';
-import signup from '../../../assets/images/signup.jpg';
+import { CoachSignupData, signupCoach } from '../services/authService';
+import signup from '../../../../assets/images/signup.jpg';
 
 const inputFields: InputFieldConfig[] = [
   {

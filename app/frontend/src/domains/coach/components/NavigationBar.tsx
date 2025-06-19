@@ -5,9 +5,9 @@ import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
 import ForumIcon from '@mui/icons-material/Forum';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import LogoutIcon from '@mui/icons-material/Logout';
-import { useLogin } from '../../../features/auth/hooks/useLogin';
-import { useAuthStore } from '../../../features/auth/store/authStore';
-import { useThemeStore } from '../../../store/themeStore';
+import { useLogin } from '../../shared/auth/hooks/useLogin';
+import { useAuthStore } from '../../shared/auth/store/authStore';
+import { useThemeStore } from '../../shared/stores/themeStore';
 
 const NavigationBar = () => {
   const { toggleTheme, theme } = useThemeStore();

@@ -19,11 +19,11 @@ import {
   addCoachProgram,
   deleteCoachProgram,
   updateCoachProgram,
-} from '../../../services/programsService';
+} from '../services/programsService';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import SendIcon from '@mui/icons-material/Send';
 import React from 'react';
-import { useAuthenticatedUser } from '../../auth/hooks/useAuthenticatedUser';
+import { useAuthenticatedUser } from '../../shared/auth/hooks/useAuthenticatedUser';
 
 const CoachPrograms = () => {
   const [programs, setPrograms] = useState<CoachProgram[]>([]);

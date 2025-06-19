@@ -1,4 +1,4 @@
-import { useAuthenticatedUser } from '../../auth/hooks/useAuthenticatedUser';
+import { useAuthenticatedUser } from '../../shared/auth/hooks/useAuthenticatedUser';
 import { useCoachWorkoutStore } from '../store/coachWorkoutStore';
 import {
   AddCommentDTO,

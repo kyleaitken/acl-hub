@@ -1,4 +1,4 @@
-import { Role } from '../../auth/types';
+import { Role } from '../../shared/auth/types';
 
 type BaseCommentPathParams = {
   clientId: number;

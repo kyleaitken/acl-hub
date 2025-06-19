@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
-import logo from '../../../assets/images/Logo.png';
+import logo from '../../../../assets/images/Logo.png';
 import { useNavigate } from 'react-router-dom';
 import { Paper } from '@mui/material';
 import { useAuthStore } from '../store/authStore';
 import { useLogin } from '../hooks/useLogin';
-import { useClientData } from '../../coach/hooks/useClientData';
+import { useClientData } from '../../../coach/hooks/useClientData';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
