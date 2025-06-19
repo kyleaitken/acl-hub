@@ -9,7 +9,7 @@ class Coaches::ClientProgramWorkoutsController < ApplicationController
         render json: @client_program_workouts.as_json(
             include: {
               workout_comments: {
-                only: [:id, :content, :timestamp, :client_type] 
+                only: [:id, :content, :timestamp, :user_type] 
               }
             }
           )    
@@ -21,7 +21,7 @@ class Coaches::ClientProgramWorkoutsController < ApplicationController
         render json: @client_program_workout.as_json(
             include: {
               workout_comments: {
-                only: [:id, :content, :timestamp, :client_type] 
+                only: [:id, :content, :timestamp, :user_type] 
               }
             }
           )     

@@ -42,7 +42,7 @@ class Coaches::WorkoutCommentsController < ApplicationController
   end
 
   def comment_params
-    params.require(:workout_comment).permit(:content, :timestamp, :client_type)
+    params.require(:workout_comment).permit(:content, :timestamp, :user_type)
   end
 
   def authorize_coach_for_client
