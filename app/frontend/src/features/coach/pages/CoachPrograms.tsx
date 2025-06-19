@@ -13,7 +13,8 @@ import {
 import TuneIcon from '@mui/icons-material/Tune';
 import SearchIcon from '@mui/icons-material/Search';
 import { useEffect, useMemo, useState } from 'react';
-import { CoachProgram, RootState } from '../../../types/types';
+import { CoachProgram } from '../types/models';
+import { RootState } from '../../../types/types';
 import {
   fetchCoachPrograms,
   addCoachProgram,

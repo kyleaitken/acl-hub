@@ -8,6 +8,9 @@ export interface Client {
   phone: string;
   active: boolean;
   profile_picture_url?: string;
+}
+
+export interface ClientDetails extends Client {
   client_programs: ClientProgram[];
   client_outcome_measure: ClientOutcomeMeasure[];
 }
@@ -45,7 +48,6 @@ export interface ClientProgramWorkout {
   date: string;
   day: number;
   week: number;
-  comment: string;
   name: string;
   warmup: string;
   completed: boolean;
@@ -74,5 +76,42 @@ export interface WorkoutComment {
   id: number;
   content: string;
   timestamp: Date;
-  user_type: string;
+  user_type: 'coach' | 'client';
+}
+
+export interface TodayWorkout {
+  client_id: Client['id'];
+  first_name: Client['first_name'];
+  last_name: Client['last_name'];
+  workout_id: ClientProgramWorkout['id'];
+  workout_name: ClientProgramWorkout['name'];
+  workout_date: ClientProgramWorkout['date'];
+  completed: ClientProgramWorkout['completed'];
+}
+
+export interface UpdatedWorkout {
+  client_id: Client['id'];
+  first_name: Client['first_name'];
+  last_name: Client['last_name'];
+  workout: ClientProgramWorkout;
+}
+
+export interface WorkoutCommentResponse {
+  id: number;
+  content: string;
+  timestamp: Date;
+  user_type: 'coach' | 'client';
+  client_program_workout_id: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CoachProgram {
+  id: number;
+  coach_id: number;
+  num_weeks: number;
+  name: string;
+  created_at: string;
+  updated_at: string;
+  description?: string;
 }

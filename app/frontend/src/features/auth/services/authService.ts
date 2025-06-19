@@ -1,3 +1,5 @@
+import { Role } from '../types';
+
 export interface CoachSignupData {
   firstName: string;
   lastName: string;
@@ -7,7 +9,20 @@ export interface CoachSignupData {
   confirmPassword: string;
 }
 
-const loginUser = async (email: string, password: string, role: string) => {
+export interface LoginResponse {
+  token: string;
+  first_name: string;
+  last_name: string;
+  id: number;
+  role: Role;
+  profile_picture_url: string | null;
+}
+
+const loginUser = async (
+  email: string,
+  password: string,
+  role: string,
+): Promise<LoginResponse> => {
   try {
     const baseUrl = `${import.meta.env.VITE_API_BASE_URL}/${role === 'coach' ? 'coaches' : 'clients'}/sign_in`;
 
@@ -34,6 +49,7 @@ const loginUser = async (email: string, password: string, role: string) => {
       last_name: data[role].last_name,
       id: data[role].id,
       role: role as 'coach' | 'client',
+      profile_picture_url: data[role].profile_picture_url ?? null,
     };
   } catch (error) {
     throw error;

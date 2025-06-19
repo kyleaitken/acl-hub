@@ -1,35 +1,24 @@
-import {
-  Box,
-  Button,
-  Divider,
-  IconButton,
-  Input,
-  OutlinedInput,
-  Popover,
-  Stack,
-  styled,
-  Tooltip,
-  Typography,
-} from '@mui/material';
+import { Divider, Popover } from '@mui/material';
 import ProfilePictureBubble from './ProfilePictureBubble';
 import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
-import { WorkoutComment } from '../types/types';
 import { formatDateToStringWithTime } from '../utils/dateUtils';
 import { useEffect, useRef, useState } from 'react';
+import React from 'react';
+import { useCoachWorkoutStore } from '../features/coach/store/coachWorkoutStore';
+import {
+  AuthenticatedUser,
+  useAuthenticatedUser,
+} from '../features/auth/hooks/useAuthenticatedUser';
+import { useCoachWorkoutActions } from '../features/coach/hooks/useCoachWorkoutActions';
 
 interface WorkoutCommentBoxProps {
-  coachId: number;
   clientId: number;
-  role: string;
+  programId: number;
+  workoutId: number;
   coachFirstName: string;
   coachLastName: string;
   clientFirstName: string;
   clientLastName: string;
-  workoutComments: WorkoutComment[];
-  addComment: (comment: string) => void;
-  deleteComment: (commentId: number) => void;
-  updateComment: (commentId: number, newComment: string) => void;
 }
 
 const WorkoutCommentBox = (props: WorkoutCommentBoxProps) => {
@@ -38,24 +27,28 @@ const WorkoutCommentBox = (props: WorkoutCommentBoxProps) => {
   const [newComment, setNewComment] = useState<string>('');
   const [commentToDelete, setCommentToDelete] = useState<number | null>(null);
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
 
   const {
-    coachId,
+    workoutId,
+    programId,
     clientId,
     coachFirstName,
     coachLastName,
     clientFirstName,
     clientLastName,
-    workoutComments,
-    role,
-    addComment,
-    deleteComment,
-    updateComment,
   } = props;
 
+  const comments = useCoachWorkoutStore(
+    (state) => state.updatedWorkoutComments[workoutId] || [],
+  );
+
+  const { id, role }: AuthenticatedUser = useAuthenticatedUser();
+  const { addCommentToWorkout, updateWorkoutComment, deleteWorkoutComment } =
+    useCoachWorkoutActions();
+
   function getCommentUserId(comment_user_type: string) {
-    return comment_user_type === 'coach' ? coachId : clientId;
+    return comment_user_type === 'coach' ? id : clientId;
   }
 
   function getCommentName(user_type: string): string {
@@ -79,25 +72,56 @@ const WorkoutCommentBox = (props: WorkoutCommentBoxProps) => {
     setEditCommentContent('');
   };
 
-  const handleAddComment = () => {
-    addComment(newComment);
+  const handleAddComment = async () => {
+    const trimmedComment = newComment.trim();
+    if (!trimmedComment) return;
+    await addCommentToWorkout({
+      clientId,
+      programId,
+      workoutId,
+      content: trimmedComment,
+      timestamp: new Date().toISOString(),
+      user_type: role,
+    });
     setNewComment('');
   };
 
   const handleUpdateComment = async (commentId: number) => {
-    if (!editCommentContent.trim()) return;
-
-    await updateComment(commentId, editCommentContent);
-    setEditCommentId(null);
+    const trimmedComment = editCommentContent.trim();
+    if (!trimmedComment) return;
+    try {
+      await updateWorkoutComment({
+        clientId,
+        programId,
+        workoutId,
+        commentId,
+        content: trimmedComment,
+        timestamp: new Date().toISOString(),
+        user_type: role,
+      });
+      setEditCommentId(null);
+    } catch (error) {
+      console.error('Failed to update comment:', error);
+    }
   };
 
   const handleDeleteComment = async () => {
-    if (commentToDelete) {
-      setAnchorEl(null);
-      await deleteComment(commentToDelete);
-      setEditCommentId(null);
-      setCommentToDelete(null);
+    try {
+      if (commentToDelete) {
+        setAnchorEl(null);
+        await deleteWorkoutComment({
+          clientId,
+          programId,
+          workoutId,
+          commentId: commentToDelete,
+        });
+        setEditCommentId(null);
+        setCommentToDelete(null);
+      }
+    } catch (error) {
+      console.error('Failed to delete comment:', error);
     }
+    return;
   };
 
   const handleDeleteClick = (
@@ -121,139 +145,84 @@ const WorkoutCommentBox = (props: WorkoutCommentBoxProps) => {
     }
   }, [editCommentContent]);
 
+  const buttonBase = 'h-9 w-20 cursor-pointer rounded-sm py-1';
+  const buttonVariants = {
+    cancel: `${buttonBase} border border-blue-500 text-blue-500 px-2`,
+    save: `${buttonBase} bg-[#4e4eff] text-white`,
+    delete: `${buttonBase} bg-red-500 text-white`,
+  };
+
   return (
-    <Box sx={{ mb: '20px' }}>
-      {workoutComments.map((comment, index) => (
-        <Box
-          className="commentBox"
-          sx={{ display: 'flex', ml: '20px', padding: '10px 0px' }}
-          key={index}
-        >
-          <Box sx={{ mr: '20px' }}>
+    <div className="workout-comments-wrapper mb-5">
+      {comments.map((comment, index) => (
+        <div className="comment ml-6 flex py-3" key={index}>
+          <div className="mr-5">
             <ProfilePictureBubble
+              userType={comment.user_type}
               userId={getCommentUserId(comment.user_type)}
               name={getCommentName(comment.user_type)}
-              height={28}
+              height={38}
             />
-          </Box>
-          <Stack className="commentStack" sx={{ flexGrow: '1', mr: '20px' }}>
-            <CommentHeader>
-              <Typography
-                className="commentUserName"
-                sx={{ fontWeight: '600', fontSize: '15px' }}
-              >
+          </div>
+          <div className="comment-content-box mr-10 flex-grow">
+            <div className="comment-header flex items-center">
+              <p className="comment-username font-bold">
                 {getCommentName(comment.user_type)}
-              </Typography>
-              <Typography
-                className="commentDate"
-                sx={{
-                  fontSize: '13px',
-                  ml: '10px',
-                  color: 'grey',
-                  flexGrow: 1,
-                }}
-              >
+              </p>
+              <p className="comment-date ml-3 flex-grow text-xs text-gray-500">
                 {getCommentDateString(comment.timestamp)}
-              </Typography>
+              </p>
               {role === comment.user_type && (
-                <IconButton
-                  sx={{ padding: 0 }}
-                  onClick={() => handleEditComment(comment.id, comment.content)}
+                <button
+                  type="button"
+                  className="cursor-pointer p-0"
+                  aria-label="Edit comment"
+                  onClick={() => {
+                    handleEditComment(comment.id, comment.content);
+                  }}
                 >
                   <EditIcon sx={{ color: 'black', fontSize: 20 }} />
-                </IconButton>
+                </button>
               )}
-            </CommentHeader>
+            </div>
             {editCommentId === comment.id ? (
-              <Stack
-                className="editCommentStack"
-                sx={{ mr: '30px', mt: '10px' }}
-              >
-                <OutlinedInput
-                  inputRef={inputRef}
+              <div className="mt-3 mr-10 flex flex-col">
+                <textarea
+                  ref={inputRef}
                   value={editCommentContent}
                   onChange={(e) => setEditCommentContent(e.target.value)}
-                  multiline
-                  sx={{
-                    mt: '5px',
-                    fontSize: '14px',
-                    width: '100%',
-                    padding: '15px 15px',
-                    minHeight: '70px',
-                    alignItems: 'flex-start',
-                  }}
-                ></OutlinedInput>
-                <Box
-                  className="editCommentButtons"
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    mt: '5px',
-                    flexGrow: 1,
-                  }}
-                >
-                  <Button
+                  className="mt-1 min-h-[70px] resize-y rounded-md border border-gray-300 px-4 py-4 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                />
+                <div className="comment-buttons mt-3 flex flex-grow items-center">
+                  <button
+                    className={`${buttonVariants.cancel}` + ' mr-4'}
+                    type="button"
                     onClick={handleCancelEdit}
-                    sx={{
-                      fontSize: '13px',
-                      mr: '10px',
-                      padding: '4px 0px',
-                      '&:hover': {
-                        background: 'lightgrey',
-                      },
-                    }}
                   >
                     Cancel
-                  </Button>
-                  <Button
+                  </button>
+                  <button
+                    type="button"
                     onClick={() => handleUpdateComment(comment.id)}
-                    sx={{
-                      background: '#4e4eff',
-                      color: 'white',
-                      mr: '10px',
-                      fontSize: '13px',
-                      padding: '4px 0px',
-                      '&:hover': {
-                        backgroundColor: 'blue',
-                      },
-                    }}
+                    className={`${buttonVariants.save}` + ' mr-4'}
                   >
                     Save
-                  </Button>
-                  <Tooltip
-                    title="Delete comment"
-                    placement="top"
-                    componentsProps={{
-                      tooltip: {
-                        sx: {
-                          backgroundColor: '#FF4D4D',
-                          color: 'white',
-                          fontSize: '14px',
-                          boxShadow: 2,
-                        },
-                      },
-                    }}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={(e) => handleDeleteClick(e, comment.id)}
+                    className={`${buttonVariants.delete}` + ' mr-4'}
                   >
-                    <IconButton
-                      onClick={(e) => handleDeleteClick(e, comment.id)}
-                      sx={{
-                        '&:hover': {
-                          background: 'transparent',
-                        },
-                      }}
-                    >
-                      <DeleteIcon sx={{ color: 'red' }} />
-                    </IconButton>
-                  </Tooltip>
-                </Box>
-              </Stack>
+                    Delete
+                  </button>
+                </div>
+              </div>
             ) : (
-              <Typography sx={{ mt: '5px', fontSize: '14px' }}>
-                {comment.content}
-              </Typography>
+              <p className="mt-1.5">{comment.content}</p>
             )}
-          </Stack>
-        </Box>
+          </div>
+        </div>
       ))}
       <Popover
         open={Boolean(anchorEl)}
@@ -268,39 +237,35 @@ const WorkoutCommentBox = (props: WorkoutCommentBoxProps) => {
           horizontal: 'center',
         }}
       >
-        <Box sx={{ p: 2, textAlign: 'center' }}>
-          <Typography sx={{ mb: 1 }}>Delete this comment?</Typography>
-          <Button
-            variant="contained"
-            color="error"
+        <div className="p-4 text-center">
+          <p className="mb-2">Delete this comment?</p>
+          <button
+            type="button"
+            className={`${buttonVariants.delete}` + ' mr-3'}
             onClick={handleDeleteComment}
-            sx={{ mr: 1 }}
           >
             Delete
-          </Button>
-          <Button variant="outlined" onClick={handleClosePopover}>
+          </button>
+          <button
+            type="button"
+            className={buttonVariants.cancel}
+            onClick={handleClosePopover}
+          >
             Cancel
-          </Button>
-        </Box>
+          </button>
+        </div>
       </Popover>
-      {workoutComments.length > 0 && <Divider sx={{ mt: '10px' }} />}
+      {comments.length > 0 && <Divider sx={{ mt: '10px' }} />}
       <form
-        onSubmit={(e) => {
+        onSubmit={async (e) => {
           e.preventDefault();
-          handleAddComment();
+          console.log('form submit'); // ← does this appear?
+          await handleAddComment();
         }}
       >
-        <Input
+        <textarea
           placeholder="Write a comment..."
-          disableUnderline
-          multiline
-          sx={{
-            margin: '20px 0px 20px 20px',
-            width: '90%',
-            minHeight: '80px',
-            alignItems: 'flex-start',
-            lineHeight: '1.5',
-          }}
+          className="mt-5 mr-0 mb-3 ml-6 min-h-[80px] w-[90%] outline-0"
           value={newComment}
           onChange={(e) => setNewComment(e.target.value)}
           onKeyDown={(e) => {
@@ -310,31 +275,15 @@ const WorkoutCommentBox = (props: WorkoutCommentBoxProps) => {
             }
           }}
         />
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mr: '20px' }}>
-          <Button
-            type="submit"
-            variant="contained"
-            sx={{
-              backgroundColor: '#4e4eff',
-              color: 'white',
-              fontSize: '13px',
-              padding: '4px 0px',
-              '&:hover': {
-                backgroundColor: 'blue',
-              },
-            }}
-          >
+        <div className="mr-9 flex justify-end">
+          <button type="submit" className={buttonVariants.save}>
             Send
-          </Button>
-        </Box>
+          </button>
+        </div>
       </form>
-    </Box>
+    </div>
   );
 };
+// WorkoutCommentBox.whyDidYouRender = true;
 
-export default WorkoutCommentBox;
-
-const CommentHeader = styled(Box)`
-  display: flex;
-  align-items: center;
-`;
+export default React.memo(WorkoutCommentBox);

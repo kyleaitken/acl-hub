@@ -1,17 +1,20 @@
 import { apiRequest } from './api';
-import { Client } from '../types';
+import { Client, ClientDetails } from '../types/models';
 
 const baseUrl = `${import.meta.env.VITE_API_BASE_URL}/coaches/clients`;
 
-const fetchClients = (token: string) => apiRequest(baseUrl, 'GET', token);
+const fetchClients = (token: string): Promise<Client[]> =>
+  apiRequest(baseUrl, 'GET', token);
 
-const fetchDetailedClientData = (token: string) =>
-  apiRequest(`${baseUrl}/detailed`, 'GET', token);
+const fetchClientDetails = (
+  token: string,
+  clientId: number,
+): Promise<ClientDetails> => apiRequest(`${baseUrl}/${clientId}`, 'GET', token);
 
-const addClient = (token: string, clientData: Client) =>
+const addClient = (token: string, clientData: Client): Promise<Client> =>
   apiRequest(baseUrl, 'POST', token, clientData);
 
-const updateClient = (token: string, clientData: Client) =>
+const updateClient = (token: string, clientData: Client): Promise<Client> =>
   apiRequest(baseUrl, 'PUT', token, clientData);
 
 const deleteClient = (token: string, clientId: number) =>
@@ -19,7 +22,7 @@ const deleteClient = (token: string, clientId: number) =>
 
 export default {
   fetchClients,
-  fetchDetailedClientData,
+  fetchClientDetails,
   addClient,
   updateClient,
   deleteClient,

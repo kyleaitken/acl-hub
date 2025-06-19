@@ -20,6 +20,7 @@ export const useLogin = () => {
       id: loginData.id,
       firstName: loginData.first_name,
       lastName: loginData.last_name,
+      profilePictureUrl: loginData.profile_picture_url,
     });
 
     return loginData.role;

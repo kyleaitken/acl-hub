@@ -1,27 +1,31 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 /* Default (light) theme */
 :root {
-    --color-bg: white;
-    --color-text: rgba(0, 0, 0, 0.87);
-    --color-text-secondary: white;
-    --color-primary: #666666;     
-    --color-secondary: #292632;   
-  }
-  
-  /* Dark mode */
-  html.dark {
-    --color-bg: #0f172a;
-    --color-text: #f8fafc;
-    --color-text-secondary: rgba(0, 0, 0, 0.87);
-    --color-primary: #90caf9; 
-    --color-secondary: #f48fb1;
-  }
-  
-  /* Fun mode */
-  html.fun {
-    --color-bg: #ffe4e6;          /* pinkish */
-    --color-text: #1f2937;
-    --color-primary: #f43f5e;     /* rose */
-    --color-secondary: #facc15;   /* yellow */
-  }
+  --color-bg: white;
+  --color-text: rgba(0, 0, 0, 0.87);
+  --color-text-secondary: white;
+  --color-text-light: #f8fafc;
+  --color-primary: #666666;
+  --color-secondary: #292632;
+  --button-highlight: #eeeeeef0;
+}
+
+/* Dark mode */
+html.dark {
+  --color-bg: #222222;
+  --color-text: #f8fafc;
+  --color-text-secondary: rgba(0, 0, 0, 0.87);
+  --color-text-light: #f8fafc;
+  --color-primary: #ffffff;
+  --color-secondary: #292632;
+  --button-highlight: #373737;
+}
+
+/* Fun mode */
+html.fun {
+  --color-bg: #ffe4e6; /* pinkish */
+  --color-text: #1f2937;
+  --color-primary: #f43f5e; /* rose */
+  --color-secondary: #facc15; /* yellow */
+}

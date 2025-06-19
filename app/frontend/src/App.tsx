@@ -2,22 +2,14 @@ import { Route, Routes } from 'react-router-dom';
 import Login from './features/auth/pages/Login';
 import CoachHomePage from './features/coach/pages/CoachHomePage';
 import CoachPrograms from './features/coach/pages/CoachPrograms';
-import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import NavigationBar from './features/coach/components/NavigationBar';
 import SignupPage from './features/auth/pages/SignupPage';
 import './styles/styles.css';
 import { useAuthStore } from './features/auth/store/authStore';
+import ProtectedRoute from './features/auth/components/ProtectedRoute';
 
 function App() {
-  const navigate = useNavigate();
   const { isLoggedIn, role } = useAuthStore();
-
-  useEffect(() => {
-    if (!isLoggedIn) {
-      navigate('/login');
-    }
-  }, [isLoggedIn]);
 
   return (
     <>
@@ -29,8 +21,32 @@ function App() {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<SignupPage />} />
-        <Route path="/coach" element={<CoachHomePage />} />
-        <Route path="/coach/programs" element={<CoachPrograms />} />
+        <Route path="/unauthorized" element={<h1>Unauthorized Access</h1>} />
+        <Route
+          path="/coach"
+          element={
+            <ProtectedRoute allowedRoles={['coach']}>
+              <CoachHomePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/coach/programs"
+          element={
+            <ProtectedRoute allowedRoles={['coach']}>
+              <CoachPrograms />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/testRoute"
+          element={
+            <ProtectedRoute allowedRoles={['client']}>
+              <CoachPrograms />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </>
   );

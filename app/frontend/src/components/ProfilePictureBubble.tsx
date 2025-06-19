@@ -1,11 +1,10 @@
-import { RootState } from '../store';
-import { useSelector } from 'react-redux';
-import { selectClientProfilePicture } from '../slices/selectors/clientsSelectors';
 import { Avatar } from '@mui/material';
+import { useUserProfilePictureUrl } from '../hooks/userUserProfilePictureUrl';
 
 interface ProfilePictureBubbleProps {
   userId: number;
   name: string;
+  userType: 'coach' | 'client';
   height?: number;
 }
 
@@ -41,10 +40,8 @@ function stringAvatar(name: string, height: number) {
 }
 
 const ProfilePictureBubble = (props: ProfilePictureBubbleProps) => {
-  const { userId, name, height = 34 } = props;
-  const profilePictureUrl = useSelector((state: RootState) =>
-    selectClientProfilePicture(userId)(state),
-  );
+  const { userId, name, height = 34, userType } = props;
+  const profilePictureUrl = useUserProfilePictureUrl(userId, userType);
 
   return (
     <Avatar

@@ -2,15 +2,10 @@ import { useEffect, useState } from 'react';
 import logo from '../../../assets/images/Logo.png';
 import { useNavigate } from 'react-router-dom';
 import { Paper } from '@mui/material';
-import {
-  fetchTodayWorkouts,
-  fetchUpdatedWorkouts,
-} from '../../../slices/thunks/workoutThunks';
 import { useAuthStore } from '../store/authStore';
 import { useLogin } from '../hooks/useLogin';
-import { useDispatch } from 'react-redux';
-import { AppDispatch } from '../../../store';
-import { fetchClients } from '../../../slices/thunks/clientThunks';
+import { useClientData } from '../../coach/hooks/useClientData';
+import { useCoachWorkoutActions } from '../../coach/hooks/useCoachWorkoutActions';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
@@ -18,9 +13,10 @@ const LoginPage = () => {
   const [coachSelected, setCoachSelected] = useState(true);
   const [showFailedLogin, setShowFailedLogin] = useState(false);
   const navigate = useNavigate();
-  const dispatch = useDispatch<AppDispatch>();
   const { loginUser } = useLogin();
   const { token, role } = useAuthStore();
+  const { fetchClients } = useClientData();
+  const workoutActions = useCoachWorkoutActions();
 
   const handleSignUp = () => {
     navigate('/signup');
@@ -38,10 +34,11 @@ const LoginPage = () => {
       const token = useAuthStore.getState().token;
 
       if (userRole === 'coach' && token) {
+        await fetchClients(token);
+        await workoutActions.fetchTodayWorkouts();
+        await workoutActions.fetchUpdatedWorkouts();
+
         navigate('/coach');
-        dispatch(fetchClients(token));
-        dispatch(fetchTodayWorkouts());
-        dispatch(fetchUpdatedWorkouts());
       } else {
         navigate('/client');
       }
@@ -116,7 +113,6 @@ const LoginPage = () => {
               <button
                 type="submit"
                 className="mt-5 h-10 cursor-pointer rounded-md bg-[#4e4eff] text-lg text-white hover:bg-blue-700"
-                onClick={handleLogin}
               >
                 Log In
               </button>

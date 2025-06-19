@@ -20,5 +20,7 @@ export const apiRequest = async (
     throw new Error(errorText || 'Request failed');
   }
 
-  return response.json();
+  const data = await response.json();
+  console.log('response for: ', url, data);
+  return data;
 };

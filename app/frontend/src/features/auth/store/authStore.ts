@@ -11,13 +11,17 @@ interface AuthState {
   firstName: string;
   lastName: string;
   isLoggedIn: boolean;
+  profilePictureUrl: string | null;
+
   login: (data: {
     token: string;
     role: Role;
     id: number;
     firstName: string;
     lastName: string;
+    profilePictureUrl: string | null;
   }) => void;
+
   logout: () => void;
 }
 
@@ -30,13 +34,16 @@ export const useAuthStore = create<AuthState>()(
       firstName: '',
       lastName: '',
       isLoggedIn: false,
-      login: ({ token, role, id, firstName, lastName }) =>
+      profilePictureUrl: null,
+
+      login: ({ token, role, id, firstName, lastName, profilePictureUrl }) =>
         set({
           token,
           role,
           id,
           firstName,
           lastName,
+          profilePictureUrl,
           isLoggedIn: true,
         }),
       logout: () =>
@@ -46,6 +53,7 @@ export const useAuthStore = create<AuthState>()(
           id: null,
           firstName: '',
           lastName: '',
+          profilePictureUrl: null,
           isLoggedIn: false,
         }),
     }),

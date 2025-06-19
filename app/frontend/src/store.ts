@@ -14,14 +14,10 @@ import { useDispatch } from 'react-redux';
 import storage from 'redux-persist/lib/storage';
 import authReducer from './slices/auth/authSlice';
 import preferencesReducer from './slices/preferences/preferencesSlice';
-import clientsReducer from './slices/coach/clientsSlice';
-import workoutsReducer from './slices/coach/workoutsSlice';
 
 const rootReducer = combineReducers({
   auth: authReducer,
   preferences: preferencesReducer,
-  clients: clientsReducer,
-  workouts: workoutsReducer,
 });
 
 const persistConfig: PersistConfig<ReturnType<typeof rootReducer>> = {

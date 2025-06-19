@@ -1,13 +1,15 @@
 import { create } from 'zustand';
 import clientService from '../services/clientService';
-import { Client } from '../types';
+import { Client, ClientDetails } from '../types/models';
 
 interface CoachClientStore {
-  clients: Client[];
+  clientsById: Record<number, Client>;
+  detailedClientsById: Record<number, ClientDetails>;
   loading: boolean;
   error?: string;
 
   fetchClients: (token: string) => Promise<void>;
+  fetchClientDetails: (token: string, id: number) => Promise<void>;
   addClient: (token: string, client: Client) => Promise<void>;
   updateClient: (token: string, client: Client) => Promise<void>;
   deleteClient: (token: string, clientId: number) => Promise<void>;
@@ -15,7 +17,8 @@ interface CoachClientStore {
 }
 
 export const useCoachClientStore = create<CoachClientStore>((set) => ({
-  clients: [],
+  clientsById: {},
+  detailedClientsById: {},
   loading: false,
   error: undefined,
 
@@ -23,9 +26,31 @@ export const useCoachClientStore = create<CoachClientStore>((set) => ({
     set({ loading: true });
     try {
       const data = await clientService.fetchClients(token);
-      set({ clients: data, loading: false });
+      const byId = Object.fromEntries(
+        data.map((client) => [client.id, client]),
+      );
+      set({ clientsById: byId, loading: false });
     } catch (err) {
       set({ error: 'Failed to fetch clients', loading: false });
+    }
+  },
+
+  fetchClientDetails: async (token, clientId) => {
+    set({ loading: true });
+    try {
+      const data: ClientDetails = await clientService.fetchClientDetails(
+        token,
+        clientId,
+      );
+      set((state) => ({
+        detailedClientsById: {
+          ...state.detailedClientsById,
+          [clientId]: data,
+        },
+        loading: false,
+      }));
+    } catch {
+      set({ error: 'Failed to fetch client details', loading: false });
     }
   },
 
@@ -34,7 +59,7 @@ export const useCoachClientStore = create<CoachClientStore>((set) => ({
     try {
       const newClient = await clientService.addClient(token, client);
       set((state) => ({
-        clients: [...state.clients, newClient],
+        clientsById: { ...state.clientsById, [newClient.id]: newClient },
         loading: false,
       }));
     } catch (err) {
@@ -47,9 +72,10 @@ export const useCoachClientStore = create<CoachClientStore>((set) => ({
     try {
       const updatedClient = await clientService.updateClient(token, client);
       set((state) => ({
-        clients: state.clients.map((c) =>
-          c.id === updatedClient.id ? updatedClient : c,
-        ),
+        clientsById: {
+          ...state.clientsById,
+          [updatedClient.id]: updatedClient,
+        },
         loading: false,
       }));
     } catch (err) {
@@ -61,10 +87,13 @@ export const useCoachClientStore = create<CoachClientStore>((set) => ({
     set({ loading: true });
     try {
       await clientService.deleteClient(token, clientId);
-      set((state) => ({
-        clients: state.clients.filter((c) => c.id !== clientId),
-        loading: false,
-      }));
+      set((state) => {
+        const { [clientId]: _, ...rest } = state.clientsById;
+        return {
+          clientsById: rest,
+          loading: false,
+        };
+      });
     } catch (err) {
       set({ error: 'Failed to delete client', loading: false });
     }
