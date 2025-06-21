@@ -20,6 +20,10 @@ export const apiRequest = async (
     throw new Error(errorText || 'Request failed');
   }
 
+  if (response.status === 204) {
+    return null;
+  }
+
   const data = await response.json();
   console.log('response for: ', url, data);
   return data;

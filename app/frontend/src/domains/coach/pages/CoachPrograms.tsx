@@ -1,49 +1,60 @@
 import {
   Box,
-  Button,
   Dialog,
   DialogTitle,
   Input,
   InputAdornment,
   Menu,
   MenuItem,
-  styled,
   Typography,
 } from '@mui/material';
 import TuneIcon from '@mui/icons-material/Tune';
 import SearchIcon from '@mui/icons-material/Search';
 import { useEffect, useMemo, useState } from 'react';
 import { CoachProgram } from '../types/models';
-import {
-  fetchCoachPrograms,
-  addCoachProgram,
-  deleteCoachProgram,
-  updateCoachProgram,
-} from '../services/programsService';
+import { useCoachProgramActions } from '../hooks/useCoachProgramActions';
+import { useCoachProgramData } from '../hooks/useCoachProgramData';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import SendIcon from '@mui/icons-material/Send';
 import React from 'react';
-import { useAuthenticatedUser } from '../../shared/auth/hooks/useAuthenticatedUser';
+import Snackbar from '@mui/material/Snackbar';
 
 const CoachPrograms = () => {
-  const [programs, setPrograms] = useState<CoachProgram[]>([]);
+  const { programs, loading, error } = useCoachProgramData();
   const [filteredPrograms, setFilteredPrograms] = useState<
     CoachProgram[] | null
   >(null);
   const [searchString, setSearchString] = useState('');
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [createProgramVisible, setCreateProgramVisible] = useState(false);
   const [editProgramId, setEditProgramId] = useState<number | null>(null);
   const [editProgramName, setEditProgramName] = useState('');
   const [editProgramDescription, setEditProgramDescription] = useState('');
   const [programName, setProgramName] = useState('');
   const [programDescription, setProgramDescription] = useState('');
+  const [programWeeks, setProgramWeeks] = useState('');
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [optionsOpenIndex, setOptionsOpenIndex] = useState<number>(-1);
+  const [openError, setOpenError] = useState(false);
   const open = Boolean(anchorEl);
 
-  const { token } = useAuthenticatedUser();
+  const {
+    addProgram,
+    updateProgram,
+    fetchPrograms,
+    fetchProgramById,
+    deleteProgram,
+    resetError,
+  } = useCoachProgramActions();
+
+  useEffect(() => {
+    fetchPrograms();
+  }, []);
+
+  useEffect(() => {
+    if (error) {
+      setOpenError(true);
+    }
+  }, [error]);
 
   const handleOpenOptions = (
     event: React.MouseEvent<HTMLButtonElement>,
@@ -52,16 +63,19 @@ const CoachPrograms = () => {
     setOptionsOpenIndex(index);
     setAnchorEl(event.currentTarget);
   };
+
   const handleCloseOptions = () => {
     setAnchorEl(null);
     setOptionsOpenIndex(-1);
   };
+
   const handleCloseDialog = () => {
     setCreateProgramVisible(false);
     setEditProgramId(null);
     setEditProgramName('');
     setEditProgramDescription('');
     setProgramName('');
+    setProgramWeeks('');
     setProgramDescription('');
   };
 
@@ -78,13 +92,15 @@ const CoachPrograms = () => {
   }, [searchString]);
 
   const handleCreateProgram = async () => {
-    if (programName !== '' && token) {
+    if (programName !== '') {
       try {
-        await addCoachProgram(token, programName, programDescription);
-        fetchPrograms();
+        await addProgram({
+          programName,
+          programDescription,
+          num_weeks: parseInt(programWeeks),
+        });
       } catch (err) {
         console.error('Error adding program:', err);
-        setError('Failed to add program. Please try again.');
       } finally {
         handleCloseDialog();
       }
@@ -95,14 +111,10 @@ const CoachPrograms = () => {
     const index = optionsOpenIndex;
     const id = sortedPrograms[index].id;
     handleCloseOptions();
-    if (token) {
-      try {
-        await deleteCoachProgram(token, id);
-        fetchPrograms();
-      } catch (err) {
-        console.error('Error deleting program:', err);
-        setError('Failed to delete program. Please try again.');
-      }
+    try {
+      await deleteProgram(id);
+    } catch (err) {
+      console.error('Error deleting program:', err);
     }
   };
 
@@ -115,52 +127,33 @@ const CoachPrograms = () => {
   };
 
   const handleSubmitEditProgram = async () => {
-    if (token && editProgramId) {
+    if (editProgramId) {
       try {
-        updateCoachProgram(
-          token,
-          editProgramId,
-          editProgramName,
-          editProgramDescription,
-        );
+        updateProgram({
+          programId: editProgramId,
+          programName: editProgramName,
+          programDescription: editProgramDescription,
+        });
+        // handleCloseDialog();
+      } catch (err) {
+        console.error('Error editing program:', err);
+      } finally {
         handleCloseDialog();
-        fetchPrograms();
-      } catch (err) {}
+      }
     }
   };
 
   const handleDuplicateProgram = async () => {
     const program = sortedPrograms[optionsOpenIndex];
     handleCloseOptions();
-    if (token) {
-      try {
-        await addCoachProgram(
-          token,
-          program.name,
-          program.description,
-          program.num_weeks,
-        );
-        fetchPrograms();
-      } catch (err) {
-        console.error('Error duplicating program:', err);
-        setError('Failed to duplicate program. Please try again.');
-      }
-    }
-  };
-
-  const fetchPrograms = async () => {
-    if (token) {
-      setLoading(true);
-      setError(null);
-      try {
-        const programs = await fetchCoachPrograms(token);
-        setPrograms(programs);
-      } catch (err) {
-        console.error('Error fetching programs:', err);
-        setError('Failed to fetch programs. Please try again.');
-      } finally {
-        setLoading(false);
-      }
+    try {
+      await addProgram({
+        programName: program.name,
+        programDescription: program.description,
+        num_weeks: program.num_weeks ?? 2,
+      });
+    } catch (err) {
+      console.error('Error duplicating program:', err);
     }
   };
 
@@ -172,64 +165,46 @@ const CoachPrograms = () => {
 
   const programsToDisplay = filteredPrograms ?? sortedPrograms;
 
-  useEffect(() => {
-    fetchPrograms();
-  }, []);
-
   return (
-    <ProgramsView id="programsView">
-      <ProgramsContainer id="programsContainer">
-        <Box
-          id="programsHeaderBox"
-          sx={{ display: 'flex', alignItems: 'center', width: '100%' }}
-        >
-          <Typography
-            sx={{ flexGrow: '1', fontSize: '20px', fontWeight: '600' }}
-          >
-            Programs
-          </Typography>
-          <Box>
-            <Button
-              onClick={() => setCreateProgramVisible(true)}
-              sx={{
-                color: 'white',
-                backgroundColor: '#4e4eff',
-                textTransform: 'none',
-                padding: '8px 10px',
-                width: '170px',
-                height: '45px',
-                '&:hover': {
-                  backgroundColor: 'blue',
-                },
-              }}
-            >
-              <Typography>+ Create Program</Typography>
-            </Button>
-            <Button
-              sx={{
-                color: 'black',
-                backgroundColor: 'white',
-                textTransform: 'none',
-                padding: '8px 10px',
-                border: '1px solid black',
-                ml: '20px',
-                width: '170px',
-                height: '45px',
-              }}
-            >
-              <Typography>Manage Tags</Typography>
-            </Button>
-          </Box>
-        </Box>
-        <Box
-          id="programsSearchAndFiltersBox"
-          sx={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            width: '100%',
-            mt: '60px',
+    <div
+      id="programs-wrapper"
+      className="flex min-h-screen flex-grow bg-gray-100 pl-[220px]"
+    >
+      <div
+        id="programs-container"
+        className="m-auto mt-15 mb-25 flex min-w-[1000px] flex-col items-center"
+      >
+        <Snackbar
+          open={openError}
+          autoHideDuration={4000}
+          onClose={() => {
+            setOpenError(false);
+            resetError();
           }}
+          message={error}
+        />
+        <div id="programs-header" className="flex w-full items-center">
+          <p className="flex-grow text-2xl font-bold">Programs</p>
+          <div>
+            <button
+              onClick={() => setCreateProgramVisible(true)}
+              type="button"
+              className="h-[45px] w-[170px] rounded-md bg-[#4e4eff] px-3 py-2 text-white"
+            >
+              + Create Program
+            </button>
+            <button
+              type="button"
+              style={{ cursor: 'pointer' }}
+              className="ml-5 h-[45px] w-[170px] cursor-pointer rounded-md border bg-white px-3 py-2"
+            >
+              Manage Tags
+            </button>
+          </div>
+        </div>
+        <div
+          id="programs-search"
+          className="mt-15 flex w-full items-center justify-center"
         >
           <Input
             fullWidth
@@ -252,35 +227,22 @@ const CoachPrograms = () => {
               flexGrow: 1,
             }}
           ></Input>
-          <Button
-            sx={{
-              color: 'black',
-              backgroundColor: 'white',
-              textTransform: 'none',
-              padding: '8px 10px',
-              border: '1px solid black',
-              ml: '20px',
-              width: '170px',
-              height: '45px',
-            }}
+          <button
+            type="button"
+            className="ml-5 flex h-[45px] w-[170px] items-center justify-center rounded-md border bg-white px-3 py-2"
           >
-            <Typography sx={{ display: 'flex', alignItems: 'center' }}>
-              <TuneIcon sx={{ mr: '5px' }} />
-              Filters
-            </Typography>
-          </Button>
-        </Box>
-        <ProgramsListBox>
-          <Header>
-            <Typography
-              sx={{ fontSize: '18px', fontWeight: 600, ml: '20px', mr: '40px' }}
-            >
-              Weeks
-            </Typography>
-            <Typography sx={{ fontSize: '18px', fontWeight: 600 }}>
-              Name
-            </Typography>
-          </Header>
+            <TuneIcon sx={{ mr: '8px' }} />
+            <span>Filters</span>
+          </button>
+        </div>
+        <div className="programs-list-container mt-7 flex w-full flex-col">
+          <div
+            id="programs-list-header"
+            className="flex h-12 w-full items-center rounded-tl-md rounded-tr-md bg-[#D8D8E0]"
+          >
+            <p className="mr-10 ml-5 text-[18px] font-bold">Weeks</p>
+            <p className="text-[18px] font-bold">Name</p>
+          </div>
           {programsToDisplay.map((program, index) => (
             <div
               style={{
@@ -337,45 +299,26 @@ const CoachPrograms = () => {
                   {program.description || ''}
                 </Typography>
               </Box>
-              <Box sx={{ mr: '25px', minWidth: '280px' }}>
-                <Button
-                  sx={{
-                    color: 'black',
-                    backgroundColor: 'white',
-                    textTransform: 'none',
-                    padding: '8px 10px',
-                    border: '1px solid black',
-                    ml: '20px',
-                    width: '170px',
-                    height: '35px',
-                  }}
+              <div className="mr-8 flex min-w-[280px] items-center">
+                <button
+                  type="button"
+                  className="ml-5 flex h-[45px] w-[170px] items-center justify-center rounded-md border bg-white px-3 py-2"
                 >
                   <SendIcon sx={{ fontSize: '20px', mr: '5px' }} />
-                  <Typography sx={{ fontSize: '15px' }}>
-                    Assign To Client
-                  </Typography>
-                </Button>
-                <Button
+                  <span>Assign To Client</span>
+                </button>
+                <button
                   id="basic-button"
+                  aria-label="More options"
                   aria-controls={open ? 'basic-menu' : undefined}
                   aria-haspopup="true"
                   aria-expanded={open ? 'true' : undefined}
                   onClick={(e) => handleOpenOptions(e, index)}
-                  sx={{
-                    color: 'black',
-                    backgroundColor: 'white',
-                    textTransform: 'none',
-                    padding: '8px 10px',
-                    border: '1px solid black',
-                    ml: '20px',
-                    width: '30px',
-                    height: '35px',
-                  }}
+                  type="button"
+                  className="ml-5 flex h-[30px] w-[45px] justify-center rounded-md border bg-white"
                 >
-                  <Typography sx={{ fontSize: '25px', paddingBottom: '12px' }}>
-                    ...
-                  </Typography>
-                </Button>
+                  <span className="text-l">•••</span>
+                </button>
                 <Menu
                   id="basic-menu"
                   anchorEl={anchorEl}
@@ -395,11 +338,11 @@ const CoachPrograms = () => {
                     Duplicate program
                   </MenuItem>
                 </Menu>
-              </Box>
+              </div>
             </div>
           ))}
-        </ProgramsListBox>
-      </ProgramsContainer>
+        </div>
+      </div>
       <Dialog open={createProgramVisible} fullWidth onClose={handleCloseDialog}>
         <DialogTitle sx={{ fontWeight: 600, fontSize: '22px' }}>
           Create new program
@@ -429,6 +372,24 @@ const CoachPrograms = () => {
             }}
           />
           <Typography sx={{ fontWeight: 600, fontSize: '16px' }}>
+            {'Program Length (Weeks)'}
+          </Typography>
+          <Input
+            placeholder="Enter the number of weeks"
+            disableUnderline
+            type="number"
+            onChange={(e) => setProgramWeeks(e.target.value)}
+            value={programWeeks}
+            sx={{
+              mb: '20px',
+              padding: '5px 5px 5px 10px',
+              border: '1px solid black',
+              backgroundColor: 'white',
+              minHeight: '45px',
+              width: '90%',
+            }}
+          />
+          <Typography sx={{ fontWeight: 600, fontSize: '16px' }}>
             Program Description (Optional)
           </Typography>
           <Input
@@ -446,40 +407,20 @@ const CoachPrograms = () => {
             }}
           />
           <Box sx={{ mt: '20px' }}>
-            <Button
+            <button
+              type="button"
+              className="mr-5 h-[40px] w-[150px] rounded-md border bg-[#4e4eff] px-3 py-2 text-white"
               onClick={handleCreateProgram}
-              sx={{
-                color: 'white',
-                backgroundColor: '#4e4eff',
-                textTransform: 'none',
-                padding: '8px 10px',
-                width: '222px',
-                height: '40px',
-                mr: '40px',
-                '&:hover': {
-                  backgroundColor: 'blue',
-                },
-              }}
             >
-              <Typography>Save and add workouts</Typography>
-            </Button>
-            <Button
+              Save Program
+            </button>
+            <button
               onClick={handleCloseDialog}
-              sx={{
-                color: 'white',
-                backgroundColor: 'red',
-                textTransform: 'none',
-                padding: '8px 10px',
-                width: '110px',
-                height: '40px',
-                mr: '40px',
-                '&:hover': {
-                  backgroundColor: 'darkred',
-                },
-              }}
+              type="button"
+              className="mr-10 h-[40px] w-[110px] rounded-md border bg-red-500 px-3 py-2 text-white"
             >
-              <Typography>Cancel</Typography>
-            </Button>
+              Cancel
+            </button>
           </Box>
         </form>
       </Dialog>
@@ -536,79 +477,25 @@ const CoachPrograms = () => {
             }}
           />
           <Box sx={{ mt: '20px' }}>
-            <Button
+            <button
               onClick={handleSubmitEditProgram}
-              sx={{
-                color: 'white',
-                backgroundColor: '#4e4eff',
-                textTransform: 'none',
-                padding: '8px 10px',
-                width: '222px',
-                height: '40px',
-                mr: '40px',
-                '&:hover': {
-                  backgroundColor: 'blue',
-                },
-              }}
+              className="mr-5 h-[40px] w-[150px] cursor-pointer rounded-md border bg-[#4e4eff] px-3 py-2 text-white"
+              type="button"
             >
-              <Typography>Update program</Typography>
-            </Button>
-            <Button
+              Update program
+            </button>
+            <button
               onClick={handleCloseDialog}
-              sx={{
-                color: 'white',
-                backgroundColor: 'red',
-                textTransform: 'none',
-                padding: '8px 10px',
-                width: '110px',
-                height: '40px',
-                mr: '40px',
-                '&:hover': {
-                  backgroundColor: 'darkred',
-                },
-              }}
+              className="mr-10 h-[40px] w-[110px] cursor-pointer rounded-md border bg-red-500 px-3 py-2 text-white"
+              type="button"
             >
-              <Typography>Cancel</Typography>
-            </Button>
+              Cancel
+            </button>
           </Box>
         </form>
       </Dialog>
-    </ProgramsView>
+    </div>
   );
 };
 
 export default CoachPrograms;
-
-const ProgramsView = styled(Box)(({ theme }) => ({
-  display: 'flex',
-  backgroundColor: theme.palette.grey[100],
-  flexGrow: 1,
-  marginLeft: '220px',
-  minHeight: '100vh',
-}));
-
-const ProgramsContainer = styled(Box)`
-  display: flex;
-  margin: auto;
-  flex-direction: column;
-  align-items: center;
-  margin-top: 60px;
-  width: 1100px;
-  margin-bottom: 100px;
-`;
-const ProgramsListBox = styled(Box)`
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  margin-top: 30px;
-`;
-
-const Header = styled(Box)(() => ({
-  width: '100%',
-  display: 'flex',
-  alignItems: 'center',
-  height: '50px',
-  backgroundColor: '#D8D8E0',
-  borderTopLeftRadius: '10px',
-  borderTopRightRadius: '10px',
-}));

@@ -1,105 +1,114 @@
-export const fetchCoachPrograms = async (token: string) => {
-    const url = `${import.meta.env.VITE_API_BASE_URL}/coaches/programs`;
+import { AddCoachProgramDTO, UpdateCoachProgramDTO } from '../types/dtos';
+import { CoachProgram } from '../types/models';
+import { apiRequest } from './api';
 
-    try {
-        const response = await fetch(url, {
-            method: 'GET',
-            headers: { 
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`,
-            }
-        });
+const baseUrl = `${import.meta.env.VITE_API_BASE_URL}/coaches/programs`;
 
-        if (!response.ok) throw new Error('Failed to fetch programs');
+const fetchCoachPrograms = (token: string): Promise<CoachProgram[]> =>
+  apiRequest(`${baseUrl}`, 'GET', token);
 
-        const data = await response.json();
-        return data;
-        
-    } catch (error) {
-        console.log("Error fetching coach's programs: ", error);
-        throw error;
-    }
-}
+const fetchCoachProgram = (
+  token: string,
+  programId: number,
+): Promise<CoachProgram> => apiRequest(`${baseUrl}/${programId}`, 'GET', token);
 
-export const addCoachProgram = async (token: string, programName: string, programDescription?: string, num_weeks?: number) => {
-    const url = `${import.meta.env.VITE_API_BASE_URL}/coaches/programs`;
+// export const fetchCoachPrograms = async (token: string) => {
+//   const url = `${import.meta.env.VITE_API_BASE_URL}/coaches/programs`;
 
-    const body = {
-        num_weeks: num_weeks || 1,
-        name: programName,
-        description: programDescription || ""
-    }
+//   try {
+//     const response = await fetch(url, {
+//       method: 'GET',
+//       headers: {
+//         'Content-Type': 'application/json',
+//         Authorization: `Bearer ${token}`,
+//       },
+//     });
 
-    try {
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: { 
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`,
-            },
-            body: JSON.stringify(body),
-        });
+//     if (!response.ok) throw new Error('Failed to fetch programs');
 
-        if (!response.ok) throw new Error('Failed to create new program');
+//     const data = await response.json();
+//     return data;
+//   } catch (error) {
+//     console.log("Error fetching coach's programs: ", error);
+//     throw error;
+//   }
+// };
 
-        const data = await response.json();
-        console.log("Return from add program: ", data)
-        return data;
-        
-    } catch (error) {
-        console.log("Error creating new program: ", error);
-        throw error;
-    }
-}
+// TODO: Make sure number of weeks is on form and mandatory. Pass empty string default from component for description, or handle that in the backend
+const addCoachProgram = (
+  token: string,
+  dto: AddCoachProgramDTO,
+): Promise<CoachProgram> => {
+  const body = {
+    name: dto.programName,
+    description: dto.programDescription,
+    num_weeks: dto.num_weeks,
+  };
+  return apiRequest(baseUrl, 'POST', token, body);
+};
+
+// export const addCoachProgram = async (
+//   token: string,
+//   programName: string,
+//   programDescription?: string,
+//   num_weeks?: number,
+// ) => {
+//   const url = `${import.meta.env.VITE_API_BASE_URL}/coaches/programs`;
+
+//   const body = {
+//     num_weeks: num_weeks || 1,
+//     name: programName,
+//     description: programDescription || '',
+//   };
+
+//   try {
+//     const response = await fetch(url, {
+//       method: 'POST',
+//       headers: {
+//         'Content-Type': 'application/json',
+//         Authorization: `Bearer ${token}`,
+//       },
+//       body: JSON.stringify(body),
+//     });
+
+//     if (!response.ok) throw new Error('Failed to create new program');
+
+//     const data = await response.json();
+//     console.log('Return from add program: ', data);
+//     return data;
+//   } catch (error) {
+//     console.log('Error creating new program: ', error);
+//     throw error;
+//   }
+// };
 
 export const deleteCoachProgram = async (token: string, programId: number) => {
-    const url = `${import.meta.env.VITE_API_BASE_URL}/coaches/programs/${programId}`;
+  const url = `${baseUrl}/${programId}`;
+  return apiRequest(url, 'DELETE', token);
+};
 
-    try {
-        const response = await fetch(url, {
-            method: 'DELETE',
-            headers: { 
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`,
-            },
-        });
+export const updateCoachProgram = async (
+  token: string,
+  dto: UpdateCoachProgramDTO,
+): Promise<CoachProgram> => {
+  const { programId, programName, programDescription, num_weeks } = dto;
+  const url = `${baseUrl}/${programId}`;
 
-        if (!response.ok) throw new Error('Failed to delete program');
-        console.log("Return from delete program: ", response)
-        return response;
-        
-    } catch (error) {
-        console.log("Error deleting program: ", error);
-        throw error;
-    }
-}
+  const body = Object.fromEntries(
+    Object.entries({
+      name: programName,
+      description: programDescription,
+      num_weeks,
+    }).filter(([_, value]) => typeof value !== 'undefined'),
+  );
 
-export const updateCoachProgram = async (token: string, programId: number, programName?: string, programDescription?: string, num_weeks?: number) => {
-    const url = `${import.meta.env.VITE_API_BASE_URL}/coaches/programs/${programId}`;
+  return apiRequest(url, 'PUT', token, body);
+};
 
-    const body: Record<string, string | number> = {};
-    if (num_weeks) body.num_weeks = num_weeks;
-    if (programName) body.name = programName;
-    if (programDescription) body.description = programDescription;
-
-    try {
-        const response = await fetch(url, {
-            method: 'PUT',
-            headers: { 
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`,
-            },
-            body: JSON.stringify(body),
-        });
-
-        if (!response.ok) throw new Error('Failed to update program');
-
-        const data = await response.json();
-        console.log("Return from update program: ", data)
-        return data;
-        
-    } catch (error) {
-        console.log("Error updating program: ", error);
-        throw error;
-    }
-}
+export default {
+  fetchCoachPrograms,
+  fetchCoachProgram,
+  addCoachProgram,
+  deleteCoachProgram,
+  updateCoachProgram,
+};

@@ -22,3 +22,16 @@ export type UpdateCommentDTO = BaseCommentPathParams & {
 export type DeleteCommentDTO = BaseCommentPathParams & {
   commentId: number;
 };
+
+export type AddCoachProgramDTO = {
+  programName: string;
+  programDescription?: string;
+  num_weeks: number;
+};
+
+export type UpdateCoachProgramDTO = {
+  programId: number;
+  programName?: string;
+  programDescription?: string;
+  num_weeks?: number;
+};
