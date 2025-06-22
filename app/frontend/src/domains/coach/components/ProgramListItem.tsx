@@ -1,33 +1,21 @@
 import { CoachProgram } from '../types/models';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import SendIcon from '@mui/icons-material/Send';
-import { Menu, MenuItem } from '@mui/material';
 import React from 'react';
 
 interface ProgramListItemProps {
-  index: number;
   program: CoachProgram;
   open: boolean;
   openOptions: (
     e: React.MouseEvent<HTMLButtonElement>,
     program: CoachProgram,
   ) => void;
-  closeOptions: () => void;
-  editProgram: () => void;
-  deleteProgram: () => void;
-  duplicateProgram: () => void;
-  anchorEl: HTMLElement | null;
 }
 
 const ProgramListItem = ({
   program,
   open,
-  anchorEl,
   openOptions,
-  closeOptions,
-  editProgram,
-  deleteProgram,
-  duplicateProgram,
 }: ProgramListItemProps) => {
   return (
     <div className="flex items-center border-2 border-gray-300 bg-white pt-3 pb-4 pl-5">
@@ -59,26 +47,11 @@ const ProgramListItem = ({
           type="button"
           className="ml-5 flex h-[30px] w-[45px] justify-center rounded-md border bg-white"
         >
-          <span className="text-l">•••</span>
+          <span className="text-lg">•••</span>
         </button>
-        <Menu
-          id="basic-menu"
-          anchorEl={anchorEl}
-          open={open}
-          onClose={closeOptions}
-          MenuListProps={{
-            'aria-labelledby': 'basic-button',
-          }}
-        >
-          <MenuItem onClick={() => editProgram()}>Edit program</MenuItem>
-          <MenuItem onClick={deleteProgram} sx={{ color: 'red' }}>
-            Delete program
-          </MenuItem>
-          <MenuItem onClick={duplicateProgram}>Duplicate program</MenuItem>
-        </Menu>
       </div>
     </div>
   );
 };
 
-export default ProgramListItem;
+export default React.memo(ProgramListItem);

@@ -1,16 +1,7 @@
-import {
-  Box,
-  Dialog,
-  DialogTitle,
-  Input,
-  InputAdornment,
-  Menu,
-  MenuItem,
-  Typography,
-} from '@mui/material';
+import { Input, InputAdornment, Menu, MenuItem } from '@mui/material';
 import TuneIcon from '@mui/icons-material/Tune';
 import SearchIcon from '@mui/icons-material/Search';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { CoachProgram } from '../types/models';
 import { useCoachProgramActions } from '../hooks/useCoachProgramActions';
 import { useCoachProgramData } from '../hooks/useCoachProgramData';
@@ -25,14 +16,15 @@ const CoachPrograms = () => {
     CoachProgram[] | null
   >(null);
   const [searchString, setSearchString] = useState('');
-  const [createProgramVisible, setCreateProgramVisible] = useState(false);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [openError, setOpenError] = useState(false);
   const [selectedProgram, setSelectedProgram] = useState<CoachProgram | null>(
     null,
   );
-  const [isEditing, setIsEditing] = useState(false);
-  const open = Boolean(anchorEl);
+  const [dialogMode, setDialogMode] = useState<'create' | 'edit' | null>(null);
+
+  const isEditing = dialogMode === 'edit' && selectedProgram;
+  const menuOpen = Boolean(anchorEl);
 
   const {
     addProgram,
@@ -53,21 +45,20 @@ const CoachPrograms = () => {
     }
   }, [error]);
 
-  const handleOpenOptions = (
-    event: React.MouseEvent<HTMLButtonElement>,
-    program: CoachProgram,
-  ) => {
-    setAnchorEl(event.currentTarget);
-    setSelectedProgram(program);
-  };
+  const handleOpenOptions = useCallback(
+    (event: React.MouseEvent<HTMLButtonElement>, program: CoachProgram) => {
+      setAnchorEl(event.currentTarget);
+      setSelectedProgram(program);
+    },
+    [],
+  );
 
   const handleCloseOptions = () => {
     setAnchorEl(null);
   };
 
   const handleCloseDialog = () => {
-    setCreateProgramVisible(false);
-    setIsEditing(false);
+    setDialogMode(null);
     setSelectedProgram(null);
   };
 
@@ -116,7 +107,7 @@ const CoachPrograms = () => {
 
   const handleStartEditProgram = async () => {
     if (selectedProgram) {
-      setIsEditing(true);
+      setDialogMode('edit');
       handleCloseOptions();
     }
   };
@@ -127,14 +118,15 @@ const CoachPrograms = () => {
     weeks: string,
   ) => {
     if (selectedProgram) {
+      const program = selectedProgram;
+      handleCloseDialog();
       try {
         await updateProgram({
-          programId: selectedProgram.id,
+          programId: program.id,
           programName: name,
           programDescription: desc,
           num_weeks: parseInt(weeks),
         });
-        setSelectedProgram(null);
       } catch (err) {
         console.error('Error editing program:', err);
       }
@@ -166,6 +158,15 @@ const CoachPrograms = () => {
 
   const programsToDisplay = filteredPrograms ?? sortedPrograms;
 
+  const initialFormValues = useMemo(() => {
+    if (!isEditing) return undefined;
+    return {
+      programName: selectedProgram.name,
+      programDescription: selectedProgram.description,
+      programWeeks: selectedProgram.num_weeks.toString(),
+    };
+  }, [isEditing, selectedProgram]);
+
   return (
     <div
       id="programs-wrapper"
@@ -188,7 +189,7 @@ const CoachPrograms = () => {
           <p className="flex-grow text-2xl font-bold">Programs</p>
           <div>
             <button
-              onClick={() => setCreateProgramVisible(true)}
+              onClick={() => setDialogMode('create')}
               type="button"
               className="h-[45px] w-[170px] rounded-md bg-[#4e4eff] px-3 py-2 text-white"
             >
@@ -244,25 +245,19 @@ const CoachPrograms = () => {
             <p className="mr-10 ml-5 text-[18px] font-bold">Weeks</p>
             <p className="text-[18px] font-bold">Name</p>
           </div>
-          {programsToDisplay.map((program, index) => (
+          {programsToDisplay.map((program) => (
             <ProgramListItem
               key={program.id}
-              index={index}
               program={program}
-              open={open}
+              open={menuOpen}
               openOptions={handleOpenOptions}
-              closeOptions={handleCloseOptions}
-              editProgram={handleStartEditProgram}
-              deleteProgram={handleDeleteProgram}
-              duplicateProgram={handleDuplicateProgram}
-              anchorEl={anchorEl}
             />
           ))}
         </div>
         <Menu
           id="basic-menu"
           anchorEl={anchorEl}
-          open={open}
+          open={menuOpen}
           onClose={handleCloseOptions}
           MenuListProps={{ 'aria-labelledby': 'basic-button' }}
         >
@@ -278,24 +273,16 @@ const CoachPrograms = () => {
         </Menu>
       </div>
       <CreateOrEditProgramDialog
-        open={createProgramVisible || isEditing}
+        open={dialogMode !== null}
         closeDialog={handleCloseDialog}
         submitProgram={(name, desc, weeks) => {
-          if (selectedProgram) {
+          if (isEditing) {
             handleSubmitEditProgram(name, desc, weeks);
           } else {
             handleCreateProgram(name, desc, weeks);
           }
         }}
-        initialValues={
-          isEditing && selectedProgram
-            ? {
-                programName: selectedProgram.name,
-                programDescription: selectedProgram.description,
-                programWeeks: selectedProgram.num_weeks.toString(),
-              }
-            : undefined
-        }
+        initialValues={initialFormValues}
       />
     </div>
   );
