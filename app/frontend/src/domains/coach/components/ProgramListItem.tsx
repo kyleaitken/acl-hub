@@ -5,11 +5,15 @@ import { Menu, MenuItem } from '@mui/material';
 import React from 'react';
 
 interface ProgramListItemProps {
+  index: number;
   program: CoachProgram;
   open: boolean;
-  openOptions: (e: React.MouseEvent<HTMLButtonElement>, index: number) => void;
+  openOptions: (
+    e: React.MouseEvent<HTMLButtonElement>,
+    program: CoachProgram,
+  ) => void;
   closeOptions: () => void;
-  editProgram: (id: number) => void;
+  editProgram: () => void;
   deleteProgram: () => void;
   duplicateProgram: () => void;
   anchorEl: HTMLElement | null;
@@ -26,18 +30,7 @@ const ProgramListItem = ({
   duplicateProgram,
 }: ProgramListItemProps) => {
   return (
-    <div
-      style={{
-        display: 'flex',
-        paddingLeft: '20px',
-        paddingBottom: '15px',
-        alignItems: 'center',
-        backgroundColor: 'white',
-        paddingTop: '10px',
-        border: '2px solid lightgray',
-      }}
-      key={program.id}
-    >
+    <div className="flex items-center border-2 border-gray-300 bg-white pt-3 pb-4 pl-5">
       <div className="relative mt-3 mr-15 inline-flex items-center">
         <CalendarTodayIcon sx={{ fontSize: 40, color: 'gray' }} />
         <div className="absolute inset-0 mt-2 flex items-center justify-center font-bold">
@@ -62,7 +55,7 @@ const ProgramListItem = ({
           aria-controls={open ? 'basic-menu' : undefined}
           aria-haspopup="true"
           aria-expanded={open ? 'true' : undefined}
-          onClick={(e) => openOptions(e, program.id)}
+          onClick={(e) => openOptions(e, program)}
           type="button"
           className="ml-5 flex h-[30px] w-[45px] justify-center rounded-md border bg-white"
         >
@@ -77,9 +70,7 @@ const ProgramListItem = ({
             'aria-labelledby': 'basic-button',
           }}
         >
-          <MenuItem onClick={() => editProgram(program.id)}>
-            Edit program
-          </MenuItem>
+          <MenuItem onClick={() => editProgram()}>Edit program</MenuItem>
           <MenuItem onClick={deleteProgram} sx={{ color: 'red' }}>
             Delete program
           </MenuItem>
