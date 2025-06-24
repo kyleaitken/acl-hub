@@ -5,6 +5,7 @@ class Coach < ApplicationRecord
          :recoverable, :rememberable, :validatable
     has_many :clients, dependent: :nullify 
     has_many :programs, dependent: :destroy
+    has_many :tags, dependent: :destroy
 
     # Ensure the email is unique and present
     validates :email, presence: true, uniqueness: true

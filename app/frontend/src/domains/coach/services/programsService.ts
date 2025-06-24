@@ -47,10 +47,26 @@ export const updateCoachProgram = async (
   return apiRequest(url, 'PUT', token, body);
 };
 
+const addTagToProgram = (
+  token: string,
+  programId: number,
+  tagId: number,
+): Promise<CoachProgram> =>
+  apiRequest(`${baseUrl}/${programId}/add_tag/${tagId}`, 'POST', token);
+
+const removeTagFromProgram = (
+  token: string,
+  programId: number,
+  tagId: number,
+): Promise<CoachProgram> =>
+  apiRequest(`${baseUrl}/${programId}/remove_tag/${tagId}`, 'DELETE', token);
+
 export default {
   fetchCoachPrograms,
   fetchCoachProgram,
   addCoachProgram,
   deleteCoachProgram,
   updateCoachProgram,
+  addTagToProgram,
+  removeTagFromProgram,
 };

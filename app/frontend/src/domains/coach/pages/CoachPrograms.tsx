@@ -9,6 +9,7 @@ import React from 'react';
 import Snackbar from '@mui/material/Snackbar';
 import ProgramListItem from '../components/ProgramListItem';
 import CreateOrEditProgramDialog from '../components/CreateOrEditProgramDialog';
+import TagManager from '../components/TagManager';
 
 const CoachPrograms = () => {
   const { programs, loading, error } = useCoachProgramData();
@@ -22,9 +23,12 @@ const CoachPrograms = () => {
     null,
   );
   const [dialogMode, setDialogMode] = useState<'create' | 'edit' | null>(null);
+  const [tagManagerOpen, setTagManagerOpen] = useState(false);
 
   const isEditing = dialogMode === 'edit' && selectedProgram;
   const menuOpen = Boolean(anchorEl);
+
+  console.log(programs, loading, error);
 
   const {
     addProgram,
@@ -167,6 +171,10 @@ const CoachPrograms = () => {
     };
   }, [isEditing, selectedProgram]);
 
+  useEffect(() => {
+    console.log('tagManagerOpen changed:', tagManagerOpen);
+  }, [tagManagerOpen]);
+
   return (
     <div
       id="programs-wrapper"
@@ -199,6 +207,7 @@ const CoachPrograms = () => {
               type="button"
               style={{ cursor: 'pointer' }}
               className="ml-5 h-[45px] w-[170px] cursor-pointer rounded-md border bg-white px-3 py-2"
+              onClick={() => setTagManagerOpen(true)}
             >
               Manage Tags
             </button>
@@ -283,6 +292,11 @@ const CoachPrograms = () => {
           }
         }}
         initialValues={initialFormValues}
+      />
+      <TagManager
+        key="tag-manager"
+        isOpen={tagManagerOpen}
+        handleClose={() => setTagManagerOpen(false)}
       />
     </div>
   );

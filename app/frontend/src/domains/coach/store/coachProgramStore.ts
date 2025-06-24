@@ -16,6 +16,16 @@ interface CoachProgramStore {
   ) => Promise<void>;
   deleteProgram: (token: string, programId: number) => Promise<void>;
   addProgram: (token: string, programData: AddCoachProgramDTO) => Promise<void>;
+  addTagToProgram: (
+    token: string,
+    programId: number,
+    tagId: number,
+  ) => Promise<void>;
+  removeTagFromProgram: (
+    token: string,
+    programId: number,
+    tagId: number,
+  ) => Promise<void>;
 
   setError: (message: string) => void;
   resetError: () => void;
@@ -96,6 +106,39 @@ export const useCoachProgramStore = create<CoachProgramStore>((set) => ({
       }));
     } catch (err) {
       set({ error: `Failed to add new program`, loading: false });
+    }
+  },
+  addTagToProgram: async (token: string, programId: number, tagId: number) => {
+    try {
+      const updated = await programsService.addTagToProgram(
+        token,
+        programId,
+        tagId,
+      );
+      set((state) => ({
+        programs: { ...state.programs, [programId]: updated },
+      }));
+    } catch (err) {
+      set({ error: 'Failed to add tag to program' });
+    }
+  },
+
+  removeTagFromProgram: async (
+    token: string,
+    programId: number,
+    tagId: number,
+  ) => {
+    try {
+      const updated = await programsService.removeTagFromProgram(
+        token,
+        programId,
+        tagId,
+      );
+      set((state) => ({
+        programs: { ...state.programs, [programId]: updated },
+      }));
+    } catch (err) {
+      set({ error: 'Failed to remove tag from program' });
     }
   },
   setError: (message) => set({ error: message }),

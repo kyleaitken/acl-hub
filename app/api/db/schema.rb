@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_06_15_004635) do
+ActiveRecord::Schema[7.2].define(version: 2025_06_22_135451) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -221,6 +221,20 @@ ActiveRecord::Schema[7.2].define(version: 2025_06_15_004635) do
     t.index ["coach_id"], name: "index_programs_on_coach_id"
   end
 
+  create_table "programs_tags", id: false, force: :cascade do |t|
+    t.bigint "program_id", null: false
+    t.bigint "tag_id", null: false
+    t.index ["program_id", "tag_id"], name: "index_programs_tags_on_program_id_and_tag_id", unique: true
+  end
+
+  create_table "tags", force: :cascade do |t|
+    t.string "name"
+    t.bigint "coach_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["coach_id"], name: "index_tags_on_coach_id"
+  end
+
   create_table "workout_comments", force: :cascade do |t|
     t.bigint "client_program_workout_id", null: false
     t.text "content"
@@ -246,5 +260,8 @@ ActiveRecord::Schema[7.2].define(version: 2025_06_15_004635) do
   add_foreign_key "program_workout_exercises", "program_workouts"
   add_foreign_key "program_workouts", "programs"
   add_foreign_key "programs", "coaches"
+  add_foreign_key "programs_tags", "programs"
+  add_foreign_key "programs_tags", "tags"
+  add_foreign_key "tags", "coaches"
   add_foreign_key "workout_comments", "client_program_workouts"
 end

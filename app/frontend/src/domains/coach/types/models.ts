@@ -114,4 +114,10 @@ export interface CoachProgram {
   created_at: string;
   updated_at: string;
   description?: string;
+  tags: ProgramTag[];
+}
+
+export interface ProgramTag {
+  id: number;
+  name: string;
 }
