@@ -94,7 +94,7 @@ const CoachHomePage = () => {
       </div>
       <div
         id="updated-workouts-wrapper"
-        className="flex flex-grow items-center justify-center bg-[#F3F4F6]"
+        className="flex flex-grow items-start justify-center bg-[#F3F4F6]"
       >
         <div
           id="workouts"

@@ -1,4 +1,4 @@
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes, useNavigate } from 'react-router-dom';
 import Login from './domains/shared/auth/pages/Login';
 import CoachHomePage from './domains/coach/pages/CoachHomePage';
 import CoachPrograms from './domains/coach/pages/CoachPrograms';
@@ -7,6 +7,7 @@ import SignupPage from './domains/shared/auth/pages/SignupPage';
 import './styles/styles.css';
 import { useAuthStore } from './domains/shared/auth/store/authStore';
 import ProtectedRoute from './domains/shared/auth/components/ProtectedRoute';
+import { useEffect } from 'react';
 
 function App() {
   const { isLoggedIn, role } = useAuthStore();
@@ -19,6 +20,7 @@ function App() {
         </div>
       )}
       <Routes>
+        <Route path="/" element={<RedirectHome />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/unauthorized" element={<h1>Unauthorized Access</h1>} />
@@ -53,3 +55,24 @@ function App() {
 }
 
 export default App;
+
+
+const RedirectHome = () => {
+  const { isLoggedIn, role } = useAuthStore();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!isLoggedIn) {
+      navigate('/login');
+    } else if (role === 'coach') {
+      navigate('/coach');
+    } else if (role === 'client') {
+      navigate('/client');
+    } else {
+      navigate('/unauthorized');
+    }
+  }, [isLoggedIn, role, navigate]);
+
+  return <div>Redirecting...</div>; 
+};
+
