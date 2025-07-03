@@ -33,7 +33,7 @@ const CoachHomePage = () => {
   return (
     <div
       id="coach-home-page-wrapper"
-      className="ml-[220px] flex min-h-screen text-[var(--color-text)]"
+      className="flex min-h-screen text-[var(--color-text)]"
     >
       <div
         id="today-workouts-container"
@@ -98,7 +98,7 @@ const CoachHomePage = () => {
       >
         <div
           id="workouts"
-          className="mr-[500px] ml-[100px] pt-[30px] pb-[40px]"
+          className="pt-[30px] pb-[40px]"
         >
           <p className="mt-2 mb-8 text-2xl font-bold">
             Good {timeOfDay},{' '}

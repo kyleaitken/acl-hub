@@ -132,6 +132,11 @@ const SignupPage = () => {
     }
   };
 
+  const handleLogin = () => {
+    navigate('/login');
+    setForm(initialForm);
+  }
+
   function handleChange(field: keyof typeof form) {
     return function (e: React.ChangeEvent<HTMLInputElement>) {
       const value =
@@ -153,8 +158,8 @@ const SignupPage = () => {
   return (
     <>
       {imageLoaded ? (
-        <div className="flex h-screen justify-center bg-gray-100 pt-[100px]">
-          <div className="flex">
+        <div className="flex h-screen bg-[#18161f] pt-[50px] flex-col items-center">
+          <div className="flex mb-10">
             <img
               src={signup}
               style={{
@@ -174,10 +179,11 @@ const SignupPage = () => {
                 borderTopRightRadius: '12px',
                 borderBottomRightRadius: '12px',
                 boxShadow: '1',
+                backgroundColor: '#544e63'
               }}
             >
-              <h2 className="mt-[20px] text-center font-['Nunito'] text-[24px] font-bold">
-                Start your ACL Hub account today!
+              <h2 className="mt-[20px] text-center font-['Nunito'] text-[28px] font-bold text-white">
+                Start your free trial
               </h2>
               <div></div>
               <form
@@ -192,7 +198,7 @@ const SignupPage = () => {
                   }
                 }}
               >
-                <div className="mx-[20px] my-[30px] flex flex-col">
+                <div className="mx-10 my-3 flex flex-col">
                   <div>
                     {inputFields.map((field) => {
                       return (
@@ -209,9 +215,8 @@ const SignupPage = () => {
                       );
                     })}
                   </div>
-
                   <button
-                    className="mt-[60px] cursor-pointer rounded-md bg-[#3838c9] p-1 text-lg text-white transition duration-150 hover:bg-blue-500 active:scale-95 active:opacity-90"
+                    className="w-[300px] mt-[60px] self-center cursor-pointer rounded-md bg-[#3838c9] py-2 text-md text-white transition duration-150 hover:bg-blue-500 active:scale-95 active:opacity-90"
                     type="submit"
                   >
                     Sign up
@@ -219,6 +224,10 @@ const SignupPage = () => {
                 </div>
               </form>
             </Paper>
+          </div>
+          <div className='text-white'>
+            <span>Already have an account? </span>
+            <span onClick={() => handleLogin()}className='hover:underline text-blue-200 cursor-pointer'>Log in</span>
           </div>
         </div>
       ) : (
@@ -242,14 +251,17 @@ const ValidatedInput = (props: ValidatedInputProps) => {
   } = props;
 
   return (
-    <div className="text-md mt-[20px] mb-[2px] font-semibold">
-      <p>{label}</p>
+    <div className="mt-[20px] mb-[2px] text-white flex flex-col">
+      <p className='font-bold text-xs mb-1'>{label}</p>
       <input
         type={type}
         value={value}
         onChange={changeHandler}
         placeholder={placeholder}
-        className="w-90 rounded-md border border-gray-300 p-1 text-lg focus:border-blue-400 focus:outline-none"
+        className="w-full rounded-md border border-gray-300 p-2 
+                  hover:border-blue-300 
+                  focus:border-blue-500 focus:ring-4 focus:ring-blue-200 
+                  focus:outline-none transition"
       />
       <div className="mt-1 h-1">
         {error && <p className="text-sm text-red-400">{errorText}</p>}

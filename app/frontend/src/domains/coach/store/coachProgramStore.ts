@@ -68,9 +68,20 @@ export const useCoachProgramStore = create<CoachProgramStore>((set) => ({
         token,
         programData,
       );
-      set((state) => ({
-        programs: { ...state.programs, [programId]: updatedProgram },
-      }));
+      set((state) => {
+        const existing = state.programs[programId];
+        return {
+          programs: {
+            ...state.programs,
+            [programId]: {
+              ...existing,
+              ...updatedProgram,
+              tags: existing?.tags ?? [],
+            },
+          },
+          loading: false,
+        };
+      });
     } catch (err) {
       set({
         error: `Failed to update program with id: ${programId}`,
@@ -95,14 +106,24 @@ export const useCoachProgramStore = create<CoachProgramStore>((set) => ({
   },
   addProgram: async (token: string, programData: AddCoachProgramDTO) => {
     set({ loading: true });
-    console.log(programData);
     try {
       const newProgram = await programsService.addCoachProgram(
         token,
         programData,
       );
+
+      // add empty tags collection to new program
+      const normalizedProgram: CoachProgram = {
+        ...newProgram,
+        tags: newProgram.tags ?? [],
+      };
+
       set((state) => ({
-        programs: { ...state.programs, [newProgram.id]: newProgram },
+        programs: { 
+          ...state.programs, 
+          [newProgram.id]: normalizedProgram 
+
+        },
       }));
     } catch (err) {
       set({ error: `Failed to add new program`, loading: false });

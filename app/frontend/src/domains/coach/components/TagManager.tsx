@@ -1,37 +1,35 @@
 import { useTagStore } from '../store/tagStore';
-import { useAuthenticatedUser } from '../../shared/auth/hooks/useAuthenticatedUser'; // or wherever you store the token
-import { useEffect, useMemo, useState } from 'react';
-import { ProgramTag } from '../types/models';
+import { useAuthenticatedUser } from '../../shared/auth/hooks/useAuthenticatedUser'; 
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { CoachProgram, ProgramTag } from '../types/models';
 import {
-  Button,
   Dialog,
-  IconButton,
   Input,
   InputAdornment,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
-import SaveIcon from '@mui/icons-material/Save';
-import CancelIcon from '@mui/icons-material/Close';
 import React from 'react';
 
 interface TagManagerProps {
   isOpen: boolean;
   handleClose: () => void;
+  selectedProgram: CoachProgram | null;
+  handleAddTagToProgram: (programId: number, tagId: number) => void;
 }
 
-const TagManager = ({ isOpen, handleClose }: TagManagerProps) => {
+const TagManager = ({ isOpen, handleClose, selectedProgram, handleAddTagToProgram }: TagManagerProps) => {
   const { token } = useAuthenticatedUser();
-  const { tags, loading, error, fetchTags, addTag, updateTag, deleteTag } =
+  const { tags, fetchTags, addTag, updateTag, deleteTag } =
     useTagStore();
   const [tagSearchString, setTagSearchString] = useState('');
   const [editTagId, setEditTagId] = useState<number | null>(null);
   const [editTagName, setEditTagName] = useState('');
   const [newTagName, setNewTagName] = useState('');
+  const [addedTagIds, setAddedTagIds] = useState<Set<number>>(new Set());
+  const [activeProgram, setActiveProgram] = useState<CoachProgram | null>(null);
 
-  console.log(tags);
-
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  
   const handleAddTag = async () => {
     if (!newTagName.trim() || !token) return;
     await addTag(token, newTagName.trim());
@@ -51,11 +49,6 @@ const TagManager = ({ isOpen, handleClose }: TagManagerProps) => {
     }
   };
 
-  const handleCancelEdit = () => {
-    setEditTagId(null);
-    setEditTagName('');
-  };
-
   const handleDeleteTag = async (id: number) => {
     if (!token) return;
     await deleteTag(token, id);
@@ -67,22 +60,47 @@ const TagManager = ({ isOpen, handleClose }: TagManagerProps) => {
     }
   }, [token, fetchTags]);
 
-  const sortedTags = useMemo(() => {
-    return Object.values(tags)
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.focus();
+      inputRef.current.selectionStart = inputRef.current.value.length;
+      inputRef.current.selectionEnd = inputRef.current.value.length;
+    }
+  }, [editTagId]);
+
+  useEffect(() => {
+    if (isOpen) {
+      setActiveProgram(selectedProgram ?? null);
+      setAddedTagIds(new Set());
+      setEditTagId(null);
+      setEditTagName('');
+      setTagSearchString('');
+      setNewTagName('');
+    } 
+    
+  }, [isOpen, selectedProgram]);
+
+  const sortedTagAndProgramFilteredTags = useMemo(() => {
+    const sorted = Object.values(tags)
       .slice()
       .sort((a, b) => (a.name || '').localeCompare(b.name || ''));
-  }, [tags]);
+    return activeProgram 
+      ? sorted.filter((tag) => 
+        !activeProgram.tags.some((t) => t.id === tag.id) 
+        && !addedTagIds.has(tag.id)) 
+      : sorted;
+  }, [tags, activeProgram, addedTagIds]);
 
-  const filteredTags = useMemo(() => {
-    if (tagSearchString.trim() === '') return sortedTags;
+  const searchFilteredTags = useMemo(() => {
+    if (tagSearchString.trim() === '') return sortedTagAndProgramFilteredTags;
     const lower = tagSearchString.toLowerCase();
-    return sortedTags.filter((tag) => tag.name?.toLowerCase().includes(lower));
-  }, [tagSearchString, sortedTags]);
+    return sortedTagAndProgramFilteredTags.filter((tag) => tag.name?.toLowerCase().includes(lower));
+  }, [tagSearchString, sortedTagAndProgramFilteredTags]);
 
   return (
-    <Dialog open={isOpen} onClose={handleClose} fullWidth maxWidth="lg">
-      <div className="p-6">
-        <h1 className="mb-4 text-xl font-semibold">Manage Tags</h1>
+    <Dialog open={isOpen} onClose={handleClose} fullWidth maxWidth="sm" sx={{ml: '200px'}}>
+      <div className="flex h-[700px] flex-col p-6">
+        <h1 className="mb-4 text-xl font-semibold">Tags</h1>
         <Input
           fullWidth
           disableUnderline
@@ -100,40 +118,76 @@ const TagManager = ({ isOpen, handleClose }: TagManagerProps) => {
             py: 1,
             border: '1px solid #ccc',
             backgroundColor: 'white',
+            borderRadius: 1,
+            fontSize: '15px'
           }}
         />
 
         {/* Tag List */}
-        <div className="divide-y rounded border">
-          {filteredTags.map((tag) => (
+        <div className="rounded border overflow-scroll flex-grow">
+          {searchFilteredTags.map((tag) => (
             <div
               key={tag.id}
-              className="flex items-center justify-between px-3 py-2 hover:bg-gray-100"
+              className="flex items-center justify-between px-3 py-2 hover:bg-blue-100 hover:shadow-md"
             >
+              {/* If editing the tag */}
               {editTagId === tag.id ? (
-                <div className="flex w-full items-center">
+                <div className="flex w-full items-center text-sm" id={`tag-edit-form-${tag.id}`}>
                   <input
+                    ref={inputRef}
+                    aria-label={`Edit name for ${tag.name}`}
                     className="flex-grow border px-2 py-1"
                     value={editTagName}
                     onChange={(e) => setEditTagName(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleSaveTag();
+                      }
+                    }}
+                    onBlur={() => {
+                      handleSaveTag();
+                    }}
                   />
-                  <IconButton onClick={handleSaveTag}>
-                    <SaveIcon />
-                  </IconButton>
-                  <IconButton onClick={handleCancelEdit}>
-                    <CancelIcon />
-                  </IconButton>
                 </div>
               ) : (
                 <>
-                  <span>{tag.name}</span>
+                  <span 
+                    className={`text-sm flex-grow ${!selectedProgram ? 'cursor-text' : ''}`} 
+                    onClick={() => {
+                        if (!selectedProgram) handleEditTag(tag);
+                      }
+                    }
+                  >
+                      {tag.name}
+                  </span>
                   <div>
-                    <IconButton onClick={() => handleEditTag(tag)}>
-                      <EditIcon />
-                    </IconButton>
-                    <IconButton onClick={() => handleDeleteTag(tag.id)}>
-                      <DeleteIcon />
-                    </IconButton>
+                    {/** Adding tags to a program */}
+                    {activeProgram ? (
+                      <div>
+                        <button
+                          type="button"
+                          className="w-[140px] rounded-md bg-[#4e4eff] px-3 py-2 text-white cursor-pointer text-sm"
+                          onClick={() => {
+                            handleAddTagToProgram(activeProgram.id, tag.id)
+                            setAddedTagIds((prev) => new Set(prev).add(tag.id));
+                          }}
+                        >
+                          Add to Program
+                        </button>
+                      </div>
+                    ) : (
+                    <div>
+                      {/** Viewing all tags */}
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteTag(tag.id)}
+                        className="text-sm rounded-md cursor-pointer text-white bg-red-500 p-1 w-15 hover:bg-red-900"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                    )}
                   </div>
                 </>
               )}
@@ -142,23 +196,31 @@ const TagManager = ({ isOpen, handleClose }: TagManagerProps) => {
         </div>
 
         {/* Add Tag */}
-        <div className="mt-5 flex items-center space-x-2">
-          <Input
-            fullWidth
-            disableUnderline
-            placeholder="New tag name"
-            value={newTagName}
-            onChange={(e) => setNewTagName(e.target.value)}
-            sx={{
-              px: 1,
-              py: 1,
-              border: '1px solid #ccc',
-              backgroundColor: 'white',
-            }}
-          />
-          <Button variant="contained" onClick={handleAddTag}>
-            Add Tag
-          </Button>
+        <div>
+          <h2 className="mt-5 mb-2 font-semibold">Add New Tag</h2>
+          <div className="flex items-center space-x-2">
+            <Input
+              fullWidth
+              disableUnderline
+              placeholder="New tag name"
+              value={newTagName}
+              onChange={(e) => setNewTagName(e.target.value)}
+              sx={{
+                px: 1,
+                py: 1,
+                border: '1px solid #ccc',
+                backgroundColor: 'white',
+                borderRadius: '5px',
+                fontSize: '15px'
+              }}
+            />
+            <button 
+              type='button' onClick={handleAddTag}
+              className="h-[45px] w-[100px] rounded-md bg-[#4e4eff] px-3 py-2 text-white cursor-pointer"
+            >
+              Add Tag
+            </button>
+          </div>
         </div>
       </div>
     </Dialog>

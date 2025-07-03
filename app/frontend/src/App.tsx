@@ -8,19 +8,21 @@ import './styles/styles.css';
 import { useAuthStore } from './domains/shared/auth/store/authStore';
 import ProtectedRoute from './domains/shared/auth/components/ProtectedRoute';
 import { useEffect } from 'react';
+import { Role } from './domains/shared/auth/types';
 
 function App() {
   const { isLoggedIn, role } = useAuthStore();
 
   return (
-    <>
+    <div className="flex min-h-screen font-['Montserrat']">
       {role == 'coach' && isLoggedIn && (
-        <div className="fixed top-0 z-[1000] flex min-h-screen w-[220px] font-['Montserrat']">
+        <div className="flex sticky top-0">
           <NavigationBar />
         </div>
       )}
+      <div className='flex-grow'>
       <Routes>
-        <Route path="/" element={<RedirectHome />} />
+        <Route path="/" element={<RedirectHome isLoggedIn={isLoggedIn} role={role}/>} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/unauthorized" element={<h1>Unauthorized Access</h1>} />
@@ -50,15 +52,16 @@ function App() {
           }
         />
       </Routes>
-    </>
+      </div>
+    </div>
   );
 }
 
 export default App;
 
 
-const RedirectHome = () => {
-  const { isLoggedIn, role } = useAuthStore();
+const RedirectHome = (props: {isLoggedIn: boolean, role: Role | null}) => {
+  const { isLoggedIn, role } = props;
   const navigate = useNavigate();
 
   useEffect(() => {

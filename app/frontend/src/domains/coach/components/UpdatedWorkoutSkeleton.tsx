@@ -2,7 +2,7 @@ import { Skeleton, Paper, Stack, Box } from '@mui/material';
 
 const UpdatedWorkoutSkeleton = () => {
   return (
-    <Paper sx={{ width: '850px', mb: '50px', padding: '20px' }}>
+    <Paper sx={{ width: '700px', mb: '50px', padding: '20px' }}>
       <Stack spacing={2}>
         {/* Header with avatar and name */}
         <Box sx={{ display: 'flex', alignItems: 'center' }}>

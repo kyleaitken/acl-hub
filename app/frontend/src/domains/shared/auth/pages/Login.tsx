@@ -90,7 +90,7 @@ const LoginPage = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Email"
-                className="h-15 w-95 rounded-md border border-gray-300 p-3 text-lg focus:border-blue-400 focus:outline-none"
+                className="h-12 w-95 rounded-md border border-gray-300 p-3 text-md focus:border-blue-400 focus:outline-none"
               />
               <p className="mt-5 mb-1 text-sm font-bold">Password</p>
               <input
@@ -98,7 +98,7 @@ const LoginPage = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Password"
-                className="h-15 w-95 rounded-md border border-gray-300 p-3 text-lg focus:border-blue-400 focus:outline-none"
+                className="h-12 w-95 rounded-md border border-gray-300 p-3 text-md focus:border-blue-400 focus:outline-none"
               />
               {showFailedLogin && (
                 <div className="mt-5 rounded-md bg-[#ffd3d3] px-5 py-5 text-center shadow-sm">
@@ -107,7 +107,7 @@ const LoginPage = () => {
               )}
               <button
                 type="submit"
-                className="mt-5 h-10 cursor-pointer rounded-md bg-[#4e4eff] text-lg text-white hover:bg-blue-700"
+                className="mt-5 h-10 cursor-pointer rounded-md bg-[#4e4eff] text-md text-white hover:bg-blue-700"
               >
                 Log In
               </button>
@@ -119,10 +119,11 @@ const LoginPage = () => {
             <div className="h-[1px] flex-1 bg-[#ccc]" />
           </div>
           <button
-            className="my-4 cursor-pointer align-middle text-blue-700 hover:underline"
+            className="my-4 cursor-pointer align-middle hover:underline"
             onClick={handleSignUp}
           >
-            Don't have a coach account? Sign up
+            <span>Don't have a coach account? </span>
+            <span className='text-blue-700'>Sign up</span>
           </button>
         </div>
       </Paper>

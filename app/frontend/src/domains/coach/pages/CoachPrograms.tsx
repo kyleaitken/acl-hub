@@ -1,5 +1,4 @@
 import { Input, InputAdornment, Menu, MenuItem } from '@mui/material';
-import TuneIcon from '@mui/icons-material/Tune';
 import SearchIcon from '@mui/icons-material/Search';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { CoachProgram } from '../types/models';
@@ -10,9 +9,12 @@ import Snackbar from '@mui/material/Snackbar';
 import ProgramListItem from '../components/ProgramListItem';
 import CreateOrEditProgramDialog from '../components/CreateOrEditProgramDialog';
 import TagManager from '../components/TagManager';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 
 const CoachPrograms = () => {
-  const { programs, loading, error } = useCoachProgramData();
+  const { programs, error } = useCoachProgramData();
   const [filteredPrograms, setFilteredPrograms] = useState<
     CoachProgram[] | null
   >(null);
@@ -23,12 +25,14 @@ const CoachPrograms = () => {
     null,
   );
   const [dialogMode, setDialogMode] = useState<'create' | 'edit' | null>(null);
+  const [dialogSession, setDialogSession] = useState<{
+    mode: 'edit' | 'create';
+    program: CoachProgram | null;
+  } | null>(null);
   const [tagManagerOpen, setTagManagerOpen] = useState(false);
 
-  const isEditing = dialogMode === 'edit' && selectedProgram;
+  const isEditing = dialogSession?.mode === 'edit';
   const menuOpen = Boolean(anchorEl);
-
-  console.log(programs, loading, error);
 
   const {
     addProgram,
@@ -36,7 +40,9 @@ const CoachPrograms = () => {
     fetchPrograms,
     fetchProgramById,
     deleteProgram,
-    resetError,
+    resetError, 
+    addTagToProgram,
+    removeTagFromProgram
   } = useCoachProgramActions();
 
   useEffect(() => {
@@ -71,9 +77,13 @@ const CoachPrograms = () => {
       setFilteredPrograms(null);
     } else {
       const lowerCaseSearch = searchString.toLowerCase();
-      const filtered = sortedPrograms.filter((program) =>
-        program.name?.toLowerCase().includes(lowerCaseSearch),
-      );
+      const filtered = sortedPrograms.filter((program) => {
+        const nameMatches = program.name?.toLowerCase().includes(lowerCaseSearch);
+        const tagMatches = program.tags.some(tag => 
+          tag.name.toLowerCase().includes(lowerCaseSearch)
+        );
+        return nameMatches || tagMatches;
+      });
       setFilteredPrograms(filtered);
     }
   }, [searchString]);
@@ -109,11 +119,21 @@ const CoachPrograms = () => {
     }
   };
 
-  const handleStartEditProgram = async () => {
+  const handleStartEditProgram = () => {
+    handleCloseOptions();
     if (selectedProgram) {
-      setDialogMode('edit');
-      handleCloseOptions();
+      setDialogSession({ mode: 'edit', program: selectedProgram });
+      setDialogMode('edit'); 
     }
+  };
+
+  const handleStartCreateProgram = () => {
+    setDialogSession({ mode: 'create', program: null });
+    setDialogMode('create');
+  };
+
+  const handleDialogExited = () => {
+    setDialogSession(null); 
   };
 
   const handleSubmitEditProgram = async (
@@ -163,22 +183,39 @@ const CoachPrograms = () => {
   const programsToDisplay = filteredPrograms ?? sortedPrograms;
 
   const initialFormValues = useMemo(() => {
-    if (!isEditing) return undefined;
+    if (!dialogSession || dialogSession.mode !== 'edit' || !dialogSession.program) return undefined;
     return {
-      programName: selectedProgram.name,
-      programDescription: selectedProgram.description,
-      programWeeks: selectedProgram.num_weeks.toString(),
+      programName: dialogSession.program.name,
+      programDescription: dialogSession.program.description,
+      programWeeks: dialogSession.program.num_weeks.toString(),
     };
-  }, [isEditing, selectedProgram]);
+  }, [dialogSession]);
 
-  useEffect(() => {
-    console.log('tagManagerOpen changed:', tagManagerOpen);
-  }, [tagManagerOpen]);
+  const handleAddTagsClicked = (program: CoachProgram) => {
+    setSelectedProgram(program);
+    setTagManagerOpen(true);
+  }
+
+  const handleAddTagToProgram = async (programId: number, tagId: number) => {
+    try {
+      await addTagToProgram(programId, tagId);
+    } catch (e) {
+      console.error('Error adding tag to program:', e);
+    }
+  }
+
+  const handleRemoveTagFromProgram = async (programId: number, tagId: number) => {
+    try {
+      await removeTagFromProgram(programId, tagId);
+    } catch (e) {
+      console.error('Error removing tag from program:', e);
+    }
+  }
 
   return (
     <div
       id="programs-wrapper"
-      className="flex min-h-screen flex-grow bg-gray-100 pl-[220px]"
+      className="flex min-h-screen flex-grow bg-gray-100"
     >
       <div
         id="programs-container"
@@ -197,9 +234,9 @@ const CoachPrograms = () => {
           <p className="flex-grow text-2xl font-bold">Programs</p>
           <div>
             <button
-              onClick={() => setDialogMode('create')}
+              onClick={() => handleStartCreateProgram()}
               type="button"
-              className="h-[45px] w-[170px] rounded-md bg-[#4e4eff] px-3 py-2 text-white"
+              className="h-[45px] w-[170px] rounded-md bg-[#4e4eff] px-3 py-2 text-white cursor-pointer"
             >
               + Create Program
             </button>
@@ -220,7 +257,7 @@ const CoachPrograms = () => {
           <Input
             fullWidth
             disableUnderline
-            placeholder="Search"
+            placeholder="Search by program name or tag"
             value={searchString}
             onChange={(e) => setSearchString(e.target.value)}
             startAdornment={
@@ -236,23 +273,17 @@ const CoachPrograms = () => {
               backgroundColor: 'white',
               height: '45px',
               flexGrow: 1,
+              borderRadius: 1
             }}
           ></Input>
-          <button
-            type="button"
-            className="ml-5 flex h-[45px] w-[170px] items-center justify-center rounded-md border bg-white px-3 py-2"
-          >
-            <TuneIcon sx={{ mr: '8px' }} />
-            <span>Filters</span>
-          </button>
         </div>
         <div className="programs-list-container mt-7 flex w-full flex-col">
           <div
             id="programs-list-header"
             className="flex h-12 w-full items-center rounded-tl-md rounded-tr-md bg-[#D8D8E0]"
           >
-            <p className="mr-10 ml-5 text-[18px] font-bold">Weeks</p>
-            <p className="text-[18px] font-bold">Name</p>
+            <p className="mr-10 ml-6 font-bold">Weeks</p>
+            <p className="font-bold">Name</p>
           </div>
           {programsToDisplay.map((program) => (
             <ProgramListItem
@@ -260,6 +291,8 @@ const CoachPrograms = () => {
               program={program}
               open={menuOpen}
               openOptions={handleOpenOptions}
+              handleAddTagsToProgram={handleAddTagsClicked}
+              handleRemoveTagFromProgram={handleRemoveTagFromProgram}
             />
           ))}
         </div>
@@ -269,21 +302,25 @@ const CoachPrograms = () => {
           open={menuOpen}
           onClose={handleCloseOptions}
           MenuListProps={{ 'aria-labelledby': 'basic-button' }}
+          sx={{rounded: 1, mt: 0.5}}
         >
           <MenuItem onClick={() => handleStartEditProgram()}>
+            <EditIcon sx={{mr: 2}}/>
             Edit program
           </MenuItem>
-          <MenuItem onClick={() => handleDeleteProgram()} sx={{ color: 'red' }}>
-            Delete program
-          </MenuItem>
           <MenuItem onClick={() => handleDuplicateProgram()}>
+            <ContentCopyIcon sx={{mr: 2}}/>
             Duplicate program
+          </MenuItem>
+          <MenuItem onClick={() => handleDeleteProgram()} sx={{ color: 'red' }}>
+            <DeleteIcon sx={{mr: 2}}/>
+            Delete program
           </MenuItem>
         </Menu>
       </div>
       <CreateOrEditProgramDialog
         open={dialogMode !== null}
-        closeDialog={handleCloseDialog}
+        closeDialog={() => setDialogMode(null)}
         submitProgram={(name, desc, weeks) => {
           if (isEditing) {
             handleSubmitEditProgram(name, desc, weeks);
@@ -292,11 +329,19 @@ const CoachPrograms = () => {
           }
         }}
         initialValues={initialFormValues}
+        onExited={handleDialogExited}
       />
       <TagManager
         key="tag-manager"
         isOpen={tagManagerOpen}
-        handleClose={() => setTagManagerOpen(false)}
+        handleClose={() => { 
+          setTagManagerOpen(false);
+          setTimeout(() => {
+            setSelectedProgram(null);
+          }, 200);
+        }}
+        selectedProgram={selectedProgram}
+        handleAddTagToProgram={handleAddTagToProgram}
       />
     </div>
   );
