@@ -1,14 +1,15 @@
 import { Route, Routes, useNavigate } from 'react-router-dom';
 import Login from './domains/shared/auth/pages/Login';
-import CoachHomePage from './domains/coach/pages/CoachHomePage';
-import CoachPrograms from './domains/coach/pages/CoachPrograms';
-import NavigationBar from './domains/coach/components/NavigationBar';
+import CoachHomePage from './domains/coach/homepage/pages/CoachHomePage';
+import CoachPrograms from './domains/coach/programs/pages/CoachPrograms';
+import NavigationBar from './domains/coach/core/components/NavigationBar';
 import SignupPage from './domains/shared/auth/pages/SignupPage';
 import './styles/styles.css';
 import { useAuthStore } from './domains/shared/auth/store/authStore';
 import ProtectedRoute from './domains/shared/auth/components/ProtectedRoute';
 import { useEffect } from 'react';
 import { Role } from './domains/shared/auth/types';
+import CoachLibrary from './domains/coach/library/layout/CoachLibrary';
 
 function App() {
   const { isLoggedIn, role } = useAuthStore();
@@ -42,12 +43,19 @@ function App() {
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/testRoute"
           element={
             <ProtectedRoute allowedRoles={['client']}>
               <CoachPrograms />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/coach/library"
+          element={
+            <ProtectedRoute allowedRoles={['coach']}>
+              <CoachLibrary />
             </ProtectedRoute>
           }
         />

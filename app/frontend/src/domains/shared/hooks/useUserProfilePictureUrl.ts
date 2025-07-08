@@ -1,4 +1,4 @@
-import { useCoachClientStore } from '../../coach/store/coachClientStore';
+import { useCoachClientStore } from '../../coach/homepage/store/coachClientStore';
 import { useAuthStore } from '../auth/store/authStore';
 
 type UserType = 'coach' | 'client';

@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Paper } from '@mui/material';
 import { useAuthStore } from '../store/authStore';
 import { useLogin } from '../hooks/useLogin';
-import { useClientData } from '../../../coach/hooks/useClientData';
+import { useClientData } from '../../../coach/homepage/hooks/useClientData';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');

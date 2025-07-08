@@ -4,7 +4,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import { formatDateToStringWithTime } from '../../../utils/dateUtils';
 import { useEffect, useRef, useState } from 'react';
 import React from 'react';
-import { useCoachWorkoutStore } from '../../coach/store/coachWorkoutStore';
+import { useCoachWorkoutStore } from '../../coach/homepage/store/coachWorkoutStore';
 import {
   AuthenticatedUser,
   useAuthenticatedUser,
