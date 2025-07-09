@@ -4,15 +4,15 @@ import { useEffect, useMemo, useState } from 'react';
 import { useExercisesData } from '../hooks/useExercisesData';
 import { Exercise } from '../../core/types/models';
 import { useExercisesActions } from '../hooks/useExercisesActions';
-import AddExerciseForm, { AddExerciseFormData } from '../components/AddExerciseForm';
+import { useNavigate } from 'react-router-dom';
 
 const ExercisesView = () => {
     const [searchString, setSearchString] = useState('');
     const { exercises, loading, hasMore, page } = useExercisesData();
     const [filteredExercises, setFilteredExercises] = useState<Exercise[] | null>(null);
-    const [addingExercise, setAddingExercise] =  useState(false);
 
-    const { fetchExercises, addExercise } = useExercisesActions();
+    const { fetchExercises } = useExercisesActions();
+    const navigate = useNavigate();
 
     useEffect(() => {
         fetchExercises();
@@ -52,36 +52,13 @@ const ExercisesView = () => {
         return () => window.removeEventListener("scroll", onScroll);
     }, [loading, hasMore, page]);
 
-    const handleAddExercise = (formData: AddExerciseFormData) => {
-        const { name, url, description, muscleGroup, category } = formData;
-
-        addExercise({
-            name,
-            videoUrl: url,
-            description,
-            muscleGroup,
-            category,
-          });
-        
-        setAddingExercise(false); // close the form
-    };
-
     return (
         <div className='flex flex-col pl-15 py-10 pr-40'>
-            {addingExercise ? 
-                <>
-                    <AddExerciseForm 
-                        handleCancel={() => setAddingExercise(false)}
-                        handleAddExercise={handleAddExercise}
-                    />
-                </>
-            : 
-            <>
             <div className="exercises-header flex justify-between">
                 <p className="font-semibold text-2xl">Exercises</p>
                 <button               
                     className="h-[45px] w-[170px] rounded-md bg-[#4e4eff] px-3 py-2 text-white cursor-pointer flex items-center justify-center"
-                    onClick={() => setAddingExercise(true)}
+                    onClick={() => navigate('/coach/library/exercises/add')}
                 >
                     <AddIcon sx={{mr: 1}}/>
                     Add Exercise
@@ -95,7 +72,7 @@ const ExercisesView = () => {
                 className='mt-10'
             />
             <div className="mt-6">
-                <div className="grid grid-cols-3 gap-4 border rounded-t-md bg-[#eaeafe] px-2 py-3 font-semibold text-sm text-gray-700">
+                <div className="grid grid-cols-3 gap-4 border rounded-t-md bg-[#eaeafe] px-2 py-4 font-semibold text-sm text-gray-700">
                     <p>Exercise Name</p>
                     <p>Category</p>
                     <p>Primary Muscle Group</p>
@@ -104,15 +81,14 @@ const ExercisesView = () => {
                     <div
                         key={exercise.id}
                         className="grid grid-cols-3 gap-4 py-3 px-2 border border-t-0 text-sm bg-white cursor-pointer hover:bg-gray-100"
+                        onClick={() => navigate(`/coach/library/exercises/${exercise.id}/edit`)}
                     >
-                        <p>{exercise.name}</p>
+                        <p className='font-semibold'>{exercise.name}</p>
                         <p>{exercise.category}</p>
                         <p>{exercise.muscle_group}</p>
                     </div>
                 ))}
             </div>
-            </>
-            }
         </div>
     )
 };

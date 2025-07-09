@@ -3,7 +3,7 @@ import { Exercise, PaginatedExercisesResponse } from '../../core/types/models';
 import { apiRequest } from '../../core/api/api';
 
 const baseUrl = `${import.meta.env.VITE_API_BASE_URL}/exercises`;
-const EXERCISES_LIMIT = 16;
+const EXERCISES_LIMIT = 25;
 
 const fetchExercises = (token: string, page: number): Promise<PaginatedExercisesResponse> =>
   apiRequest(`${baseUrl}?page=${page}&limit=${EXERCISES_LIMIT}`, 'GET', token);

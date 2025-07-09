@@ -44,7 +44,7 @@ const NavigationBar = () => {
     }, 
     {
       id: "library",
-      url: "/coach/library",
+      url: "/coach/library/exercises",
       name: "Library",
       icon: FitnessCenterIcon
     }, 
@@ -57,7 +57,7 @@ const NavigationBar = () => {
   ]
 
   return (
-    <div className="navBarWrapper sticky top-0 max-h-screen flex flex-col items-center bg-[var(--color-secondary)] text-[var(--color-text-light)]">
+    <div className="navBarWrapper sticky text-sm top-0 max-h-screen flex flex-col items-center bg-[var(--color-secondary)] text-[var(--color-text-light)]">
       <Link to="/coach" onClick={() => setTabSelected('')}>
         <img
           style={{
@@ -117,7 +117,7 @@ const NavigationBar = () => {
 };
 
 const ButtonView = ({ children }: { children: React.ReactNode }) => (
-  <div className="mb-5 ml-5 flex w-[200px] items-center font-semibold text-[var(--color-text-light)]">
+  <div className="mb-5 ml-5 flex w-[150px] items-center font-semibold text-[var(--color-text-light)]">
     {children}
   </div>
 );
@@ -125,7 +125,7 @@ const ButtonView = ({ children }: { children: React.ReactNode }) => (
 export default NavigationBar;
 
 const styledLinkClasses =
-  'no-underline text-base font-semibold px-4 py-4 flex hover:underline flex items-center gap-2';
+  'no-underline font-semibold px-4 py-4 flex hover:bg-[#1b1921] flex items-center gap-2';
 
 const tabSelectedClasses = 
-  'no-underline text-base font-semibold px-4 py-4 flex hover:underline flex items-center gap-2 border-r-5 border-r-blue-500';
+  'no-underline font-semibold px-4 py-4 flex bg-[#1b1921] flex items-center gap-2 border-r-5 border-r-blue-500';
