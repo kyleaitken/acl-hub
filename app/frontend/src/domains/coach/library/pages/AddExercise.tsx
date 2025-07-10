@@ -23,6 +23,7 @@ const AddExercise = () => {
           formTitle="Add Exercise"
           initialValues={{ name: '', videoUrl: '', description: '', category: '', muscleGroup: '' }}
           onSubmit={handleAddExercise}
+          isEditing={false}
         />
       </>
     )

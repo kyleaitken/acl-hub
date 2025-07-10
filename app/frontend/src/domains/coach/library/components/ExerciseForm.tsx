@@ -1,5 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useExercisesActions } from '../hooks/useExercisesActions';
+import ConfirmModal from '../../../shared/components/ConfirmModal';
+import toast from 'react-hot-toast';
 
 export interface ExerciseFormValues {
   name: string;
@@ -7,6 +10,7 @@ export interface ExerciseFormValues {
   description?: string;
   category?: string;
   muscleGroup?: string;
+  id?: string,
 }
 
 interface ExerciseFormProps {
@@ -14,7 +18,7 @@ interface ExerciseFormProps {
   initialValues: ExerciseFormValues;
   onSubmit: (values: ExerciseFormValues) => void;
   submitLabel?: string;
-  cancelLabel?: string;
+  isEditing: boolean;
 }
 
 const CATEGORY_OPTIONS = [
@@ -31,14 +35,17 @@ const ExerciseForm = ({
   initialValues,
   onSubmit,
   submitLabel = 'Save Exercise',
+  isEditing,
 }: ExerciseFormProps) => {
   const navigate = useNavigate();
+  const { deleteExercise } = useExercisesActions();
 
   const [name, setName] = useState('');
   const [url, setUrl] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('');
   const [muscleGroup, setMuscleGroup] = useState('');
+  const [showConfirmDelete, setShowConfirmDelete] = useState(false);
 
   useEffect(() => {
     setName(initialValues.name || '');
@@ -61,6 +68,20 @@ const ExerciseForm = ({
     e.preventDefault();
     onSubmit({ name, videoUrl: embedUrl, description, category, muscleGroup });
   };
+
+  const handleDeleteExercise = () => {
+    if (!initialValues.id) return;
+    
+    try {
+      deleteExercise(Number(initialValues.id));
+      navigate("/coach/library/exercises");
+    } catch (e) {
+      console.error("Failed to delete exercise:", e);
+      toast.error("Failed to delete exercise")
+    } finally {
+      setShowConfirmDelete(false);
+    }
+  }
 
   return (
     <div className="flex flex-col pl-15 py-10 pr-40 mb-30">
@@ -158,19 +179,39 @@ const ExerciseForm = ({
             type="submit"
             disabled={!name.trim()}
             className={`h-[45px] w-[170px] rounded-md px-3 py-2 text-white flex items-center justify-center mr-5
-              ${name.trim() ? 'bg-[#4e4eff] cursor-pointer' : 'bg-gray-400 cursor-not-allowed'}`}
+              ${name.trim() ? 'bg-[#4e4eff] cursor-pointer hover:bg-blue-800' : 'bg-gray-400 cursor-not-allowed'}`}
           >
             {submitLabel}
           </button>
           <button
             type="button"
-            className="h-[45px] w-[170px] rounded-md bg-red-500 px-3 py-2 text-white cursor-pointer flex items-center justify-center mr-5"
+            className="h-[45px] w-[170px] rounded-md bg-white px-3 py-2 text-blue-500 border-1 border-blue-500 cursor-pointer flex items-center justify-center mr-5 hover:bg-gray-100"
             onClick={() => navigate("/coach/library/exercises")}
           >
             Cancel
           </button>
+          {isEditing && (
+            <div className='ml-auto'>
+              <button
+                type="button"
+                className="self-end h-[45px] w-[170px] rounded-md bg-red-500 px-3 py-2 text-white cursor-pointer flex items-center justify-center mr-5 hover:bg-red-700"
+                onClick={() => setShowConfirmDelete(true)}
+              >
+                Delete
+              </button>
+            </div>
+          )}
         </div>
       </form>
+      {showConfirmDelete && (
+        <ConfirmModal
+          title="Are you sure you want to delete this exercise?"
+          confirmButtonText="Delete"
+          confirmHandler={handleDeleteExercise}
+          cancelHandler={() => setShowConfirmDelete(false)}
+          isDanger={true}
+        />
+      )}
     </div>
   );
 };

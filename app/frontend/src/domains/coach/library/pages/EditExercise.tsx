@@ -40,6 +40,7 @@ const EditExercise = () => {
         <ExerciseForm
             formTitle={`Edit ${exercise.name}`}
             initialValues={{
+                id: exerciseId,
                 name: exercise.name,
                 videoUrl: exercise.video_url,
                 description: exercise.description,
@@ -47,6 +48,7 @@ const EditExercise = () => {
                 muscleGroup: exercise.muscle_group,
             }}
             onSubmit={handleUpdateExercise}
+            isEditing={true}
         />
     )
 };

@@ -30,7 +30,10 @@ const ExercisesView = () => {
         } else {
             const lowerCaseSearch = searchString.toLowerCase();
             const filtered = sortedExercises.filter((exercise) => {
-                return exercise.name?.toLowerCase().includes(lowerCaseSearch);
+                const nameIncludes = exercise.name?.toLowerCase().includes(lowerCaseSearch);
+                const categoryIncludes = exercise.category?.toLowerCase().includes(lowerCaseSearch);
+                const musclesIncludes = exercise.muscle_group?.toLowerCase().includes(lowerCaseSearch);
+                return nameIncludes || categoryIncludes || musclesIncludes
             });
             setFilteredExercises(filtered);
         }
@@ -51,6 +54,23 @@ const ExercisesView = () => {
         window.addEventListener("scroll", onScroll);
         return () => window.removeEventListener("scroll", onScroll);
     }, [loading, hasMore, page]);
+
+    const highlightQuery = (text: string | undefined, query: string) => {
+        if (!query || !text) return text;
+        const lowerExerciseName = text.toLowerCase();
+        const lowerQuery =  query.toLowerCase();
+        const index = lowerExerciseName.indexOf(lowerQuery);
+
+        if (index === -1) return text;
+        
+        return (
+            <>
+                {text.slice(0, index)}
+                <span className='bg-teal-200'>{text.slice(index, index + lowerQuery.length)}</span>
+                {text.slice(index + lowerQuery.length)}
+            </>
+        )
+    }
 
     return (
         <div className='flex flex-col pl-15 py-10 pr-40'>
@@ -83,9 +103,11 @@ const ExercisesView = () => {
                         className="grid grid-cols-3 gap-4 py-3 px-2 border border-t-0 text-sm bg-white cursor-pointer hover:bg-gray-100"
                         onClick={() => navigate(`/coach/library/exercises/${exercise.id}/edit`)}
                     >
-                        <p className='font-semibold'>{exercise.name}</p>
-                        <p>{exercise.category}</p>
-                        <p>{exercise.muscle_group}</p>
+                        <p className='font-semibold'>
+                            {highlightQuery(exercise.name, searchString)}
+                        </p>
+                        <p>{highlightQuery(exercise.category, searchString)}</p>
+                        <p>{highlightQuery(exercise.muscle_group, searchString)}</p>
                     </div>
                 ))}
             </div>
