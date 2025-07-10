@@ -1,6 +1,6 @@
 class Exercise < ApplicationRecord
     has_many :exercise_images, dependent: :destroy
-    has_many :user_program_workout_exercises, dependent: :destroy
+    has_many :client_program_workout_exercises, dependent: :destroy
     has_many :program_workout_exercises, dependent: :destroy
 
     validates :name, presence: true

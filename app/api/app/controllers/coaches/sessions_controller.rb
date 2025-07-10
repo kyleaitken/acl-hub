@@ -6,7 +6,7 @@ class Coaches::SessionsController < Devise::SessionsController
   def create
     self.resource = warden.authenticate!(auth_options)
     if resource
-      # Create an access token for the user
+      # Create an access token for the client
       token = Doorkeeper::AccessToken.create!(
         resource_owner_id: resource.id,
         resource_owner_type: 'Coach',

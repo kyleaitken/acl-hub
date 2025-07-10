@@ -1,6 +1,6 @@
 require "test_helper"
 
-class UserOutcomeMeasuresControllerTest < ActionDispatch::IntegrationTest
+class ClientOutcomeMeasuresControllerTest < ActionDispatch::IntegrationTest
   # test "the truth" do
   #   assert true
   # end

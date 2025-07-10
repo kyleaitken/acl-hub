@@ -5,8 +5,8 @@ services:
     build: 
       context: ./api
       dockerfile: Dockerfile.dev
-    # command: bash -c "rm -f /rails/tmp/pids/server.pid && bin/rails server -b 0.0.0.0 -p 3000"
-    command: bash -c "rm -f /rails/tmp/pids/server.pid && bin/rails db:migrate && bin/rails server -b 0.0.0.0 -p 3000"
+    command: bash -c "rm -f /rails/tmp/pids/server.pid && bin/rails server -b 0.0.0.0 -p 3000"
+    # command: bash -c "rm -f /rails/tmp/pids/server.pid && bin/rails db:migrate && bin/rails server -b 0.0.0.0 -p 3000"
 
     environment:
       RAILS_ENV: development

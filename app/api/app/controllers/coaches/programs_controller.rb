@@ -5,14 +5,28 @@ module Coaches
 
     # GET /coaches/programs
     def index
-      @programs = current_coach.programs
-      render json: @programs
+      @programs = current_coach.programs.includes(:tags)
+      render json: @programs.as_json(include: :tags)
     end
 
     # GET /coaches/programs/:id
     def show
-      @program = current_coach.programs.find(params[:id])
-      render json: @program
+      @program = current_coach.programs.includes(:tags).find(params[:id])
+      render json: @program.as_json(include: :tags)
+    end
+
+    def add_tag
+      program = current_coach.programs.find(params[:id])
+      tag = current_coach.tags.find(params[:tag_id])
+      program.tags << tag unless program.tags.include?(tag)
+      render json: program, include: :tags
+    end
+    
+    def remove_tag
+      program = current_coach.programs.find(params[:id])
+      tag = current_coach.tags.find(params[:tag_id])
+      program.tags.delete(tag)
+      render json: program, include: :tags
     end
 
     # POST /coaches/programs

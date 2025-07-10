@@ -1,9 +1,10 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import tailwindcss from '@tailwindcss/vite'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), tailwindcss()],
   build: {
       outDir: "dist",
       emptyOutDir: true,
@@ -26,8 +27,8 @@ export default defineConfig({
     port: 5173,
     proxy: {
       '/api': {
-        target: 'http://api:3000', // use this when running frontend in a cotainer
-        // target: 'http://localhost:3000', // Docker service name and port for backend API
+        // target: 'http://api:3000', // use this when running frontend in a cotainer
+        target: 'http://localhost:3000', // Docker service name and port for backend API
         changeOrigin: true,
         rewrite: path => path.replace(/^\/api/, ''),
       },

@@ -1,59 +1,108 @@
-import { useDispatch, useSelector } from 'react-redux';
-import { Route, Routes } from "react-router-dom";
-import LoginPage from './pages/LoginPage';
-import { RootState } from "./store";
-import CoachHomePage from './pages/Coach/CoachHomePage';
-import CoachPrograms from './pages/Coach/CoachPrograms';
+import { Navigate, Route, Routes, useNavigate } from 'react-router-dom';
+import Login from './domains/shared/auth/pages/Login';
+import CoachHomePage from './domains/coach/homepage/pages/CoachHomePage';
+import CoachPrograms from './domains/coach/programs/pages/CoachPrograms';
+import NavigationBar from './domains/coach/core/components/NavigationBar';
+import SignupPage from './domains/shared/auth/pages/SignupPage';
+import './styles/styles.css';
+import { useAuthStore } from './domains/shared/auth/store/authStore';
+import ProtectedRoute from './domains/shared/auth/components/ProtectedRoute';
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import NavigationBar from './components/Coach/NavigationBar';
-import { Box, CssBaseline, styled, ThemeProvider } from '@mui/material';
-import { lightTheme, darkTheme } from './context/themes';
-import { toggleTheme } from './slices/preferences/preferencesSlice';
-import SignupPage from './pages/SignupPage';
+import { Role } from './domains/shared/auth/types';
+import CoachLibrary from './domains/coach/library/layout/CoachLibrary';
+import EditExercise from './domains/coach/library/pages/EditExercise';
+import ExercisesView from './domains/coach/library/pages/ExercisesView';
+import WarmupsView from './domains/coach/library/pages/WarmupsView';
+import CooldownsView from './domains/coach/library/pages/CooldownsView';
+import MetricsView from './domains/coach/library/pages/MetricsView';
+import AddExercise from './domains/coach/library/pages/AddExercise';
+import { Toaster } from 'react-hot-toast';
+import ScrollToTop from './domains/coach/core/components/ScrollToTop';
 
 function App() {
-  const { isDarkMode } = useSelector((state: RootState) => state.preferences)
-  const {role, token} = useSelector((state: RootState) => state.auth);
-  const isLoggedIn = !!token;
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
-
-  const handleToggleTheme = () => {
-    dispatch(toggleTheme());
-  };
-
-  useEffect(() => {
-    if (!isLoggedIn) {
-      navigate("/login")
-    }
-  }, [isLoggedIn])
+  const { isLoggedIn, role } = useAuthStore();
 
   return (
-    <ThemeProvider theme={isDarkMode ? darkTheme : lightTheme}>
-      <CssBaseline />
-      {role == 'coach' && token && 
-        <NavBarView id="nav_bar_view">
-          <NavigationBar toggleTheme={handleToggleTheme}/>
-        </NavBarView>
-      }
+    <div className="flex min-h-screen font-['Montserrat']">
+      {role == 'coach' && isLoggedIn && (
+        <div className="flex sticky top-0">
+          <NavigationBar />
+        </div>
+      )}
+      <div className='flex-grow'>
+        <ScrollToTop />
         <Routes>
-          <Route path="/login" element={<LoginPage />} />
+          <Route path="/" element={<RedirectHome isLoggedIn={isLoggedIn} role={role}/>} />
+          <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignupPage />} />
-          <Route path="/coach" element={<CoachHomePage />} />
-          <Route path="/coach/programs" element={<CoachPrograms />} />
+          <Route path="/unauthorized" element={<h1>Unauthorized Access</h1>} />
+          <Route
+            path="/coach"
+            element={
+              <ProtectedRoute allowedRoles={['coach']}>
+                <CoachHomePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/coach/programs"
+            element={
+              <ProtectedRoute allowedRoles={['coach']}>
+                <CoachPrograms />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/testRoute"
+            element={
+              <ProtectedRoute allowedRoles={['client']}>
+                <CoachPrograms />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/coach/library"
+            element={
+              <ProtectedRoute allowedRoles={['coach']}>
+                <CoachLibrary />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<ExercisesView />} />
+            <Route path="exercises" element={<ExercisesView />} />
+            <Route path="warmups" element={<WarmupsView />} />
+            <Route path="cooldowns" element={<CooldownsView />} />
+            <Route path="metrics" element={<MetricsView />} />
+            <Route path="exercises/:exerciseId/edit" element={<EditExercise />} />
+            <Route path="exercises/add" element={<AddExercise />} />
+            <Route path="*" element={<Navigate to="/coach/library/exercises" replace />} />
+          </Route>
         </Routes>
-    </ThemeProvider>
+      </div>
+      <Toaster position="bottom-center" />
+    </div>
   );
 }
 
 export default App;
 
-const NavBarView = styled(Box)`
-  display: flex;
-  width: 220px;
-  min-height: 100vh;
-  position: fixed;
-  top: 0;
-  z-index: 1000;
-`
+
+const RedirectHome = (props: {isLoggedIn: boolean, role: Role | null}) => {
+  const { isLoggedIn, role } = props;
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!isLoggedIn) {
+      navigate('/login');
+    } else if (role === 'coach') {
+      navigate('/coach');
+    } else if (role === 'client') {
+      navigate('/client');
+    } else {
+      navigate('/unauthorized');
+    }
+  }, [isLoggedIn, role, navigate]);
+
+  return <div>Redirecting...</div>; 
+};
+
