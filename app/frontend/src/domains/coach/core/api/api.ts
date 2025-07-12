@@ -25,6 +25,5 @@ export const apiRequest = async (
   }
 
   const data = await response.json();
-  console.log('response for: ', url, data);
   return data;
 };

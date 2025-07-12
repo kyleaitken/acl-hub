@@ -1,25 +1,22 @@
 class ExercisesController < ApplicationController
     # GET /exercises
     def index
-        limit = params[:limit]&.to_i || 50
-        page = params[:page]&.to_i || 1
-        offset = (page - 1) * limit
-
-        @exercises = Exercise
-            .includes(:exercise_images)
-            .offset(offset)
-            .limit(limit)
-
-        total = Exercise.count
-        render json: {
+        query = ExerciseQuery.new(params)
+        @exercises = query.results
+    
+        if query.paginated?
+          render json: {
             data: @exercises.as_json(include: :exercise_images),
             pagination: {
-                page: page,
-                limit: limit,
-                total: total,
-                has_more: (page * limit) < total
+              page: (params[:page] || 1).to_i,
+              limit: (params[:limit] || 50).to_i,
+              total: query.total_count,
+              has_more: ((params[:page] || 1).to_i * (params[:limit] || 50).to_i) < query.total_count
             }
-        }
+          }
+        else
+          render json: @exercises
+        end
     end
 
     # GET /exercises/:id

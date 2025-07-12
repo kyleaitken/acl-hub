@@ -1,10 +1,11 @@
-import AddIcon from '@mui/icons-material/Add';
 import SearchBar from '../../../shared/components/SearchBar';
 import { useEffect, useMemo, useState } from 'react';
 import { useExercisesData } from '../hooks/useExercisesData';
 import { Exercise } from '../../core/types/models';
 import { useExercisesActions } from '../hooks/useExercisesActions';
 import { useNavigate } from 'react-router-dom';
+import LibraryHeader from '../components/LibraryHeader';
+import { highlightQuery } from '../../core/utils/text';
 
 const ExercisesView = () => {
     const [searchString, setSearchString] = useState('');
@@ -55,36 +56,14 @@ const ExercisesView = () => {
         return () => window.removeEventListener("scroll", onScroll);
     }, [loading, hasMore, page]);
 
-    const highlightQuery = (text: string | undefined, query: string) => {
-        if (!query || !text) return text;
-        const lowerExerciseName = text.toLowerCase();
-        const lowerQuery =  query.toLowerCase();
-        const index = lowerExerciseName.indexOf(lowerQuery);
-
-        if (index === -1) return text;
-        
-        return (
-            <>
-                {text.slice(0, index)}
-                <span className='bg-teal-200'>{text.slice(index, index + lowerQuery.length)}</span>
-                {text.slice(index + lowerQuery.length)}
-            </>
-        )
-    }
-
     return (
         <div className='flex flex-col pl-15 py-10 pr-40'>
-            <div className="exercises-header flex justify-between">
-                <p className="font-semibold text-2xl">Exercises</p>
-                <button               
-                    className="h-[45px] w-[170px] rounded-md bg-[#4e4eff] px-3 py-2 text-white cursor-pointer flex items-center justify-center"
-                    onClick={() => navigate('/coach/library/exercises/add')}
-                >
-                    <AddIcon sx={{mr: 1}}/>
-                    Add Exercise
-                </button>
-            </div>
-            <p className='text-sm'>Use the exercises library to add demo videos for your clients</p>
+            <LibraryHeader 
+                title={"Exercises"}
+                subtitle={"Use the exercises library to add demo videos for your clients"}
+                buttonText={"Add Exercise"}
+                addHandler={() => navigate('/coach/library/exercises/add')}
+            />
             <SearchBar 
                 searchString={searchString} 
                 searchHandler={setSearchString}
@@ -97,7 +76,7 @@ const ExercisesView = () => {
                     <p>Category</p>
                     <p>Primary Muscle Group</p>
                 </div>
-                {(exercisesToDisplay ?? exercises).map((exercise) => (
+                {exercisesToDisplay.map((exercise) => (
                     <div
                         key={exercise.id}
                         className="grid grid-cols-3 gap-4 py-3 px-2 border border-t-0 text-sm bg-white cursor-pointer hover:bg-gray-100"

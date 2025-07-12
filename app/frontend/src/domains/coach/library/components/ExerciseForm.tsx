@@ -69,12 +69,13 @@ const ExerciseForm = ({
     onSubmit({ name, videoUrl: embedUrl, description, category, muscleGroup });
   };
 
-  const handleDeleteExercise = () => {
+  const handleDeleteExercise = async () => {
     if (!initialValues.id) return;
     
     try {
-      deleteExercise(Number(initialValues.id));
+      await deleteExercise(Number(initialValues.id));
       navigate("/coach/library/exercises");
+      toast.success("Exercise deleted!");
     } catch (e) {
       console.error("Failed to delete exercise:", e);
       toast.error("Failed to delete exercise")

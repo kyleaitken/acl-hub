@@ -18,6 +18,8 @@ import MetricsView from './domains/coach/library/pages/MetricsView';
 import AddExercise from './domains/coach/library/pages/AddExercise';
 import { Toaster } from 'react-hot-toast';
 import ScrollToTop from './domains/coach/core/components/ScrollToTop';
+import AddWarmup from './domains/coach/library/pages/AddWarmup';
+import EditWarmup from './domains/coach/library/pages/EditWarmup';
 
 function App() {
   const { isLoggedIn, role } = useAuthStore();
@@ -71,6 +73,8 @@ function App() {
             <Route index element={<ExercisesView />} />
             <Route path="exercises" element={<ExercisesView />} />
             <Route path="warmups" element={<WarmupsView />} />
+            <Route path="warmups/add" element={<AddWarmup />} />
+            <Route path="warmups/:warmupId/edit" element={<EditWarmup />} />
             <Route path="cooldowns" element={<CooldownsView />} />
             <Route path="metrics" element={<MetricsView />} />
             <Route path="exercises/:exerciseId/edit" element={<EditExercise />} />
@@ -79,7 +83,7 @@ function App() {
           </Route>
         </Routes>
       </div>
-      <Toaster position="bottom-center" />
+      <Toaster position="top-center" />
     </div>
   );
 }

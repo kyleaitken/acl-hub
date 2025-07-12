@@ -6,6 +6,8 @@ class Coach < ApplicationRecord
     has_many :clients, dependent: :nullify 
     has_many :programs, dependent: :destroy
     has_many :tags, dependent: :destroy
+    has_many :warmups, dependent: :destroy
+    has_many :cooldowns, dependent: :destroy
 
     # Ensure the email is unique and present
     validates :email, presence: true, uniqueness: true

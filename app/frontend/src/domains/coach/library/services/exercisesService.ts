@@ -13,6 +13,11 @@ const fetchExercise = (
   exerciseId: number,
 ): Promise<Exercise> => apiRequest(`${baseUrl}/${exerciseId}`, 'GET', token);
 
+const searchExercises = (
+  token: string,
+  query: string,
+): Promise<Exercise[]> => apiRequest(`${baseUrl}?query=${query}`, 'GET', token);
+
 const addExercise = (
   token: string,
   dto: AddExerciseDTO,
@@ -60,6 +65,7 @@ export const updateExercise = async (
 export default {
   fetchExercises,
   fetchExercise,
+  searchExercises,
   addExercise,
   deleteExercse,
   updateExercise,

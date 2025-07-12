@@ -27,8 +27,8 @@ const EditExercise = () => {
             await updateExercise({exerciseId: id, ...formData});
             navigate('/coach/library/exercises'); 
         } catch (e) {
-            console.error('Failed to add exercise:', e);
-            toast.error("Failed to add exercise")
+            console.error('Failed to update exercise:', e);
+            toast.error("Failed to udpate exercise")
         }
     }
 
