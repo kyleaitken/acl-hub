@@ -45,14 +45,18 @@ const WarmupForm = ({
   const [exerciseIds, setExerciseIds] = useState<number[]>([]);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [searchString, setSearchString] = useState('');
+  const [previewExerciseId, setPreviewExerciseId] = useState<number | null>(null);
+  const [anchorRect, setAnchorRect] = useState<DOMRect | null>(null);
+
+  const tagRefs = useRef<Record<number, HTMLDivElement | null>>({});
+  const previewRef = useRef<HTMLDivElement>(null);
+  const searchContainerRef = useRef<HTMLDivElement>(null);
 
   const { exercisesMap } = useExercisesData();
   const { fetchExercise } = useExercisesActions();
   const navigate = useNavigate();
   const { deleteWarmup } = useWarmupsActions();
-  const { results: searchResults, search, loading } = useExerciseSearch();
-
-  const searchContainerRef = useRef<HTMLDivElement>(null);
+  const { results: searchResults, search } = useExerciseSearch();
 
   const addedExerciseIds = useMemo(
     () => new Set(exerciseIds),
@@ -95,14 +99,26 @@ const WarmupForm = ({
     setExerciseIds(initialValues.exerciseIds || []);
   }, [initialValues]);
 
-  // dismiss dropdown when search loses focus
+  // dismiss dropdowns when they lose focus
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        searchContainerRef.current &&
-        !searchContainerRef.current.contains(event.target as Node)
-      ) {
+      const target = event.target as Node;
+  
+      const clickedOutsideSearch = searchContainerRef.current &&
+        !searchContainerRef.current.contains(target);
+  
+      const tagElement = previewExerciseId ? tagRefs.current[previewExerciseId] : null;
+      const clickedOutsideTag = tagElement && !tagElement.contains(target);
+  
+      const clickedOutsidePreview = previewRef.current &&
+        !previewRef.current.contains(target);
+  
+      if (clickedOutsideSearch) {
         setSearchString('');
+      }
+  
+      if (previewExerciseId && clickedOutsideTag && clickedOutsidePreview) {
+        setPreviewExerciseId(null);
       }
     };
   
@@ -110,7 +126,8 @@ const WarmupForm = ({
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, []);
+  }, [previewExerciseId, anchorRect]);
+
 
   const getEmbedUrl = (url: string): string => {
     if (url.includes('/embed/')) return url;
@@ -138,6 +155,17 @@ const WarmupForm = ({
     }
   }
 
+  const handlePreviewToggle = (exerciseId: number) => {
+    const tagEl = tagRefs.current[exerciseId];
+    if (previewExerciseId === exerciseId) {
+      setPreviewExerciseId(null);
+      setAnchorRect(null);
+    } else if (tagEl) {
+      setPreviewExerciseId(exerciseId);
+      setAnchorRect(tagEl.getBoundingClientRect());
+    }
+  };
+
   return (
     <div className="flex flex-col pl-15 py-10 pr-40 mb-30">
       <p className="font-semibold text-2xl">{formTitle}</p>
@@ -153,21 +181,6 @@ const WarmupForm = ({
           />
         </FormField>
 
-        {/* <div className="px-5 pb-5 h-[700px]">
-          {embedUrl ? (
-            <iframe
-              title="Video Preview"
-              src={embedUrl}
-              className="w-full h-full rounded-md border transition-all duration-300 ease-in"
-              allowFullScreen
-            />
-          ) : (
-            <div className="w-full h-full rounded-md border bg-gray-100 flex items-center justify-center text-sm text-gray-500">
-              No video preview available
-            </div>
-          )}
-        </div> */}
-
         <FormField label="Instructions" id="warmup-instruction">
           <textarea
             id="warmup-instruction"
@@ -179,68 +192,106 @@ const WarmupForm = ({
         </FormField>
 
         <FormField label="Demo videos" id="demo-videos">
-            <div ref={searchContainerRef} className="relative">
-                <SearchBar
-                searchString={searchString}
-                searchHandler={setSearchString}
-                placeholder="Add exercise demo videos (optional)"
-                className="mt-1"
-                />
+          <div ref={searchContainerRef} className="relative">
+            <SearchBar
+            searchString={searchString}
+            searchHandler={setSearchString}
+            placeholder="Add exercise demo videos (optional)"
+            className="mt-1"
+            />
 
-                {/* Always render dropdown container when input is focused and query is long enough */}
-                {searchString.length >= 4 && (
-                <div className="absolute top-full left-0 right-0 bg-white border rounded shadow-md max-h-60 overflow-y-auto z-50">
-                    {filteredSearchResults.length > 0 ? (
-                    filteredSearchResults.map((exercise) => (
-                        <div
-                        key={exercise.id}
-                        className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm"
-                        onClick={() => {
-                            if (!exerciseIds.includes(exercise.id)) {
-                                setExerciseIds(prev => [...prev, exercise.id]);
-                                setSearchString('');
-                            }
-                        }}
-                        >
-                        {highlightQuery(exercise.name, searchString)}
-                        </div>
-                    ))
-                    ) : (
-                    <div className="px-4 py-2 text-sm text-gray-500">No matches found.</div>
-                    )}
-                </div>
+            {searchString.length >= 4 && (
+            <div className="absolute top-full left-0 right-0 bg-white border rounded shadow-md max-h-60 overflow-y-auto z-50">
+                {filteredSearchResults.length > 0 ? (
+                filteredSearchResults.map((exercise) => (
+                  <div
+                    key={exercise.id}
+                    className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm"
+                    onClick={() => {
+                      if (!exerciseIds.includes(exercise.id)) {
+                          setExerciseIds(prev => [...prev, exercise.id]);
+                          setSearchString('');
+                      }
+                  }}
+                  >
+                    {highlightQuery(exercise.name, searchString)}
+                    </div>
+                ))
+                ) : (
+                  <div className="px-4 py-2 text-sm text-gray-500">No matches found.</div>
                 )}
             </div>
+            )}
+          </div>
         </FormField>
 
-
-
         <div id="warmup-exercise-tags-wrapper" className='flex flex-wrap max-w-full px-4 pb-4'>
-            {addedExercises.map((exercise: Exercise) => {
-                return (
-                    <div key={exercise.id} className='flex items-center justify-center bg-gray-100 rounded-xl mr-2 mt-2'>
-                        <IconButton sx={{py: 0.5, px: 1,
-                            '&:hover': {
-                                backgroundColor: '#d1d5db'
-                            }
-                        }}>
-                            <VideocamIcon sx={{fontSize: '16px', p: 0}}/>
-                        </IconButton>
-                        <span className='text-xs font-semibold'>{exercise.name}</span>
-                        <IconButton 
-                            onClick={() => setExerciseIds(exerciseIds.filter((ex) => ex !== exercise.id))}
-                            sx={{
-                            py: 0.5, px: 1,
-                            '&:hover': {
-                                backgroundColor: '#d1d5db' 
-                            }
-                            }}
-                        >
-                            <CloseIcon sx={{fontSize: '16px'}} />
-                        </IconButton>
-                    </div>
-                )
-            })}
+          {addedExercises.map((exercise: Exercise) => {
+            const hasVideo = Boolean(exercise.video_url);
+            return (
+              <div 
+                key={exercise.id}
+                className='flex items-center justify-center bg-gray-100 rounded-xl mr-2 mt-2'
+                ref={(el) => (tagRefs.current[exercise.id] = el)}
+              >
+                {hasVideo && 
+                <IconButton 
+                  onClick={() => handlePreviewToggle(exercise.id)}
+                  sx={{
+                    py: 0.5, px: 1,
+                    '&:hover': {
+                        backgroundColor: '#d1d5db'
+                    }
+                  }}
+                >
+                  <VideocamIcon sx={{fontSize: '16px', p: 0}}/>
+                </IconButton>
+                }
+                <span className={`${!hasVideo ? 'pl-3' : ''} text-xs font-semibold`}>{exercise.name}</span>
+                <IconButton 
+                  onClick={() => setExerciseIds(exerciseIds.filter((ex) => ex !== exercise.id))}
+                  sx={{
+                  py: 0.5, px: 1,
+                  '&:hover': {
+                      backgroundColor: '#d1d5db' 
+                  }
+                  }}
+                >
+                  <CloseIcon sx={{fontSize: '16px'}} />
+                </IconButton>
+              </div>
+            )
+          })}
+
+          {previewExerciseId && anchorRect && (
+            <div
+              className="fixed flex px-5 py-4 flex-col z-[100] border rounded bg-white shadow-lg"
+              ref={previewRef}
+              style={{
+                top: anchorRect.bottom + window.scrollY + 4,
+                left: anchorRect.left + window.scrollX,
+                width: 400,
+                height: 300,
+              }}
+            >
+              <p className='font-bold text-lg'>{exercisesMap[previewExerciseId]?.name}</p>
+              <iframe
+                title="Exercise Video Preview"
+                src={getEmbedUrl(exercisesMap[previewExerciseId]?.video_url || '')}
+                allowFullScreen
+                className="w-full h-full rounded"
+              />
+              <div className='text-xs mt-2'>
+                <span>You can update this video from the </span>
+                <a
+                  href={`/coach/library/exercises/${previewExerciseId}/edit`}
+                  className="text-blue-500 hover:underline"
+                >
+                  exercise library.
+                </a>
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="flex px-5 pb-6 pt-2">
