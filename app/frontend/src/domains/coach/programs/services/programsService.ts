@@ -1,5 +1,4 @@
-import { AddCoachProgramDTO, UpdateCoachProgramDTO } from '../../core/types/dtos';
-import { CoachProgram } from '../../core/types/models';
+import { AddCoachProgramDTO, UpdateCoachProgramDTO, CoachProgram } from '../types';
 import { apiRequest } from '../../core/api/api';
 
 const baseUrl = `${import.meta.env.VITE_API_BASE_URL}/coaches/programs`;

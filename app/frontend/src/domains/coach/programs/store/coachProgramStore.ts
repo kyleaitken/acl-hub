@@ -1,7 +1,6 @@
 import { create } from 'zustand';
 import programsService from '../services/programsService';
-import { CoachProgram } from '../../core/types/models';
-import { AddCoachProgramDTO, UpdateCoachProgramDTO } from '../../core/types/dtos';
+import { CoachProgram, AddCoachProgramDTO, UpdateCoachProgramDTO } from '../types';
 
 interface CoachProgramStore {
   programs: Record<number, CoachProgram>;

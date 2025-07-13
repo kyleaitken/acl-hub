@@ -1,4 +1,4 @@
-import { CoachProgram } from '../../core/types/models';
+import { CoachProgram } from '../types';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import SendIcon from '@mui/icons-material/Send';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';

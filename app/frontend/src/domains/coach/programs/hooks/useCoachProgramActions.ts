@@ -1,6 +1,6 @@
 import { useAuthenticatedUser } from '../../../shared/auth/hooks/useAuthenticatedUser';
 import { useCoachProgramStore } from '../store/coachProgramStore';
-import { UpdateCoachProgramDTO, AddCoachProgramDTO } from '../../core/types/dtos';
+import { UpdateCoachProgramDTO, AddCoachProgramDTO } from '../types';
 
 export const useCoachProgramActions = () => {
   const { token } = useAuthenticatedUser();

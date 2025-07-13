@@ -1,7 +1,7 @@
 import { Input, InputAdornment, Menu, MenuItem } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { CoachProgram } from '../../core/types/models';
+import { CoachProgram } from '../types';
 import { useCoachProgramActions } from '../hooks/useCoachProgramActions';
 import { useCoachProgramData } from '../hooks/useCoachProgramData';
 import React from 'react';
@@ -36,7 +36,6 @@ const CoachPrograms = () => {
     addProgram,
     updateProgram,
     fetchPrograms,
-    fetchProgramById,
     deleteProgram,
     resetError, 
     addTagToProgram,

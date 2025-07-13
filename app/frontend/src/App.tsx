@@ -1,6 +1,6 @@
 import { Navigate, Route, Routes, useNavigate } from 'react-router-dom';
 import Login from './domains/shared/auth/pages/Login';
-import CoachHomePage from './domains/coach/homepage/pages/CoachHomePage';
+import CoachHomePage from './domains/coach/homefeed/pages/CoachHomePage';
 import CoachPrograms from './domains/coach/programs/pages/CoachPrograms';
 import NavigationBar from './domains/coach/core/components/NavigationBar';
 import SignupPage from './domains/shared/auth/pages/SignupPage';
@@ -9,19 +9,19 @@ import { useAuthStore } from './domains/shared/auth/store/authStore';
 import ProtectedRoute from './domains/shared/auth/components/ProtectedRoute';
 import { useEffect } from 'react';
 import { Role } from './domains/shared/auth/types';
-import CoachLibrary from './domains/coach/library/layout/CoachLibrary';
-import EditExercise from './domains/coach/library/pages/EditExercise';
-import ExercisesView from './domains/coach/library/pages/ExercisesView';
-import WarmupsView from './domains/coach/library/pages/WarmupsView';
-import CooldownsView from './domains/coach/library/pages/CooldownsView';
-import MetricsView from './domains/coach/library/pages/MetricsView';
-import AddExercise from './domains/coach/library/pages/AddExercise';
+import CoachLibrary from './domains/coach/libraries/layout/CoachLibrary';
+import EditExercise from './domains/coach/libraries/features/exercises/pages/EditExercise';
+import ExercisesView from './domains/coach/libraries/features/exercises/pages/ExercisesView';
+import Warmups from './domains/coach/libraries/features/routines/pages/Warmups';
+import Cooldowns from './domains/coach/libraries/features/routines/pages/Cooldowns';
+import MetricsView from './domains/coach/libraries/features/metrics/pages/MetricsView';
+import AddExercise from './domains/coach/libraries/features/exercises/pages/AddExercise';
 import { Toaster } from 'react-hot-toast';
 import ScrollToTop from './domains/coach/core/components/ScrollToTop';
-import AddWarmup from './domains/coach/library/pages/AddWarmup';
-import EditWarmup from './domains/coach/library/pages/EditWarmup';
-import AddCooldown from './domains/coach/library/pages/AddCooldown';
-import EditCooldown from './domains/coach/library/pages/EditCooldown';
+import AddWarmup from './domains/coach/libraries/features/routines/pages/AddWarmup';
+import EditWarmup from './domains/coach/libraries/features/routines/pages/EditWarmup';
+import AddCooldown from './domains/coach/libraries/features/routines/pages/AddCooldown';
+import EditCooldown from './domains/coach/libraries/features/routines/pages/EditCooldown';
 
 function App() {
   const { isLoggedIn, role } = useAuthStore();
@@ -79,11 +79,11 @@ function App() {
             <Route path="exercises/:exerciseId/edit" element={<EditExercise />} />
             <Route path="exercises/add" element={<AddExercise />} />
 
-            <Route path="warmups" element={<WarmupsView />} />
+            <Route path="warmups" element={<Warmups />} />
             <Route path="warmups/add" element={<AddWarmup />} />
             <Route path="warmups/:warmupId/edit" element={<EditWarmup />} />
 
-            <Route path="cooldowns" element={<CooldownsView />} />
+            <Route path="cooldowns" element={<Cooldowns />} />
             <Route path="cooldowns/add" element={<AddCooldown />} />
             <Route path="cooldowns/:cooldownId/edit" element={<EditCooldown />} />
 

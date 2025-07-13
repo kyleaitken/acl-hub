@@ -1,4 +1,4 @@
-import { ProgramTag } from '../../core/types/models';
+import { ProgramTag } from '../types';
 import { apiRequest } from '../../core/api/api';
 
 const baseUrl = `${import.meta.env.VITE_API_BASE_URL}/coaches/tags`;
