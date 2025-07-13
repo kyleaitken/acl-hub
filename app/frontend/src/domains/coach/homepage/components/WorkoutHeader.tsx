@@ -1,5 +1,5 @@
 import ProfilePictureBubble from '../../../shared/components/ProfilePictureBubble';
-import { capitalize } from '../../../../utils/utils';
+import { capitalize } from '../../core/utils/text';
 
 // WorkoutHeader.tsx
 interface WorkoutHeaderProps {

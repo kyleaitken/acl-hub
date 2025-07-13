@@ -1,5 +1,5 @@
 import { Divider, Paper } from '@mui/material';
-import { formatDateString } from '../../../../utils/dateUtils';
+import { formatDateString } from '../../core/utils/dateUtils';
 import LocalFireDepartmentIcon from '@mui/icons-material/LocalFireDepartment';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';

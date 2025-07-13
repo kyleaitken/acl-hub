@@ -1,10 +1,10 @@
 import { List, Collapse, ListItem } from '@mui/material';
-import { getDaySuffix, getTimeOfDay } from '../../../../utils/dateUtils';
+import { getDaySuffix, getTimeOfDay } from '../../core/utils/dateUtils';
 import { useEffect, useState } from 'react';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ProfilePictureBubble from '../../../shared/components/ProfilePictureBubble';
-import { capitalize } from '../../../../utils/utils';
+import { capitalize } from '../../core/utils/text';
 import UpdatedWorkoutPaper from '../components/UpdatedWorkoutPaper';
 import React from 'react';
 import { useAuthenticatedUser } from '../../../shared/auth/hooks/useAuthenticatedUser';

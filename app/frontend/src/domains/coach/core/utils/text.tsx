@@ -21,3 +21,5 @@ export const getEmbedUrl = (url: string): string => {
   const videoIdMatch = url.match(/(?:v=|\/shorts\/|\.be\/)([\w-]{11})/);
   return videoIdMatch ? `https://www.youtube.com/embed/${videoIdMatch[1]}` : '';
 };
+
+export const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
