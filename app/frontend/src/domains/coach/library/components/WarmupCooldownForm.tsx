@@ -8,6 +8,7 @@ import { useExercisesActions } from '../hooks/useExercisesActions';
 import FormField from '../../core/components/FormField';
 import ExercisesSearch from './ExercisesSearch';
 import ExerciseTagsContainer from './ExerciseTagsContainer';
+import { useCooldownsActions } from '../hooks/useCooldownsActions';
 
 export interface WarmupCooldownFormValues {
   name: string;
@@ -18,6 +19,7 @@ export interface WarmupCooldownFormValues {
 
 interface WarmupCooldownFormProps {
   formTitle: string;
+  formType: 'Warmup' | 'Cooldown';
   initialValues: {
     name?: string;
     instructions?: string;
@@ -31,6 +33,7 @@ interface WarmupCooldownFormProps {
 
 const WarmupCooldownForm = ({
   formTitle,
+  formType,
   initialValues,
   onSubmit,
   submitLabel,
@@ -45,6 +48,7 @@ const WarmupCooldownForm = ({
   const { fetchExercise } = useExercisesActions();
   const navigate = useNavigate();
   const { deleteWarmup } = useWarmupsActions();
+  const { deleteCooldown } = useCooldownsActions();
 
   const addedExercises = useMemo(() => {
     return (exerciseIds ?? [])
@@ -72,17 +76,18 @@ const WarmupCooldownForm = ({
     onSubmit({ name, instructions, exerciseIds });
   };
 
-  const handleDeleteWarmup = () => {
+  const handleDeleteClicked = () => {
     if (!initialValues.id) return;
     setShowConfirmDelete(false);
 
+    const deleteHandler = formType === "Cooldown" ? deleteCooldown : deleteWarmup;
     try {
-      deleteWarmup(Number(initialValues.id));
-      navigate("/coach/library/warmups");
-      toast.success("Warmup deleted!");
+      deleteHandler(Number(initialValues.id));
+      navigate(`/coach/library/${formType.toLowerCase()}s`);
+      toast.success(`${formType} deleted!`);
     } catch (e) {
-      console.error("Failed to delete warmup:", e);
-      toast.error("Failed to delete warmup")
+      console.error(`Failed to delete ${formType}:`, e);
+      toast.error(`Failed to delete ${formType}.`)
     }
   }
 
@@ -90,20 +95,20 @@ const WarmupCooldownForm = ({
     <div className="flex flex-col pl-15 py-10 pr-40 mb-30">
       <p className="font-semibold text-2xl">{formTitle}</p>
       <form onSubmit={handleSubmit} className="w-full bg-white rounded-md shadow-xl mt-6 pt-5">
-        <FormField label="Warmup Name" id="warmup-name" required>
+        <FormField label={`${formType} Name`} id={`${formType}-name`} required>
           <input
-            id="warmup-name"
+            id={`${formType}-name`} 
             className="border mt-1 py-2 px-3 rounded-sm"
-            placeholder="Enter an warmup name"
+            placeholder={`Enter a ${formType.toLowerCase()} name`}
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
           />
         </FormField>
 
-        <FormField label="Instructions" id="warmup-instruction">
+        <FormField label="Instructions" id="instructions">
           <textarea
-            id="warmup-instruction"
+            id="instructions"
             className="border mt-1 py-2 px-3 rounded-sm"
             placeholder="Enter some instructions (Optional)"
             value={instructions}
@@ -133,7 +138,7 @@ const WarmupCooldownForm = ({
           <button
             type="button"
             className="h-[45px] w-[170px] rounded-md bg-white px-3 py-2 text-blue-500 border-1 border-blue-500 cursor-pointer flex items-center justify-center mr-5 hover:bg-gray-100"
-            onClick={() => navigate("/coach/library/warmups")}
+            onClick={() => navigate(`/coach/library/${formType.toLowerCase()}s`)}
           >
             Cancel
           </button>
@@ -153,9 +158,9 @@ const WarmupCooldownForm = ({
 
       {showConfirmDelete && (
         <ConfirmModal
-          title="Are you sure you want to delete this warmup?"
+          title={`Are you sure you want to delete this ${formType}`}
           confirmButtonText="Delete"
-          confirmHandler={handleDeleteWarmup}
+          confirmHandler={handleDeleteClicked}
           cancelHandler={() => setShowConfirmDelete(false)}
           isDanger={true}
         />

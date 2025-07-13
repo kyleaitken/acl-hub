@@ -14,8 +14,6 @@ const WarmupsView = () => {
         fetchWarmups();
     }, [])
 
-    console.log("Warmups: ", warmups);
-
     const sortedWarmups = useMemo(() => {
         return warmups
             .slice()

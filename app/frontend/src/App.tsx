@@ -20,6 +20,8 @@ import { Toaster } from 'react-hot-toast';
 import ScrollToTop from './domains/coach/core/components/ScrollToTop';
 import AddWarmup from './domains/coach/library/pages/AddWarmup';
 import EditWarmup from './domains/coach/library/pages/EditWarmup';
+import AddCooldown from './domains/coach/library/pages/AddCooldown';
+import EditCooldown from './domains/coach/library/pages/EditCooldown';
 
 function App() {
   const { isLoggedIn, role } = useAuthStore();
@@ -71,15 +73,21 @@ function App() {
             }
           >
             <Route index element={<ExercisesView />} />
+            <Route path="*" element={<Navigate to="/coach/library/exercises" replace />} />
+
             <Route path="exercises" element={<ExercisesView />} />
+            <Route path="exercises/:exerciseId/edit" element={<EditExercise />} />
+            <Route path="exercises/add" element={<AddExercise />} />
+
             <Route path="warmups" element={<WarmupsView />} />
             <Route path="warmups/add" element={<AddWarmup />} />
             <Route path="warmups/:warmupId/edit" element={<EditWarmup />} />
+
             <Route path="cooldowns" element={<CooldownsView />} />
+            <Route path="cooldowns/add" element={<AddCooldown />} />
+            <Route path="cooldowns/:cooldownId/edit" element={<EditCooldown />} />
+
             <Route path="metrics" element={<MetricsView />} />
-            <Route path="exercises/:exerciseId/edit" element={<EditExercise />} />
-            <Route path="exercises/add" element={<AddExercise />} />
-            <Route path="*" element={<Navigate to="/coach/library/exercises" replace />} />
           </Route>
         </Routes>
       </div>

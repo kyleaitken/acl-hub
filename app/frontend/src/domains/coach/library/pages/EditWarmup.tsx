@@ -26,7 +26,7 @@ const EditWarmup = () => {
     const handleUpdateWarmup = async (formData: WarmupCooldownFormValues) => {
         try {
             navigate('/coach/library/warmups'); 
-            await updateWarmup({warmupId: id, ...formData});
+            await updateWarmup({id: id, ...formData});
             toast.success("Warmup saved!", { style: {backgroundColor: '#bffddc'}})
         } catch (e) {
             console.error('Failed to update warmup:', e);
@@ -43,6 +43,7 @@ const EditWarmup = () => {
       <>
         <WarmupCooldownForm
           formTitle={`Edit ${warmup.name}`}
+          formType="Warmup"
           initialValues={{
             name: warmup.name,
             instructions: warmup.instructions,

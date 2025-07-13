@@ -22,6 +22,7 @@ const AddWarmup = () => {
       <>
         <WarmupCooldownForm
           formTitle="Add Warmup"
+          formType="Warmup"
           initialValues={{}}
           onSubmit={handleAddWarmup}
           isEditing={false}

@@ -5,19 +5,6 @@ export enum LibraryTab {
     Metrics = 'metrics'
 }
 
-export type UpdateWarmupDTO = {
-    warmupId: number;
-    name: string;
-    instructions?: string;
-    exerciseIds?: Array<number>;
-}
-
-export type AddWarmupDTO = {
-    name: string;
-    instructions?: string;
-    exerciseIds?: Array<number>;
-}
-
 export type AddExerciseDTO = {
     name: string;
     description?: string;
@@ -35,9 +22,22 @@ export type AddExerciseDTO = {
     videoUrl?: string;
   }
   
-  export type Warmup = {
+  export type WarmupOrCooldown = {
     id: number;
     name: string;
     instructions?: string;
     exerciseIds?: number[];
   }
+
+  export type UpdateWarmupCooldownDTO = {
+    id: number;
+    name: string;
+    instructions?: string;
+    exerciseIds?: Array<number>;
+}
+
+export type AddWarmupCooldownDTO = {
+    name: string;
+    instructions?: string;
+    exerciseIds?: Array<number>;
+}

@@ -1,6 +1,6 @@
 import { useWarmupsStore } from './../store/warmupsStore';
 import { useAuthenticatedUser } from '../../../shared/auth/hooks/useAuthenticatedUser';
-import { AddWarmupDTO, UpdateWarmupDTO } from '../types';
+import { AddWarmupCooldownDTO, UpdateWarmupCooldownDTO } from '../types';
 
 export const useWarmupsActions = () => {
   const { token } = useAuthenticatedUser();
@@ -14,8 +14,8 @@ export const useWarmupsActions = () => {
   return {
     fetchWarmups: () => fetchWarmups(token),
     fetchWarmup: (id: number) => fetchWarmup(token, id),
-    addWarmup: (warmupData: AddWarmupDTO) => addWarmup(token, warmupData),
-    updateWarmup: (warmupData: UpdateWarmupDTO) => updateWarmup(token, warmupData),
+    addWarmup: (warmupData: AddWarmupCooldownDTO) => addWarmup(token, warmupData),
+    updateWarmup: (warmupData: UpdateWarmupCooldownDTO) => updateWarmup(token, warmupData),
     deleteWarmup: (id: number) => deleteWarmup(token, id)
   };
 };

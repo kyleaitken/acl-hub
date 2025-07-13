@@ -1,9 +1,9 @@
-import { Warmup, AddWarmupDTO, UpdateWarmupDTO } from './../types';
+import { WarmupOrCooldown, AddWarmupCooldownDTO, UpdateWarmupCooldownDTO } from './../types';
 import { create } from 'zustand';
 import warmupsService from '../services/warmupsService';
 
 interface WarmupsStore {
-  warmups: Record<number, Warmup>;
+  warmups: Record<number, WarmupOrCooldown>;
   loading: boolean;
   error?: string;
 
@@ -11,10 +11,10 @@ interface WarmupsStore {
   fetchWarmup: (token: string, warmupId: number) => Promise<void>;
   updateWarmup: (
     token: string,
-    warmupData: UpdateWarmupDTO,
+    warmupData: UpdateWarmupCooldownDTO,
   ) => Promise<void>;
   deleteWarmup: (token: string, warmupId: number) => Promise<void>;
-  addWarmup: (token: string, warmupData: AddWarmupDTO) => Promise<void>;
+  addWarmup: (token: string, warmupData: AddWarmupCooldownDTO) => Promise<void>;
 
   setError: (message: string) => void;
   resetError: () => void;
@@ -60,25 +60,25 @@ export const useWarmupsStore = create<WarmupsStore>((set) => ({
       }));
     } catch (err) {
       set({
-        error: `Failed to fetch exercise with id: ${warmupId}`,
+        error: `Failed to fetch warmup with id: ${warmupId}`,
         loading: false,
       });
     }
   },
-  updateWarmup: async (token: string, warmupData: UpdateWarmupDTO) => {
+  updateWarmup: async (token: string, warmupData: UpdateWarmupCooldownDTO) => {
     set({ loading: true });
-    const { warmupId } = warmupData;
+    const { id } = warmupData;
     try {
       const updatedWarmup = await warmupsService.updateWarmup(
         token,
         warmupData,
       );
       set((state) => {
-        const existing = state.warmups[warmupId];
+        const existing = state.warmups[id];
         return {
           warmups: {
             ...state.warmups,
-            [warmupId]: {
+            [id]: {
               ...existing,
               ...updatedWarmup,
             },
@@ -88,7 +88,7 @@ export const useWarmupsStore = create<WarmupsStore>((set) => ({
       });
     } catch (err) {
       set({
-        error: `Failed to update exercise with id: ${warmupId}`,
+        error: `Failed to update warmup with id: ${id}`,
         loading: false,
       });
     }
@@ -103,12 +103,12 @@ export const useWarmupsStore = create<WarmupsStore>((set) => ({
       });
     } catch (err) {
       set({
-        error: `Failed to delete exercise with id: ${warmupId}`,
+        error: `Failed to delete warmup with id: ${warmupId}`,
         loading: false,
       });
     }
   },
-  addWarmup: async (token: string, warmupData: AddWarmupDTO) => {
+  addWarmup: async (token: string, warmupData: AddWarmupCooldownDTO) => {
     set({ loading: true });
     try {
       const newWarmup = await warmupsService.addWarmup(
@@ -133,9 +133,9 @@ export const useWarmupsStore = create<WarmupsStore>((set) => ({
 }));
 
 
-const normalizeWarmup = (raw: any): Warmup => ({
+const normalizeWarmup = (raw: any): WarmupOrCooldown => ({
   id: raw.id,
   name: raw.name,
   instructions: raw.instructions,
-  exerciseIds: raw.exercise_ids, // map here
+  exerciseIds: raw.exercise_ids,
 });
