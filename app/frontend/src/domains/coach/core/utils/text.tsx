@@ -14,3 +14,10 @@ export const highlightQuery = (text: string | undefined, query: string) => {
       </>
     );
 };
+
+export const getEmbedUrl = (url: string): string => {
+  if (url.includes('/embed/')) return url;
+
+  const videoIdMatch = url.match(/(?:v=|\/shorts\/|\.be\/)([\w-]{11})/);
+  return videoIdMatch ? `https://www.youtube.com/embed/${videoIdMatch[1]}` : '';
+};

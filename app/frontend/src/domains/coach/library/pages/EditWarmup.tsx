@@ -1,8 +1,7 @@
 import { useNavigate, useParams } from "react-router-dom";
-import WarmupForm from "../components/WarmupForm";
 import { useWarmupsActions } from "../hooks/useWarmupsActions";
 import { toast } from 'react-hot-toast';
-import { WarmupFormValues } from "../components/WarmupForm";
+import WarmupCooldownForm, { WarmupCooldownFormValues } from "../components/WarmupCooldownForm";
 import { useWarmupsData } from "../hooks/useWarmupsData";
 import { useEffect } from "react";
 
@@ -24,7 +23,7 @@ const EditWarmup = () => {
         }
     }, [warmup, id, fetchWarmup]);
 
-    const handleUpdateWarmup = async (formData: WarmupFormValues) => {
+    const handleUpdateWarmup = async (formData: WarmupCooldownFormValues) => {
         try {
             navigate('/coach/library/warmups'); 
             await updateWarmup({warmupId: id, ...formData});
@@ -42,7 +41,7 @@ const EditWarmup = () => {
 
     return (
       <>
-        <WarmupForm
+        <WarmupCooldownForm
           formTitle={`Edit ${warmup.name}`}
           initialValues={{
             name: warmup.name,
@@ -52,6 +51,7 @@ const EditWarmup = () => {
           }}
           onSubmit={handleUpdateWarmup}
           isEditing={true}
+          submitLabel="Save Warmup"
         />
       </>
     )

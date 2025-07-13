@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useExercisesActions } from '../hooks/useExercisesActions';
 import ConfirmModal from '../../../shared/components/ConfirmModal';
 import toast from 'react-hot-toast';
+import FormField from '../../core/components/FormField';
+import { getEmbedUrl } from '../../core/utils/text';
 
 export interface ExerciseFormValues {
   name: string;
@@ -54,13 +56,6 @@ const ExerciseForm = ({
     setCategory(initialValues.category || '');
     setMuscleGroup(initialValues.muscleGroup || '');
   }, [initialValues]);
-
-  const getEmbedUrl = (url: string): string => {
-    if (url.includes('/embed/')) return url;
-
-    const videoIdMatch = url.match(/(?:v=|\/shorts\/|\.be\/)([\w-]{11})/);
-    return videoIdMatch ? `https://www.youtube.com/embed/${videoIdMatch[1]}` : '';
-  };
 
   const embedUrl = getEmbedUrl(url);
 
@@ -218,22 +213,3 @@ const ExerciseForm = ({
 };
 
 export default ExerciseForm;
-
-const FormField = ({
-  label,
-  id,
-  required = false,
-  children,
-}: {
-  label: string;
-  id: string;
-  required?: boolean;
-  children: React.ReactNode;
-}) => (
-  <div className="flex flex-col px-5 pb-5">
-    <label htmlFor={id} className="text-sm font-semibold">
-      {label} {required && <span className="text-red-500">*</span>}
-    </label>
-    {children}
-  </div>
-);
