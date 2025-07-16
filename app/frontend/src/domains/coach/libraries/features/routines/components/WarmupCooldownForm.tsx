@@ -15,6 +15,7 @@ export interface WarmupCooldownFormValues {
   instructions?: string;
   exerciseIds?: number[];
   id?: number;
+  custom?: boolean;
 }
 
 interface WarmupCooldownFormProps {
@@ -76,13 +77,13 @@ const WarmupCooldownForm = ({
     onSubmit({ name, instructions, exerciseIds });
   };
 
-  const handleDeleteClicked = () => {
+  const handleDeleteClicked = async () => {
     if (!initialValues.id) return;
     setShowConfirmDelete(false);
 
     const deleteHandler = formType === "Cooldown" ? deleteCooldown : deleteWarmup;
     try {
-      deleteHandler(Number(initialValues.id));
+      await deleteHandler(Number(initialValues.id));
       navigate(`/coach/library/${formType.toLowerCase()}s`);
       toast.success(`${formType} deleted!`);
     } catch (e) {

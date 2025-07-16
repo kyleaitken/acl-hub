@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_07_10_210906) do
+ActiveRecord::Schema[7.2].define(version: 2025_07_15_025548) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -131,6 +131,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_07_10_210906) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "coach_id", null: false
+    t.boolean "custom", default: false, null: false
     t.index ["coach_id"], name: "index_cooldowns_on_coach_id"
   end
 
@@ -209,11 +210,6 @@ ActiveRecord::Schema[7.2].define(version: 2025_07_10_210906) do
     t.bigint "exercise_id", null: false
     t.string "order"
     t.string "instructions"
-    t.integer "sets"
-    t.integer "reps"
-    t.float "weight"
-    t.string "duration"
-    t.string "hold"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["exercise_id"], name: "index_program_workout_exercises_on_exercise_id"
@@ -274,6 +270,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_07_10_210906) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "coach_id", null: false
+    t.boolean "custom", default: false, null: false
     t.index ["coach_id"], name: "index_warmups_on_coach_id"
   end
 

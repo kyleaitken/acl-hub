@@ -1,9 +1,9 @@
-import { WarmupOrCooldown, AddWarmupCooldownDTO, UpdateWarmupCooldownDTO } from '../types';
+import { LibraryWarmupOrCooldown, AddWarmupCooldownDTO, UpdateWarmupCooldownDTO } from '../types';
 import { create } from 'zustand';
 import cooldownsService from '../services/cooldownsService';
 
 interface CooldownsStore {
-  cooldowns: Record<number, WarmupOrCooldown>;
+  cooldowns: Record<number, LibraryWarmupOrCooldown>;
   loading: boolean;
   error?: string;
 
@@ -135,9 +135,10 @@ export const useCooldownsStore = create<CooldownsStore>((set) => ({
 }));
 
 
-const normalizeCooldown = (raw: any): WarmupOrCooldown => ({
+const normalizeCooldown = (raw: any): LibraryWarmupOrCooldown => ({
   id: raw.id,
   name: raw.name,
   instructions: raw.instructions,
   exerciseIds: raw.exercise_ids,
+  custom: raw.custom
 });

@@ -1,6 +1,6 @@
 export const apiRequest = async (
   url: string,
-  method: 'GET' | 'POST' | 'PUT' | 'DELETE',
+  method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH',
   token: string,
   body?: any,
 ) => {

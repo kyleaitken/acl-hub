@@ -50,11 +50,8 @@ module Coaches
         end
 
         def program_workout_exercise_params
-            params.require(:program_workout_exercise).permit(:exercise_id, :order, :instructions, :sets, :reps, :weight, :duration, :hold)
+            params.require(:program_workout_exercise).permit(:exercise_id, :order, :instructions)
         end
 
-        # def ensure_current_coach
-        #     render json: { error: 'Unauthorized' }, status: :unauthorized unless current_coach
-        # end
     end
 end

@@ -59,7 +59,7 @@ module Coaches
         end
 
         def program_workout_params
-            params.require(:program_workout).permit(:day, :week, :order)
+            params.require(:program_workout).permit(:day, :week, :order, :warmup_id, :cooldown_id)
         end
     end
 end

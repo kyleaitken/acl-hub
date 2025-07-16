@@ -24,7 +24,7 @@ export interface Exercise {
   category?: string;
   video_url?: string;
   muscle_group?: string;
-  images: ExerciseImage[];
+  images?: ExerciseImage[];
 }
 
 export interface ExerciseImage {

@@ -1,20 +1,22 @@
 import { create } from 'zustand';
 import programsService from '../services/programsService';
-import { CoachProgram, AddCoachProgramDTO, UpdateCoachProgramDTO } from '../types';
+import { Program, AddProgramDTO, UpdateProgramDTO, ProgramDetails, BulkReorderProgramWorkoutsDTO } from '../types';
 
-interface CoachProgramStore {
-  programs: Record<number, CoachProgram>;
+interface ProgramStore {
+  programs: Record<number, Program>;
+  detailedPrograms: Record<number, ProgramDetails>;
   loading: boolean;
   error?: string;
 
   fetchPrograms: (token: string) => Promise<void>;
-  fetchProgramById: (token: string, programId: number) => Promise<void>;
+  fetchProgram: (token: string, programId: number) => Promise<void>;
   updateProgram: (
     token: string,
-    programData: UpdateCoachProgramDTO,
+    programData: UpdateProgramDTO,
   ) => Promise<void>;
+  updateWorkoutPositions: (token: string, programData: BulkReorderProgramWorkoutsDTO) => Promise<void>;
   deleteProgram: (token: string, programId: number) => Promise<void>;
-  addProgram: (token: string, programData: AddCoachProgramDTO) => Promise<void>;
+  addProgram: (token: string, programData: AddProgramDTO) => Promise<void>;
   addTagToProgram: (
     token: string,
     programId: number,
@@ -30,27 +32,32 @@ interface CoachProgramStore {
   resetError: () => void;
 }
 
-export const useCoachProgramStore = create<CoachProgramStore>((set) => ({
+export const useProgramStore = create<ProgramStore>((set) => ({
   programs: {},
+  detailedPrograms: {},
   loading: false,
   error: undefined,
 
   fetchPrograms: async (token: string) => {
     set({ loading: true });
     try {
-      const list = await programsService.fetchCoachPrograms(token);
+      const list = await programsService.fetchPrograms(token);
       const normalized = Object.fromEntries(list.map((p) => [p.id, p]));
       set({ programs: normalized, loading: false });
     } catch (err) {
       set({ error: "Failed to fetch coach's programs", loading: false });
     }
   },
-  fetchProgramById: async (token: string, programId: number) => {
+  fetchProgram: async (token: string, programId: number) => {
     set({ loading: true });
     try {
-      const program = await programsService.fetchCoachProgram(token, programId);
+      const program = await programsService.fetchProgram(token, programId);
       set((state) => ({
-        programs: { ...state.programs, [programId]: program },
+        detailedPrograms: { 
+          ...state.detailedPrograms, 
+          [programId]: program 
+        },
+        loading: false
       }));
     } catch (err) {
       set({
@@ -59,11 +66,11 @@ export const useCoachProgramStore = create<CoachProgramStore>((set) => ({
       });
     }
   },
-  updateProgram: async (token: string, programData: UpdateCoachProgramDTO) => {
+  updateProgram: async (token: string, programData: UpdateProgramDTO) => {
     set({ loading: true });
     const { programId } = programData;
     try {
-      const updatedProgram = await programsService.updateCoachProgram(
+      const updatedProgram = await programsService.updateProgram(
         token,
         programData,
       );
@@ -88,10 +95,36 @@ export const useCoachProgramStore = create<CoachProgramStore>((set) => ({
       });
     }
   },
+  updateWorkoutPositions: async (token: string, programData: BulkReorderProgramWorkoutsDTO) => {
+    set({ loading: true });
+    const { programId } = programData;
+    try {
+      const updatedProgram = await programsService.updateWorkoutPositions(token, programData);
+      set((state) => {
+        const existingProgram = state.detailedPrograms[programId];
+        return {
+          detailedPrograms: {
+            ...state.detailedPrograms,
+            [programId]: {
+              ...existingProgram,
+              ...updatedProgram,
+              tags: existingProgram?.tags ?? [],
+            },
+          },
+          loading: false,
+        };
+      });
+    } catch (err) {
+      set({
+        error: `Failed to bulk update program with id: ${programId}`,
+        loading: false,
+      });
+    }
+  },
   deleteProgram: async (token: string, programId: number) => {
     set({ loading: true });
     try {
-      await programsService.deleteCoachProgram(token, programId);
+      await programsService.deleteProgram(token, programId);
       set((state) => {
         const { [programId]: _, ...rest } = state.programs;
         return { programs: rest };
@@ -103,16 +136,16 @@ export const useCoachProgramStore = create<CoachProgramStore>((set) => ({
       });
     }
   },
-  addProgram: async (token: string, programData: AddCoachProgramDTO) => {
+  addProgram: async (token: string, programData: AddProgramDTO) => {
     set({ loading: true });
     try {
-      const newProgram = await programsService.addCoachProgram(
+      const newProgram = await programsService.addProgram(
         token,
         programData,
       );
 
       // add empty tags collection to new program
-      const normalizedProgram: CoachProgram = {
+      const normalizedProgram: Program = {
         ...newProgram,
         tags: newProgram.tags ?? [],
       };

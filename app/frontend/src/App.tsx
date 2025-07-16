@@ -1,7 +1,7 @@
 import { Navigate, Route, Routes, useNavigate } from 'react-router-dom';
 import Login from './domains/shared/auth/pages/Login';
 import CoachHomePage from './domains/coach/homefeed/pages/CoachHomePage';
-import CoachPrograms from './domains/coach/programs/pages/CoachPrograms';
+import ProgramsList from './domains/coach/programs/pages/ProgramsList';
 import NavigationBar from './domains/coach/core/components/NavigationBar';
 import SignupPage from './domains/shared/auth/pages/SignupPage';
 import './styles/styles.css';
@@ -22,6 +22,7 @@ import AddWarmup from './domains/coach/libraries/features/routines/pages/AddWarm
 import EditWarmup from './domains/coach/libraries/features/routines/pages/EditWarmup';
 import AddCooldown from './domains/coach/libraries/features/routines/pages/AddCooldown';
 import EditCooldown from './domains/coach/libraries/features/routines/pages/EditCooldown';
+import ProgramPage from './domains/coach/programs/pages/ProgramPage';
 
 function App() {
   const { isLoggedIn, role } = useAuthStore();
@@ -52,15 +53,24 @@ function App() {
             path="/coach/programs"
             element={
               <ProtectedRoute allowedRoles={['coach']}>
-                <CoachPrograms />
+                <ProgramsList />
               </ProtectedRoute>
             }
           />
           <Route
+            path="/coach/programs/:programId"
+            element={
+              <ProtectedRoute allowedRoles={['coach']}>
+                <ProgramPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
             path="/testRoute"
             element={
               <ProtectedRoute allowedRoles={['client']}>
-                <CoachPrograms />
+                <ProgramsList />
               </ProtectedRoute>
             }
           />

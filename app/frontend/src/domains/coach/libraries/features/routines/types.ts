@@ -1,8 +1,18 @@
-export type WarmupOrCooldown = {
+import { Exercise } from "../exercises/types";
+
+export interface LibraryWarmupOrCooldown {
   id: number;
   name: string;
   instructions?: string;
   exerciseIds?: number[];
+  custom: boolean;
+}
+
+export interface DetailedWarmupOrCooldown extends LibraryWarmupOrCooldown {
+  exercises: Exercise[];
+  coach_id: number;
+  created_at: string;
+  updated_at: string;
 }
 
 export type UpdateWarmupCooldownDTO = {

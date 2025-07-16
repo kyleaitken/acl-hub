@@ -11,8 +11,20 @@ module Coaches
 
     # GET /coaches/programs/:id
     def show
-      @program = current_coach.programs.includes(:tags).find(params[:id])
-      render json: @program.as_json(include: :tags)
+      @program = current_coach.programs
+        .includes(:tags, program_workouts: [:warmup, :cooldown, program_workout_exercises: :exercise])
+        .find(params[:id])
+    
+      render json: @program.as_json(include: {
+        tags: {},
+        program_workouts: {
+          include: {
+            warmup: { include: :exercises },
+            cooldown: { include: :exercises },
+            program_workout_exercises: { include: :exercise }
+          }
+        }
+      })
     end
 
     def add_tag
@@ -49,6 +61,43 @@ module Coaches
       end
     end
 
+    # PATCH /coaches/programs/:id/update_positions
+    def update_positions
+      @program = current_coach.programs.find(params[:id])
+      updates = params[:program_workouts]
+      errors = []
+
+      ProgramWorkout.transaction do
+        updates.each do |workout_data|
+          pw = @program.program_workouts.find(workout_data[:id])
+          unless pw.update(workout_data.permit(:day, :week, :order))
+            errors << { id: pw.id, errors: pw.errors.full_messages }
+          end
+        end
+
+        raise ActiveRecord::Rollback if errors.any?
+      end
+
+      if errors.any?
+        render json: { errors: errors }, status: :unprocessable_entity
+      else
+        updated_program = @program.reload
+          .as_json(include: {
+            tags: {},
+            program_workouts: {
+              include: {
+                warmup: { include: :exercises },
+                cooldown: { include: :exercises },
+                program_workout_exercises: { include: :exercise }
+              }
+            }
+          })
+      
+        render json: updated_program, status: :ok
+      end
+    end
+
+
     # DELETE /coaches/programs/:id
     def destroy
       @program = current_coach.programs.find(params[:id])
@@ -61,10 +110,6 @@ module Coaches
     def program_params
       params.require(:program).permit(:name, :num_weeks, :description)
     end
-
-    # def ensure_current_coach
-    #   render json: { error: 'Unauthorized' }, status: :unauthorized unless current_coach
-    # end
 
   end
 end

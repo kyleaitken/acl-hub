@@ -71,6 +71,7 @@ Rails.application.routes.draw do
       member do
         post 'add_tag/:tag_id', to: 'programs#add_tag'
         delete 'remove_tag/:tag_id', to: 'programs#remove_tag'
+        patch 'update_positions', to: 'programs#update_positions'
       end
       resources :program_workouts do
         resources :program_workout_exercises

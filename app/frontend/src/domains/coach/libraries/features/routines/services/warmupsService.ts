@@ -1,20 +1,20 @@
-import { AddWarmupCooldownDTO, UpdateWarmupCooldownDTO, WarmupOrCooldown } from '../types';
+import { AddWarmupCooldownDTO, UpdateWarmupCooldownDTO, LibraryWarmupOrCooldown } from '../types';
 import { apiRequest } from '../../../../core/api/api';
 
 const baseUrl = `${import.meta.env.VITE_API_BASE_URL}/coaches/warmups`;
 
-const fetchWarmups = (token: string): Promise<WarmupOrCooldown[]> =>
+const fetchWarmups = (token: string): Promise<LibraryWarmupOrCooldown[]> =>
   apiRequest(`${baseUrl}`, 'GET', token);
 
 const fetchWarmup = (
   token: string,
   warmupId: number,
-): Promise<WarmupOrCooldown> => apiRequest(`${baseUrl}/${warmupId}`, 'GET', token);
+): Promise<LibraryWarmupOrCooldown> => apiRequest(`${baseUrl}/${warmupId}`, 'GET', token);
 
 const addWarmup = (
   token: string,
   dto: AddWarmupCooldownDTO,
-): Promise<WarmupOrCooldown> => {
+): Promise<LibraryWarmupOrCooldown> => {
   const { name, instructions, exerciseIds } = dto;
 
   const body = Object.fromEntries(
@@ -35,7 +35,7 @@ export const deleteWarmup = async (token: string, warmupId: number) => {
 export const updateWarmup = async (
   token: string,
   dto: UpdateWarmupCooldownDTO,
-): Promise<WarmupOrCooldown> => {
+): Promise<LibraryWarmupOrCooldown> => {
   const { id, name, instructions, exerciseIds } = dto;
   const url = `${baseUrl}/${id}`;
 

@@ -53,7 +53,8 @@ module Coaches
         id: cooldown.id,
         name: cooldown.name,
         instructions: cooldown.instructions,
-        exercise_ids: cooldown.exercise_ids
+        exercise_ids: cooldown.exercise_ids,
+        custom: cooldown.custom
       }
     end
 

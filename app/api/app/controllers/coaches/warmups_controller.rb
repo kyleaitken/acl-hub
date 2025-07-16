@@ -53,7 +53,8 @@ module Coaches
           id: warmup.id,
           name: warmup.name,
           instructions: warmup.instructions,
-          exercise_ids: warmup.exercise_ids
+          exercise_ids: warmup.exercise_ids,
+          custom: warmup.custom
         }
       end
   

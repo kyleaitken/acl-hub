@@ -1,9 +1,9 @@
-import { WarmupOrCooldown, AddWarmupCooldownDTO, UpdateWarmupCooldownDTO } from '../types';
+import { LibraryWarmupOrCooldown, AddWarmupCooldownDTO, UpdateWarmupCooldownDTO } from '../types';
 import { create } from 'zustand';
 import warmupsService from '../services/warmupsService';
 
 interface WarmupsStore {
-  warmups: Record<number, WarmupOrCooldown>;
+  warmups: Record<number, LibraryWarmupOrCooldown>;
   loading: boolean;
   error?: string;
 
@@ -133,9 +133,10 @@ export const useWarmupsStore = create<WarmupsStore>((set) => ({
 }));
 
 
-const normalizeWarmup = (raw: any): WarmupOrCooldown => ({
+const normalizeWarmup = (raw: any): LibraryWarmupOrCooldown => ({
   id: raw.id,
   name: raw.name,
   instructions: raw.instructions,
   exerciseIds: raw.exercise_ids,
+  custom: raw.custom
 });

@@ -1,4 +1,4 @@
-import { CoachProgram } from '../types';
+import { Program } from '../types';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import SendIcon from '@mui/icons-material/Send';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
@@ -6,14 +6,15 @@ import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import React from 'react';
 
 interface ProgramListItemProps {
-  program: CoachProgram;
+  program: Program;
   open: boolean;
   openOptions: (
     e: React.MouseEvent<HTMLButtonElement>,
-    program: CoachProgram,
+    program: Program,
   ) => void;
-  handleAddTagsToProgram: (program: CoachProgram) => void;
+  handleAddTagsToProgram: (program: Program) => void;
   handleRemoveTagFromProgram: (programId: number, tagId: number) => void;
+  handleNavigateToProgram: (programId: number) => void;
 }
 
 const ProgramListItem = ({
@@ -21,7 +22,8 @@ const ProgramListItem = ({
   open,
   openOptions,
   handleAddTagsToProgram,
-  handleRemoveTagFromProgram
+  handleRemoveTagFromProgram,
+  handleNavigateToProgram
 }: ProgramListItemProps) => {
 
   const hasTags = program.tags.length > 0;
@@ -35,7 +37,11 @@ const ProgramListItem = ({
             {program.num_weeks}
           </div>
         </div>
-        <div id={`program-${program.id}-name`} className="mt-3 flex flex-grow flex-col items-start">
+        <div
+          onClick={() => handleNavigateToProgram(program.id)} 
+          id={`program-${program.id}-name`} 
+          className="mt-3 flex flex-grow flex-col items-startv cursor-pointer"
+        >
           <p className='font-bold'>{program.name}</p>
           <p className="mt-1 max-w-[95%] text-sm">{program.description || ''}</p>
         </div>
@@ -64,7 +70,7 @@ const ProgramListItem = ({
       <div className="tags-buttons-container ml-24 flex flex-wrap items-center gap-2 pb-4 px-5 w-[800px]">
       <button
           type="button"
-          className='text-xs rounded-lg px-2 py-1 cursor-pointer mr-5 h-7 bg-blue-500 text-white'
+          className='text-xs rounded-lg px-2 py-1 cursor-pointer mr-5 h-7 bg-[#4e4eff] text-white'
           onClick={() => handleAddTagsToProgram(program)}
         >
           <span className='flex justify-center'>

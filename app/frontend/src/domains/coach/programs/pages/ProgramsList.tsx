@@ -1,9 +1,9 @@
 import { Input, InputAdornment, Menu, MenuItem } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { CoachProgram } from '../types';
-import { useCoachProgramActions } from '../hooks/useCoachProgramActions';
-import { useCoachProgramData } from '../hooks/useCoachProgramData';
+import { Program } from '../types';
+import { useProgramActions } from '../hooks/useProgramActions';
+import { useProgramData } from '../hooks/useProgramData';
 import React from 'react';
 import Snackbar from '@mui/material/Snackbar';
 import ProgramListItem from '../components/ProgramListItem';
@@ -12,25 +12,28 @@ import TagManager from '../components/TagManager';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import { useNavigate } from 'react-router-dom';
 
-const CoachPrograms = () => {
-  const { programs, error } = useCoachProgramData();
-  const [filteredPrograms, setFilteredPrograms] = useState<CoachProgram[] | null>(null);
+const ProgramsList = () => {
+  const { programs, error } = useProgramData();
+  const [filteredPrograms, setFilteredPrograms] = useState<Program[] | null>(null);
   const [searchString, setSearchString] = useState('');
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [openError, setOpenError] = useState(false);
-  const [selectedProgram, setSelectedProgram] = useState<CoachProgram | null>(
+  const [selectedProgram, setSelectedProgram] = useState<Program | null>(
     null,
   );
   const [dialogMode, setDialogMode] = useState<'create' | 'edit' | null>(null);
   const [dialogSession, setDialogSession] = useState<{
     mode: 'edit' | 'create';
-    program: CoachProgram | null;
+    program: Program | null;
   } | null>(null);
   const [tagManagerOpen, setTagManagerOpen] = useState(false);
 
   const isEditing = dialogSession?.mode === 'edit';
   const menuOpen = Boolean(anchorEl);
+
+  const navigate = useNavigate();   
 
   const {
     addProgram,
@@ -40,7 +43,7 @@ const CoachPrograms = () => {
     resetError, 
     addTagToProgram,
     removeTagFromProgram
-  } = useCoachProgramActions();
+  } = useProgramActions();
 
   useEffect(() => {
     fetchPrograms();
@@ -53,7 +56,7 @@ const CoachPrograms = () => {
   }, [error]);
 
   const handleOpenOptions = useCallback(
-    (event: React.MouseEvent<HTMLButtonElement>, program: CoachProgram) => {
+    (event: React.MouseEvent<HTMLButtonElement>, program: Program) => {
       setAnchorEl(event.currentTarget);
       setSelectedProgram(program);
     },
@@ -188,7 +191,7 @@ const CoachPrograms = () => {
     };
   }, [dialogSession]);
 
-  const handleAddTagsClicked = (program: CoachProgram) => {
+  const handleAddTagsClicked = (program: Program) => {
     setSelectedProgram(program);
     setTagManagerOpen(true);
   }
@@ -290,6 +293,7 @@ const CoachPrograms = () => {
               openOptions={handleOpenOptions}
               handleAddTagsToProgram={handleAddTagsClicked}
               handleRemoveTagFromProgram={handleRemoveTagFromProgram}
+              handleNavigateToProgram={(programId: number) => navigate(`/coach/programs/${programId}`)}
             />
           ))}
         </div>
@@ -344,4 +348,4 @@ const CoachPrograms = () => {
   );
 };
 
-export default CoachPrograms;
+export default ProgramsList;
