@@ -50,6 +50,7 @@ export interface ProgramWorkout {
   program_workout_exercises: ProgramWorkoutExercise[];
   created_at: string;
   updated_at: string;
+  name?: string;
   warmup?: DetailedWarmupOrCooldown;
   cooldown?: DetailedWarmupOrCooldown;
   program_id?: number;

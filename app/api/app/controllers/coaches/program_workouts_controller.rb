@@ -1,10 +1,8 @@
 module Coaches
     class ProgramWorkoutsController < ApplicationController
         before_action -> { doorkeeper_authorize! :coach }
-        # before_action :ensure_current_coach
-        before_action :set_program # Still needed to load @program
+        before_action :set_program 
 
-        # TODO: Update program controller to include warmups and cooldowns
         # GET /coaches/programs/:program_id/program_workouts
         def index
             @program_workouts = @program.program_workouts.includes(:program_workout_exercises, :warmup, :cooldown)
@@ -59,7 +57,7 @@ module Coaches
         end
 
         def program_workout_params
-            params.require(:program_workout).permit(:day, :week, :order, :warmup_id, :cooldown_id)
+            params.require(:program_workout).permit(:name, :day, :week, :order, :warmup_id, :cooldown_id)
         end
     end
 end
