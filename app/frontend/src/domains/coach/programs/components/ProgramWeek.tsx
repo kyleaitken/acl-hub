@@ -1,52 +1,57 @@
+// src/components/ProgramWeek.tsx
 import { useMemo } from "react";
-import { ProgramWorkout } from "../types";
 import ProgramDay from "./ProgramDay";
+import { ProgramWorkout } from "../types";
 
 interface ProgramWeekProps {
   week: number;
   workouts: ProgramWorkout[];
   isLastWeek: boolean;
-  onDropToDay: (targetWeek: number, targetDay: number) => void;
+  moveWorkout: (
+    workoutId: number,
+    toWeek: number,
+    toDay: number,
+    toIndex: number
+  ) => void;
+  onDrop: () => void;
 }
 
-const ProgramWeek = ({week, workouts, isLastWeek, onDropToDay}: ProgramWeekProps) => {
-
-  const workoutsByDay: Record<number, ProgramWorkout[]> = useMemo(() => {
-    const grouped: Record<number, ProgramWorkout[]> = {};
+const ProgramWeek = ({
+  week,
+  workouts,
+  isLastWeek,
+  moveWorkout,
+  onDrop,
+}: ProgramWeekProps) => {
   
-    for (const workout of workouts) {
-      const day = workout.day;
-      if (!grouped[day]) grouped[day] = [];
-      grouped[day].push(workout);
-    }
-  
-    // Sort each day's workouts by `order`
-    for (const day in grouped) {
-      grouped[day].sort((a, b) => a.order - b.order);
-    }
-  
-    return grouped;
+  const byDay = useMemo(() => {
+    const groupedWorkouts: Record<number, ProgramWorkout[]> = {};
+    workouts.forEach((w) => {
+      (groupedWorkouts[w.day] ||= []).push(w);
+    });
+    Object.values(groupedWorkouts).forEach((arr) =>
+      arr.sort((a, b) => a.order - b.order)
+    );
+    return groupedWorkouts;
   }, [workouts]);
 
   return (
     <div className="w-full" id={`week-${week}`}>
       <div className="flex">
-        {[...Array(7)].map((_, dayIndex) => {
-          const daysWorkouts = workoutsByDay[dayIndex + 1] || [];
-          return (
-            <ProgramDay 
-              key={dayIndex}
-              dayIndex={dayIndex}
-              week={week}
-              isLastWeek={isLastWeek}
-              workouts={daysWorkouts}
-              onDropToDay={onDropToDay}
-            />
-          )
-        })}
+        {[...Array(7)].map((_, dayIndex) => (
+          <ProgramDay
+            key={dayIndex}
+            dayIndex={dayIndex}
+            week={week}
+            isLastWeek={isLastWeek}
+            workouts={byDay[dayIndex + 1] || []}
+            moveWorkout={moveWorkout}
+            onDrop={onDrop}
+          />
+        ))}
       </div>
     </div>
-  )
+  );
 };
 
 export default ProgramWeek;

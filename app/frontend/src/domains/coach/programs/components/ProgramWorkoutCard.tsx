@@ -1,13 +1,40 @@
+// src/components/ProgramWorkoutCard.tsx
+import { useDrag, DragSourceMonitor } from "react-dnd";
 import { ProgramWorkout } from "../types";
+
+export interface DragItem {
+  id: number;
+  week: number;
+  day: number;
+  index: number;
+}
 
 interface ProgramWorkoutCardProps {
   workout: ProgramWorkout;
-};
+  index: number;
+  week: number;
+  day: number;
+}
 
-const ProgramWorkoutCard = ({workout}: ProgramWorkoutCardProps) => {
+const ProgramWorkoutCard = ({
+  workout,
+  index,
+  week,
+  day,
+}: ProgramWorkoutCardProps) => {
+  const [{ isDragging }, drag] = useDrag({
+    type: "WORKOUT",
+    item: { id: workout.id, week, day, index } as DragItem,
+    collect: (monitor: DragSourceMonitor) => ({
+      isDragging: monitor.isDragging(),
+    }),
+  });
+
   return (
     <div
-      className="border border-gray-300 rounded-md shadow-sm p-3 mb-2 cursor-move bg-white hover:shadow-md"
+      ref={drag}
+      style={{ opacity: isDragging ? 0.5 : 1, cursor: "move" }}
+      className="mb-2 p-2 border rounded bg-white shadow"
     >
       <div className="text-sm font-semibold">Workout {workout.order}</div>
       <div className="text-xs text-gray-600">
