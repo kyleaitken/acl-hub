@@ -9,14 +9,15 @@ import EditIcon from '@mui/icons-material/Edit';
 import SendIcon from '@mui/icons-material/Send';
 import { ProgramWorkout } from '../types';
 import ProgramWeek from '../components/ProgramWeek';
+import { useDragStore } from '../../core/store/dragStore';
+import toast from 'react-hot-toast';
 
 const ProgramPage = () => {
-  
   const navigate = useNavigate();
-  const { fetchProgram } = useProgramActions();
+  const { fetchProgram, updateWorkoutPositions } = useProgramActions();
   const { programId } = useParams();
   const id = Number(programId);
-
+  const { draggedWorkout, dropTarget, setDraggedWorkout, setDropTarget } = useDragStore();
   const { program } = useProgramDetails(id);
 
   useEffect(() => {
@@ -34,16 +35,55 @@ const ProgramPage = () => {
     return grouped;
   }, [program?.program_workouts]);
 
+  const handleDropToDay = async (targetWeek: number, targetDay: number) => {    
+    if (!draggedWorkout || !program || !dropTarget) return;
+  
+    const { workout: dragged, from } = draggedWorkout;
+    let updated = program.program_workouts.filter(w => w.id !== dragged.id);
+
+    // build the target-day stack (sorted)
+    const targetStack = updated
+      .filter(w => w.week === targetWeek && w.day === targetDay)
+      .sort((a, b) => a.order - b.order);
+
+    let newStack;
+    // same-day reorder?
+    if (from.week === targetWeek && from.day === targetDay) {
+      // splice into the recorded drop index
+      const arr = [...targetStack];
+      arr.splice(dropTarget.index, 0, { ...dragged, week: targetWeek, day: targetDay });
+      newStack = arr;
+    } else {
+      // cross-day move: append
+        newStack = [...targetStack, { ...dragged, week: targetWeek, day: targetDay }];
+    }
+
+    // reassign order sequentially
+    const reordered = newStack.map((w, i) => ({ ...w, order: i }));
+
+    // merge back into full list
+    updated = [
+      ...updated.filter(w => !(w.week === targetWeek && w.day === targetDay)),
+      ...reordered,
+    ];
+  
+    try {
+      await updateWorkoutPositions({
+        programId: program.id,
+        workouts_positions: updated.map(({ id, week, day, order }) => ({ id, week, day, order })),
+      });
+      setDraggedWorkout(null);
+      setDropTarget(null);
+      toast.success("Workout moved");
+    } catch (err) {
+      console.error("Update failed", err);
+      toast.error("Failed to move workout");
+    }
+  };
+
   return (
     /*
-      ProgramBox:
-      - Grid of Weeks
-        - Each week has 7 columns that are a day
-      - Day
-        - contains a stack of workouts
-        - can drag workout components to other days
       - Workout
-        - can drag workout
         - can copy workout and paste into another day
         - can click workout, which opens footer with options to delete, copy, cut
         - workouts have a title, warmup, list of exercises, cooldown
@@ -87,6 +127,7 @@ const ProgramPage = () => {
               week={Number(week)}
               workouts={workouts}
               isLastWeek={index === arr.length - 1}
+              onDropToDay={handleDropToDay}
             />
           )
         })}

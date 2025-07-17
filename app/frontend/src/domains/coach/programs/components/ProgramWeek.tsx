@@ -6,9 +6,10 @@ interface ProgramWeekProps {
   week: number;
   workouts: ProgramWorkout[];
   isLastWeek: boolean;
+  onDropToDay: (targetWeek: number, targetDay: number) => void;
 }
 
-const ProgramWeek = ({week, workouts, isLastWeek}: ProgramWeekProps) => {
+const ProgramWeek = ({week, workouts, isLastWeek, onDropToDay}: ProgramWeekProps) => {
 
   const workoutsByDay: Record<number, ProgramWorkout[]> = useMemo(() => {
     const grouped: Record<number, ProgramWorkout[]> = {};
@@ -39,6 +40,7 @@ const ProgramWeek = ({week, workouts, isLastWeek}: ProgramWeekProps) => {
               week={week}
               isLastWeek={isLastWeek}
               workouts={daysWorkouts}
+              onDropToDay={onDropToDay}
             />
           )
         })}
