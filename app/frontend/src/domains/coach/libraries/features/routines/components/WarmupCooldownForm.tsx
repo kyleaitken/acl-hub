@@ -118,7 +118,7 @@ const WarmupCooldownForm = ({
         </FormField>
 
         <ExercisesSearch 
-          handleAddExercise={(exerciseId) => setExerciseIds(prev => [...prev, exerciseId])}
+          handleAddExercise={(ex) => setExerciseIds(prev => [...prev, ex.id])}
           exerciseIds={exerciseIds}
         />
 

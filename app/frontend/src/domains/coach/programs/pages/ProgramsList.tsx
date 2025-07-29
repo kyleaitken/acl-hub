@@ -37,7 +37,7 @@ const ProgramsList = () => {
 
   const {
     addProgram,
-    updateProgram,
+    updateProgramDetails,
     fetchPrograms,
     deleteProgram,
     resetError, 
@@ -145,7 +145,7 @@ const ProgramsList = () => {
       const program = selectedProgram;
       handleCloseDialog();
       try {
-        await updateProgram({
+        await updateProgramDetails({
           programId: program.id,
           programName: name,
           programDescription: desc,

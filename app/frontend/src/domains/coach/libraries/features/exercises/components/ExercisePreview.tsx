@@ -44,7 +44,6 @@ const ExercisePreview = ({anchorRect, name, url, exerciseId, handleDismissPrevie
         </a>
       </div>
     </div>
-          
   )
 };
 

@@ -23,3 +23,14 @@ export const getEmbedUrl = (url: string): string => {
 };
 
 export const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+
+export function isTrustedVideoUrl(url: string): boolean {
+  try {
+    const parsed = new URL(url);
+    const trustedHosts = ['youtube.com', 'youtu.be', 'www.youtube.com', 'player.vimeo.com', 'vimeo.com'];
+    return trustedHosts.includes(parsed.hostname);
+  } catch {
+    return false;
+  }
+}
+

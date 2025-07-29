@@ -1,4 +1,4 @@
-import { AddProgramDTO, UpdateProgramDTO, Program, ProgramDetails, BulkReorderProgramWorkoutsDTO } from '../types';
+import { AddProgramDTO, UpdateProgramDTO, Program, ProgramDetails, BulkReorderProgramWorkoutsDTO, AddWorkoutDTO, ProgramWorkout } from '../types';
 import { apiRequest } from '../../core/api/api';
 
 const baseUrl = `${import.meta.env.VITE_API_BASE_URL}/coaches/programs`;
@@ -11,7 +11,6 @@ const fetchProgram = (
   programId: number,
 ): Promise<ProgramDetails> => apiRequest(`${baseUrl}/${programId}`, 'GET', token);
 
-// TODO: Make sure number of weeks is on form and mandatory. Pass empty string default from component for description, or handle that in the backend
 const addProgram = (
   token: string,
   dto: AddProgramDTO,
@@ -29,7 +28,7 @@ export const deleteProgram = async (token: string, programId: number) => {
   return apiRequest(url, 'DELETE', token);
 };
 
-export const updateProgram = async (
+export const updateProgramDetails = async (
   token: string,
   dto: UpdateProgramDTO,
 ): Promise<Program> => {
@@ -69,13 +68,49 @@ const removeTagFromProgram = (
 ): Promise<Program> =>
   apiRequest(`${baseUrl}/${programId}/remove_tag/${tagId}`, 'DELETE', token);
 
+const deleteWorkoutsFromProgram = (
+  token: string,
+  programId: number,
+  workoutIds: number[]
+): Promise<void> => {
+  return apiRequest(
+    `${baseUrl}/${programId}/program_workouts/destroy_multiple`,
+    "DELETE",
+    token,
+    { ids: workoutIds }
+  );
+};
+
+const addWorkoutToProgram = (
+  token: string,
+  dto: AddWorkoutDTO
+): Promise<ProgramWorkout> => {
+  const { programId, program_workout } = dto;
+  const url = `${baseUrl}/${programId}/program_workouts`;
+
+  const cleaned = Object.fromEntries(
+    Object.entries(program_workout).filter(
+      ([, v]) => v !== undefined
+    )
+  );
+
+  return apiRequest(
+    url,
+    'POST',
+    token,
+    { program_workout: cleaned }
+  );
+}
+
 export default {
   fetchPrograms,
   fetchProgram,
   addProgram,
   deleteProgram,
-  updateProgram,
+  updateProgramDetails,
   updateWorkoutPositions,
   addTagToProgram,
   removeTagFromProgram,
+  deleteWorkoutsFromProgram,
+  addWorkoutToProgram
 };

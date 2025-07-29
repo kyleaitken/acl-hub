@@ -74,6 +74,9 @@ Rails.application.routes.draw do
         patch 'update_positions', to: 'programs#update_positions'
       end
       resources :program_workouts do
+        collection do
+          delete :destroy_multiple
+        end
         resources :program_workout_exercises
       end
     end

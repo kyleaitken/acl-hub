@@ -7,14 +7,14 @@ interface WarmupsStore {
   loading: boolean;
   error?: string;
 
-  fetchWarmups: (token: string) => Promise<void>;
+  fetchWarmups: (token: string) => Promise<LibraryWarmupOrCooldown[]>;
   fetchWarmup: (token: string, warmupId: number) => Promise<void>;
   updateWarmup: (
     token: string,
     warmupData: UpdateWarmupCooldownDTO,
   ) => Promise<void>;
   deleteWarmup: (token: string, warmupId: number) => Promise<void>;
-  addWarmup: (token: string, warmupData: AddWarmupCooldownDTO) => Promise<void>;
+  addWarmup: (token: string, warmupData: AddWarmupCooldownDTO) => Promise<LibraryWarmupOrCooldown>;
 
   setError: (message: string) => void;
   resetError: () => void;
@@ -44,8 +44,10 @@ export const useWarmupsStore = create<WarmupsStore>((set) => ({
         },
         loading: false,
       }));
+      return Object.values(normalized);
     } catch (err) {
       set({ error: "Failed to fetch coach's warmups", loading: false });
+      return [];
     }
   },
   fetchWarmup: async (token: string, warmupId: number) => {
@@ -123,8 +125,10 @@ export const useWarmupsStore = create<WarmupsStore>((set) => ({
         },
         loading: false,
       }));
+      return newWarmup;
     } catch (err) {
       set({ error: `Failed to add new warmup`, loading: false });
+      throw(err);
     }
   },
 

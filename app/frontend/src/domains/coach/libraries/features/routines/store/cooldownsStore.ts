@@ -7,14 +7,14 @@ interface CooldownsStore {
   loading: boolean;
   error?: string;
 
-  fetchCooldowns: (token: string) => Promise<void>;
+  fetchCooldowns: (token: string) => Promise<LibraryWarmupOrCooldown[]>;
   fetchCooldown: (token: string, cooldownId: number) => Promise<void>;
   updateCooldown: (
     token: string,
     cooldownData: UpdateWarmupCooldownDTO,
   ) => Promise<void>;
   deleteCooldown: (token: string, cooldownId: number) => Promise<void>;
-  addCooldown: (token: string, cooldownData: AddWarmupCooldownDTO) => Promise<void>;
+  addCooldown: (token: string, cooldownData: AddWarmupCooldownDTO) => Promise<LibraryWarmupOrCooldown>;
 
   setError: (message: string) => void;
   resetError: () => void;
@@ -44,8 +44,10 @@ export const useCooldownsStore = create<CooldownsStore>((set) => ({
         },
         loading: false,
       }));
+      return Object.values(normalized);
     } catch (err) {
       set({ error: "Failed to fetch coach's cooldowns", loading: false });
+      return [];
     }
   },
   fetchCooldown: async (token: string, cooldownId: number) => {
@@ -125,8 +127,10 @@ export const useCooldownsStore = create<CooldownsStore>((set) => ({
         },
         loading: false,
       }));
+      return newCooldown;
     } catch (err) {
       set({ error: `Failed to add new cooldown`, loading: false });
+      throw(err);
     }
   },
 

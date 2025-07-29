@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_07_17_194247) do
+ActiveRecord::Schema[7.2].define(version: 2025_07_27_132145) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -153,6 +153,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_07_17_194247) do
     t.string "video_url"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "custom", default: false, null: false
   end
 
   create_table "oauth_access_grants", force: :cascade do |t|
@@ -223,8 +224,8 @@ ActiveRecord::Schema[7.2].define(version: 2025_07_17_194247) do
     t.integer "order"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.bigint "warmup_id", null: false
-    t.bigint "cooldown_id", null: false
+    t.bigint "warmup_id"
+    t.bigint "cooldown_id"
     t.string "name"
     t.index ["cooldown_id"], name: "index_program_workouts_on_cooldown_id"
     t.index ["program_id"], name: "index_program_workouts_on_program_id"

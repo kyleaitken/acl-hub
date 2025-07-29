@@ -16,8 +16,8 @@ interface ExercisesStore {
     exerciseData: UpdateExerciseDTO,
   ) => Promise<void>;
   deleteExercise: (token: string, exerciseId: number) => Promise<void>;
-  addExercise: (token: string, exerciseData: AddExerciseDTO) => Promise<void>;
-
+  addExercise: (token: string, exerciseData: AddExerciseDTO) => Promise<Exercise>;
+  addSearchedExercises: (exercises: Exercise[]) => void;
   setError: (message: string) => void;
   resetError: () => void;
 }
@@ -131,11 +131,27 @@ export const useExercisesStore = create<ExercisesStore>((set) => ({
 
         },
       }));
+
+      return newExercise;
     } catch (err) {
       set({ error: `Failed to add new exercise`, loading: false });
+      throw err; 
     }
   },
-
+  addSearchedExercises: (searched: Exercise[]) =>
+    set(state => {
+      const toAdd = searched.filter(e => {
+        const existing = state.exercises[e.id];
+        return !existing || existing.updated_at !== e.updated_at;
+      });
+      if (toAdd.length === 0) return {};
+      return {
+        exercises: {
+          ...state.exercises,
+          ...Object.fromEntries(toAdd.map(e => [e.id, e])),
+        },
+      };
+  }),
   setError: (message) => set({ error: message }),
   resetError: () => set({ error: undefined }),
 }));

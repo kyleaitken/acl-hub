@@ -1,16 +1,20 @@
 import { create } from 'zustand';
 import programsService from '../services/programsService';
-import { Program, AddProgramDTO, UpdateProgramDTO, ProgramDetails, BulkReorderProgramWorkoutsDTO } from '../types';
+import { Program, AddProgramDTO, UpdateProgramDTO, ProgramDetails, BulkReorderProgramWorkoutsDTO, AddWorkoutDTO, UpdateWorkoutDTO } from '../types';
 
 interface ProgramStore {
   programs: Record<number, Program>;
   detailedPrograms: Record<number, ProgramDetails>;
+  copiedWorkoutIds: number[];
+  selectedWorkoutIds: number[];
+
+  isEditingWorkout: boolean;
   loading: boolean;
   error?: string;
 
   fetchPrograms: (token: string) => Promise<void>;
   fetchProgram: (token: string, programId: number) => Promise<void>;
-  updateProgram: (
+  updateProgramDetails: (
     token: string,
     programData: UpdateProgramDTO,
   ) => Promise<void>;
@@ -27,7 +31,13 @@ interface ProgramStore {
     programId: number,
     tagId: number,
   ) => Promise<void>;
+  setCopiedWorkoutIds: (workoutIds: number[]) => void;
+  setSelectedWorkoutIds: (workoutIds: number[]) => void;
+  addWorkoutToProgram: (token: string, workoutData: AddWorkoutDTO) => Promise<void>;
+  deleteWorkoutsFromProgram: (token: string, programId: number, workoutIds: number[]) => Promise<void>;
+  updateWorkout: (workoutData: UpdateWorkoutDTO) => Promise<void>;
 
+  setIsEditingWorkout: (flag: boolean) => void;
   setError: (message: string) => void;
   resetError: () => void;
 }
@@ -35,8 +45,11 @@ interface ProgramStore {
 export const useProgramStore = create<ProgramStore>((set) => ({
   programs: {},
   detailedPrograms: {},
+  selectedWorkoutIds: [],
   loading: false,
   error: undefined,
+  copiedWorkoutIds: [],
+  isEditingWorkout: false,
 
   fetchPrograms: async (token: string) => {
     set({ loading: true });
@@ -66,11 +79,11 @@ export const useProgramStore = create<ProgramStore>((set) => ({
       });
     }
   },
-  updateProgram: async (token: string, programData: UpdateProgramDTO) => {
+  updateProgramDetails: async (token: string, programData: UpdateProgramDTO) => {
     set({ loading: true });
     const { programId } = programData;
     try {
-      const updatedProgram = await programsService.updateProgram(
+      const updatedProgram = await programsService.updateProgramDetails(
         token,
         programData,
       );
@@ -194,6 +207,65 @@ export const useProgramStore = create<ProgramStore>((set) => ({
       set({ error: 'Failed to remove tag from program' });
     }
   },
+  addWorkoutToProgram: async (
+    token: string,
+    workoutData: AddWorkoutDTO
+  ) => {
+    set({ loading: true });
+    try {
+      const programId = workoutData.programId;
+      const newWorkout = await programsService.addWorkoutToProgram(token, workoutData);
+
+      set((state) => {
+        const detailed = state.detailedPrograms[programId]!
+        return {
+          detailedPrograms: {
+            ...state.detailedPrograms,
+            [programId]: {
+              ...detailed,
+              program_workouts: [...detailed.program_workouts, newWorkout],
+            },
+          },
+          loading: false,
+        }
+      })
+  
+    } catch (err) {
+      set({ loading: false, error: (err as Error).message })
+      throw err
+    }
+  },
+  deleteWorkoutsFromProgram: async (
+    token: string,
+    programId: number,
+    workoutIds: number[]
+  ) => {
+    set({ loading: true });
+    try {
+      await programsService.deleteWorkoutsFromProgram(token, programId, workoutIds);
+      set((state) => {
+        const prog = state.detailedPrograms[programId];
+        return {
+          detailedPrograms: {
+            ...state.detailedPrograms,
+            [programId]: {
+              ...prog,
+              program_workouts: prog.program_workouts.filter((w) => !workoutIds.includes(w.id)) 
+            }
+          },
+          loading: false
+        }
+      })
+    } catch (err) {
+      set({ error: "Failed to delete workouts", loading: false });
+    }
+  },
+  updateWorkout: async () => {
+
+  },
+  setIsEditingWorkout: (flag) => set({isEditingWorkout: flag}),
+  setCopiedWorkoutIds: (workoutIds) => set({ copiedWorkoutIds: workoutIds }),
+  setSelectedWorkoutIds: (workoutIds) => set({ selectedWorkoutIds: workoutIds }),
   setError: (message) => set({ error: message }),
   resetError: () => set({ error: undefined }),
 }));

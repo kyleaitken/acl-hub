@@ -1,6 +1,6 @@
 import { useAuthenticatedUser } from '../../../shared/auth/hooks/useAuthenticatedUser';
 import { useProgramStore } from '../store/programStore';
-import { UpdateProgramDTO, AddProgramDTO, BulkReorderProgramWorkoutsDTO } from '../types';
+import { UpdateProgramDTO, AddProgramDTO, BulkReorderProgramWorkoutsDTO, AddWorkoutDTO } from '../types';
 
 export const useProgramActions = () => {
   const { token } = useAuthenticatedUser();
@@ -8,13 +8,18 @@ export const useProgramActions = () => {
   const fetchPrograms = useProgramStore((s) => s.fetchPrograms);
   const fetchProgram = useProgramStore((s) => s.fetchProgram);
   const addProgram = useProgramStore((s) => s.addProgram);
-  const updateProgram = useProgramStore((s) => s.updateProgram);
+  const updateProgramDetails = useProgramStore((s) => s.updateProgramDetails);
   const updateWorkoutPositions = useProgramStore((s) => s.updateWorkoutPositions);
   const deleteProgram = useProgramStore((s) => s.deleteProgram);
   const addTagToProgram = useProgramStore((s) => s.addTagToProgram);
   const removeTagFromProgram = useProgramStore(
     (s) => s.removeTagFromProgram,
   );
+  const addWorkoutToProgram = useProgramStore((s) => s.addWorkoutToProgram);
+  const deleteWorkoutsFromProgram = useProgramStore((s) => s.deleteWorkoutsFromProgram);
+  const setCopiedWorkoutIds = useProgramStore((s) => s.setCopiedWorkoutIds);
+  const setSelectedWorkoutIds = useProgramStore((s) => s.setSelectedWorkoutIds);
+  const setIsEditingWorkout = useProgramStore((s) => s.setIsEditingWorkout);
   const setError = useProgramStore((s) => s.setError);
   const resetError = useProgramStore((s) => s.resetError);
 
@@ -22,13 +27,18 @@ export const useProgramActions = () => {
     fetchPrograms: () => fetchPrograms(token),
     fetchProgram: (id: number) => fetchProgram(token, id),
     addProgram: (dto: AddProgramDTO) => addProgram(token, dto),
-    updateProgram: (dto: UpdateProgramDTO) => updateProgram(token, dto),
+    updateProgramDetails: (dto: UpdateProgramDTO) => updateProgramDetails(token, dto),
     updateWorkoutPositions: (dto: BulkReorderProgramWorkoutsDTO) => updateWorkoutPositions(token, dto),
     deleteProgram: (id: number) => deleteProgram(token, id),
     addTagToProgram: (programId: number, tagId: number) =>
       addTagToProgram(token, programId, tagId),
     removeTagFromProgram: (programId: number, tagId: number) =>
       removeTagFromProgram(token, programId, tagId),
+    addWorkoutToProgram: (dto: AddWorkoutDTO) => addWorkoutToProgram(token, dto),
+    deleteWorkoutsFromProgram: (programId: number, workoutIds: number[]) => deleteWorkoutsFromProgram(token, programId, workoutIds),
+    setCopiedWorkoutIds: (workoutIds: number[]) => setCopiedWorkoutIds(workoutIds),
+    setSelectedWorkoutIds: (workoutIds: number[]) => setSelectedWorkoutIds(workoutIds),
+    setIsEditingWorkout: (flag: boolean) => setIsEditingWorkout(flag),
     setError: (error: string) => setError(error),
     resetError: () => resetError(),
   };
