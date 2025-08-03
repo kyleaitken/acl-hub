@@ -6,6 +6,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { useProgramData } from "../hooks/useProgramStoreData";
 
 interface ProgramWeekProps {
+  programId: number;
   week: number;
   workouts: ProgramWorkout[];
   isLastWeek: boolean;
@@ -22,6 +23,7 @@ interface ProgramWeekProps {
 }
 
 const ProgramWeek = ({
+  programId,
   week,
   workouts,
   isLastWeek,
@@ -52,6 +54,7 @@ const ProgramWeek = ({
         {[...Array(7)].map((_, dayIndex) => (
           <ProgramDay
             key={dayIndex}
+            programId={programId}
             dayIndex={dayIndex}
             week={week}
             isLastWeek={isLastWeek}

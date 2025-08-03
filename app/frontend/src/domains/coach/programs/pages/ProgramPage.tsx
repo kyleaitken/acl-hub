@@ -35,7 +35,7 @@ const ProgramPage = () => {
           onClick={() => navigate("/coach/programs")}
         >
           <WestIcon sx={{ fontSize: "18px", mr: 1.5 }} />
-          <span className="text-sm">Back to Programs</span>
+          <span className="text-md">Back to Programs</span>
         </button>
         <div
           id="program-box"
@@ -43,15 +43,15 @@ const ProgramPage = () => {
         >
           <div className="flex" id="program-header">
             <div id="program-title-and-description" className="flex flex-col flex-grow">
-              <div className='text-2xl font-semibold'>{program.name}</div>
+              <div className='text-3xl font-bold'>{program.name}</div>
               <div className='mt-4 text-md'>{program.description}</div>
             </div>
             <div id="top-program-buttons" className='flex flex-col'>
-              <button className='border-1 py-1 px-2 h-[40px] rounded-md cursor-pointer flex items-center mb-2 hover:bg-gray-200'>
+              <button className='border-1 py-1 px-8 h-[40px] rounded-md cursor-pointer flex items-center mb-2 hover:bg-gray-200'>
                 <EditIcon sx={{fontSize: '18px', mr: 1}} />
                 Edit Program
               </button>
-              <button className='border-1 py-1 px-2 h-[40px] rounded-md cursor-pointer flex items-center bg-[#4e4eff] text-white hover:bg-blue-500'>
+              <button className='border-1 py-1 px-8 h-[40px] rounded-md cursor-pointer flex items-center bg-[#356ccc] text-white hover:bg-blue-500'>
                 <SendIcon sx={{ fontSize: '18px', mr: 1 }} />
                 Assign to Client
               </button>
@@ -64,6 +64,7 @@ const ProgramPage = () => {
             const workouts = workoutsByWeek[weekNum] || [];
             return (
               <ProgramWeek
+                programId={id}
                 key={weekNum}
                 week={weekNum}
                 workouts={workouts}

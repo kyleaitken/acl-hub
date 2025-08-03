@@ -277,7 +277,7 @@ const ProgramsList = () => {
             }}
           ></Input>
         </div>
-        <div className="programs-list-container mt-7 flex w-full flex-col">
+        <div className="programs-list-wrapper mt-7 flex w-full flex-col">
           <div
             id="programs-list-header"
             className="flex h-12 w-full items-center rounded-tl-md rounded-tr-md bg-[#D8D8E0]"

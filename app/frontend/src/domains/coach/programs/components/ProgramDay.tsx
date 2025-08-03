@@ -3,13 +3,13 @@ import WorkoutCard from "./WorkoutCard";
 import { ProgramWorkout, WorkoutFormItem, WorkoutStackItem } from "../types";
 import { useProgramData } from "../hooks/useProgramStoreData";
 import WorkoutForm from "./WorkoutForm";
-import { useParams } from "react-router-dom";
 import { useProgramActions } from "../hooks/useProgramStoreActions";
 import { useWorkoutDrop } from '../hooks/useWorkoutDrop';
 import ProgramDayHeader from "./ProgramDayHeader";
 import { useProgramDayActions } from "../hooks/useProgramDayActions";
 
 interface ProgramDayProps {
+  programId: number;
   dayIndex: number;
   isLastWeek: boolean;
   week: number;
@@ -26,6 +26,7 @@ interface ProgramDayProps {
 }
 
 const ProgramDay = ({
+  programId,
   dayIndex,
   isLastWeek,
   week,
@@ -39,7 +40,7 @@ const ProgramDay = ({
   const { copiedWorkoutIds, isEditingWorkout } = useProgramData(); // TODO maybe have a flag in state like idsCopied so that I don't need to pull this into each program day
   const {setIsEditingWorkout} = useProgramActions();
   const { pasteCopied, submitNew } 
-    = useProgramDayActions({ programId: Number(useParams<{ programId: string }>()), week, day: dayIndex+1 });
+    = useProgramDayActions({ programId: programId, week, day: dayIndex+1 });
 
   const { dropContainer, dropPlaceholder } = useWorkoutDrop({
     week,
@@ -109,7 +110,7 @@ const ProgramDay = ({
         onPasteWorkouts={pasteCopied}
         onAddWorkout={handleAddNewWorkout}
       />
-      <div className="flex-grow bg-white flex flex-col py-2 px-1">
+      <div className="flex-grow bg-white flex flex-col py-0 px-0">
         {stack.map((w, i) => {
           if (w.__type === 'form') {
             return (
@@ -130,6 +131,7 @@ const ProgramDay = ({
                 week={week}
                 day={dayIndex + 1}
                 moveWorkout={moveWorkout}
+                isLastWorkout={i === stack.length - 1}
                 onDrop={onDrop}
                 canDrag={!isEditingWorkout} // disable dragging while editing workouts
                 onSelect={onSelectWorkout}

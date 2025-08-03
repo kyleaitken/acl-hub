@@ -9,7 +9,6 @@ import { ProgramWorkout } from "../types";
 import Checkbox from '@mui/material/Checkbox';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import OpenWithIcon from '@mui/icons-material/OpenWith';
-import ExerciseTagsContainer from "../../libraries/features/exercises/components/ExerciseTagsContainer";
 import { useProgramActions } from "../hooks/useProgramStoreActions";
 import { useProgramData } from "../hooks/useProgramStoreData";
 
@@ -26,6 +25,7 @@ interface ProgramWorkoutCardProps {
   week: number;
   day: number;
   canDrag: boolean;
+  isLastWorkout: boolean;
   moveWorkout: (
     workoutId: number,
     toWeek: number,
@@ -42,6 +42,7 @@ const WorkoutCard = ({
   week,
   day,
   canDrag,
+  isLastWorkout,
   moveWorkout,
   onDrop,
   onSelect
@@ -109,28 +110,34 @@ const WorkoutCard = ({
     <div
       ref={cardRef}
       style={{ opacity: isDragging ? 0.5 : 1 }}
-      className="mb-10 border shadow-sm rounded-md p-1 bg-white"
+      className={`border-b py-1 bg-white cursor-pointer pb-0 ${isLastWorkout ? 'border-b-0' : ''}`}
+      onClick={() => console.log("Workout card clicked")}
     >
-      <div className="workout-card-header flex items-start mb-2">
+      <div className="workout-card-header flex items-start mt-1 mb-2 mx-1">
         <Checkbox 
           checked={isSelected}
           disableRipple 
-          size="medium" 
-          sx={{p:0, pb: 1, pr: 1}} 
+          size="large" 
+          sx={{p:0, pb: 1, pr: 0.5}} 
           onClick={(e) => {
             e.stopPropagation();
             const clickedPosition = (week - 1) * 7 + day;
             onSelect(workout.id, e.shiftKey, clickedPosition);
           }}
         />
-        <span className="text-md font-semibold flex-grow">{workout.name || `Workout`}</span>
+        <span className="text-[17px] font-semibold flex-grow mr-4">{workout.name || `Workout`}</span>
         <div className="copy-and-move-buttons flex items-center">
           <button
-            aria-label="copy-workout"
-            onClick={() => setCopiedWorkoutIds([workout.id])}
+            type="button"
             className="cursor-pointer"
+            aria-label="copy-workout"
+            onMouseDown={e => e.stopPropagation()}
+            onClick={e => {
+              e.stopPropagation();
+              setCopiedWorkoutIds([workout.id]);
+            }}
           >
-            <ContentCopyIcon sx={{fontSize: '20px'}}/>
+            <ContentCopyIcon sx={{fontSize: 22}}/>
           </button>
           <button 
             ref={handleRef} 
@@ -138,36 +145,26 @@ const WorkoutCard = ({
             aria-label="move workout"
             className={`ml-1 ${canDrag ? 'cursor-move' : 'cursor-not-allowed opacity-50'}`}
           >
-            <OpenWithIcon sx={{ fontSize: 20 }} />
+            <OpenWithIcon sx={{ fontSize: 22 }} />
           </button>
         </div>
       </div>
 
       {workout.warmup?.instructions && 
-        <div className="flex flex-col">
+        <div className="flex flex-col px-1">
           <div className="text-xs text-gray-600 whitespace-pre-line">
             {workout.warmup.instructions}
           </div>
-          <div className="divider my-1 w-full border-t border-gray-400" />
-          {workout.warmup?.exercises && isExpanded &&
-            <div className="flex flex-col">
-              <ExerciseTagsContainer 
-                addedExercises={workout.warmup.exercises}
-                handleRemoveExercise={() => console.log('remove ex from warmup')}
-                size="small"
-              />
-              <div className="divider my-1 w-full border-t border-gray-400" />
-            </div>
-          }
+          <div className="divider mt-1 w-full border-t border-gray-400" />
         </div>
       }
 
       {workout.program_workout_exercises?.length > 0 && (
         <div>
           {workout.program_workout_exercises.map((ex, idx) => (
-            <div key={ex.id ?? idx} className="flex flex-col py-2">
+            <div key={ex.id ?? idx} className="flex flex-col py-2 px-1 min-h-15 hover:bg-gray-200">
               <div className="exercise-title font-semibold">
-                {ex.order} {ex.exercise.name}
+                {`${ex.order}) ${ex.exercise.name}`}
               </div>
               <p className="text-sm text-gray-600">
                 {ex.instructions}
@@ -178,21 +175,11 @@ const WorkoutCard = ({
       )}
 
       {workout.cooldown?.instructions && 
-        <div className="flex flex-col">
-          <div className="divider my-1 w-full border-t border-gray-400" />
+        <div className="flex flex-col px-1 pb-8">
+          <div className="divider mb-1 w-full border-t border-gray-400" />
           <div className="text-xs text-gray-600 whitespace-pre-line">
             {workout.cooldown.instructions}
           </div>
-          {workout.cooldown?.exercises && isExpanded &&
-            <div className="flex flex-col">
-              <div className="divider my-1 w-full border-t border-gray-400" />
-              <ExerciseTagsContainer 
-                addedExercises={workout.cooldown.exercises}
-                handleRemoveExercise={() => console.log('remove ex from cooldown')}
-                size="small"
-              />
-            </div>
-          }
         </div>
       }
     </div>
