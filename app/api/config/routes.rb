@@ -76,6 +76,7 @@ Rails.application.routes.draw do
       resources :program_workouts do
         collection do
           delete :destroy_multiple
+          post :copy_workouts
         end
         resources :program_workout_exercises
       end

@@ -1,3 +1,4 @@
+import { BulkCopyWorkoutsDTO } from '../types';
 import { useAuthenticatedUser } from '../../../shared/auth/hooks/useAuthenticatedUser';
 import { useProgramStore } from '../store/programStore';
 import { UpdateProgramDTO, AddProgramDTO, BulkReorderProgramWorkoutsDTO, AddWorkoutDTO } from '../types';
@@ -17,6 +18,7 @@ export const useProgramActions = () => {
   );
   const addWorkoutToProgram = useProgramStore((s) => s.addWorkoutToProgram);
   const deleteWorkoutsFromProgram = useProgramStore((s) => s.deleteWorkoutsFromProgram);
+  const bulkCopyWorkoutsToProgram = useProgramStore((s) => s.bulkCopyWorkoutsToProgram);
   const setCopiedWorkoutIds = useProgramStore((s) => s.setCopiedWorkoutIds);
   const setSelectedWorkoutIds = useProgramStore((s) => s.setSelectedWorkoutIds);
   const setIsEditingWorkout = useProgramStore((s) => s.setIsEditingWorkout);
@@ -36,6 +38,7 @@ export const useProgramActions = () => {
       removeTagFromProgram(token, programId, tagId),
     addWorkoutToProgram: (dto: AddWorkoutDTO) => addWorkoutToProgram(token, dto),
     deleteWorkoutsFromProgram: (programId: number, workoutIds: number[]) => deleteWorkoutsFromProgram(token, programId, workoutIds),
+    bulkCopyWorkoutsToProgram: (workoutsData: BulkCopyWorkoutsDTO) => bulkCopyWorkoutsToProgram(token, workoutsData),
     setCopiedWorkoutIds: (workoutIds: number[]) => setCopiedWorkoutIds(workoutIds),
     setSelectedWorkoutIds: (workoutIds: number[]) => setSelectedWorkoutIds(workoutIds),
     setIsEditingWorkout: (flag: boolean) => setIsEditingWorkout(flag),

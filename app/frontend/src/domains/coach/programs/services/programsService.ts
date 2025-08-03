@@ -1,4 +1,13 @@
-import { AddProgramDTO, UpdateProgramDTO, Program, ProgramDetails, BulkReorderProgramWorkoutsDTO, AddWorkoutDTO, ProgramWorkout } from '../types';
+import { 
+  AddProgramDTO, 
+  UpdateProgramDTO, 
+  Program, 
+  ProgramDetails, 
+  BulkReorderProgramWorkoutsDTO, 
+  AddWorkoutDTO, 
+  ProgramWorkout, 
+  BulkCopyWorkoutsDTO 
+} from '../types';
 import { apiRequest } from '../../core/api/api';
 
 const baseUrl = `${import.meta.env.VITE_API_BASE_URL}/coaches/programs`;
@@ -102,6 +111,22 @@ const addWorkoutToProgram = (
   );
 }
 
+const bulkCopyWorkoutsToProgram = (
+  token: string,
+  dto: BulkCopyWorkoutsDTO
+): Promise<{ program: { id: number; num_weeks: number }, workouts: ProgramWorkout[] }> => {
+  return apiRequest(
+    `${baseUrl}/${dto.programId}/program_workouts/copy_workouts`,
+    "POST",
+    token,
+    {
+      workout_ids:  dto.workoutIds,
+      target_week:  dto.targetWeek,
+      target_day:   dto.targetDay,
+    }
+  );
+};
+
 export default {
   fetchPrograms,
   fetchProgram,
@@ -109,6 +134,7 @@ export default {
   deleteProgram,
   updateProgramDetails,
   updateWorkoutPositions,
+  bulkCopyWorkoutsToProgram,
   addTagToProgram,
   removeTagFromProgram,
   deleteWorkoutsFromProgram,

@@ -37,6 +37,13 @@ export type BulkReorderProgramWorkoutsDTO = {
   workouts_positions: WorkoutPositionData[];
 };
 
+export interface BulkCopyWorkoutsDTO {
+  programId: number;
+  workoutIds: number[];
+  targetDay: number;
+  targetWeek: number;
+}
+
 // 2) Raw‑payload / “shape” types
 interface RoutineAttributes {
   name?: string;

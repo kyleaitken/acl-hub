@@ -40,6 +40,38 @@ module Coaches
           end
         end
 
+        def copy_workouts
+          program     = Program.find(params[:program_id])
+          source      = fetch_source_workouts(program)
+          base_day    = day_of_program(source.first)
+          new_workouts = []
+        
+          ProgramWorkout.transaction do
+            source.each do |orig|
+              offset       = day_of_program(orig) - base_day
+              new_week, new_day = map_to_target_week_day(offset)
+        
+              clone = build_clone(orig, new_week, new_day, program)
+              duplicate_exercises(orig, clone)
+              new_workouts << clone
+            end
+    
+            # bump num_weeks if necessary
+            max_copied_week = new_workouts.map(&:week).max
+            if max_copied_week > program.num_weeks
+              program.update!(num_weeks: max_copied_week)
+            end
+          end
+        
+          render json: {
+            program: {
+              id:          program.id,
+              num_weeks:   program.num_weeks
+            },
+            workouts: new_workouts.map { |w| detailed_payload(w) }
+          }, status: :created
+        end
+
         # PATCH/PUT coaches/programs/:program_id/program_workouts/:id
         def update
           @program_workout = @program.program_workouts.find(params[:id])
@@ -67,13 +99,53 @@ module Coaches
 
         private
 
+        def fetch_source_workouts(program)
+          program.program_workouts
+                 .where(id: params[:workout_ids])
+                 .order(:week, :day, :order)
+        end
+      
+        # “Absolute” day number in the program calendar
+        def day_of_program(workout)
+          (workout.week - 1) * 7 + workout.day
+        end
+      
+        # Map an offset (in days) onto the target week/day
+        def map_to_target_week_day(offset)
+          target_index = ((params[:target_week] - 1) * 7 + params[:target_day]) + offset
+          # divmod gives zero-based [quotient, remainder]
+          week_zero, day_zero = (target_index - 1).divmod(7)
+          [ week_zero + 1, day_zero + 1 ]
+        end
+      
+        # Clone the ProgramWorkout record with correct week/day/order
+        def build_clone(orig, new_week, new_day, program)
+          existing = program.program_workouts
+                            .where(week: new_week, day: new_day)
+                            .count
+      
+          clone = orig.dup
+          clone.week  = new_week
+          clone.day   = new_day
+          clone.order = existing
+          clone.save!
+          clone
+        end
+      
+        # Re-attach each exercise link to the new workout
+        def duplicate_exercises(orig, clone)
+          orig.program_workout_exercises.find_each do |pwe|
+            clone.program_workout_exercises.create!(
+              exercise_id:  pwe.exercise_id,
+              order:        pwe.order,
+              instructions: pwe.instructions
+            )
+          end
+        end
+
         def set_program
             @program = Program.find(params[:program_id])
         end
-
-        # def program_workout_params
-        #     params.require(:program_workout).permit(:name, :day, :week, :order, :warmup_id, :cooldown_id)
-        # end
 
         def detailed_payload(workout)
           workout.as_json(

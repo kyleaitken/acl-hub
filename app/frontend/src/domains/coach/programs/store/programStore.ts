@@ -1,3 +1,4 @@
+import { BulkCopyWorkoutsDTO, ProgramWorkout } from './../types';
 import { create } from 'zustand';
 import programsService from '../services/programsService';
 import { Program, AddProgramDTO, UpdateProgramDTO, ProgramDetails, BulkReorderProgramWorkoutsDTO, AddWorkoutDTO, UpdateWorkoutDTO } from '../types';
@@ -31,6 +32,7 @@ interface ProgramStore {
     programId: number,
     tagId: number,
   ) => Promise<void>;
+  bulkCopyWorkoutsToProgram: (token: string, workoutsData: BulkCopyWorkoutsDTO) => Promise<{ program: { id: number; num_weeks: number }, workouts: ProgramWorkout[] }>;
   setCopiedWorkoutIds: (workoutIds: number[]) => void;
   setSelectedWorkoutIds: (workoutIds: number[]) => void;
   addWorkoutToProgram: (token: string, workoutData: AddWorkoutDTO) => Promise<void>;
@@ -88,15 +90,24 @@ export const useProgramStore = create<ProgramStore>((set) => ({
         programData,
       );
       set((state) => {
-        const existing = state.programs[programId];
+        const existingBasic = state.programs[programId];
+        const existingDetail  = state.detailedPrograms[programData.programId] || {}
+
         return {
           programs: {
             ...state.programs,
             [programId]: {
-              ...existing,
+              ...existingBasic,
               ...updatedProgram,
-              tags: existing?.tags ?? [],
+              tags: existingBasic?.tags ?? [],
             },
+          },
+          detailedPrograms: {
+            ...state.detailedPrograms,
+            [programData.programId]: {
+              ...existingDetail,
+              ...updatedProgram,
+            }
           },
           loading: false,
         };
@@ -233,6 +244,36 @@ export const useProgramStore = create<ProgramStore>((set) => ({
     } catch (err) {
       set({ loading: false, error: (err as Error).message })
       throw err
+    }
+  },
+  bulkCopyWorkoutsToProgram: async (
+    token: string,
+    workoutsData: BulkCopyWorkoutsDTO
+  ): Promise<{ program: { id: number; num_weeks: number }, workouts: ProgramWorkout[] }> => {
+    set({ loading: true });
+    try {
+      const response = await programsService.bulkCopyWorkoutsToProgram(token, workoutsData);
+      set((state) => {
+        const prog = state.detailedPrograms[workoutsData.programId]!;
+        return {
+          detailedPrograms: {
+            ...state.detailedPrograms,
+            [workoutsData.programId]: {
+              ...prog,
+              num_weeks: response.program.num_weeks,
+              program_workouts: [
+                ...prog.program_workouts,
+                ...response.workouts,
+              ],
+            },
+          },
+          loading: false,
+        };
+      });
+      return response;
+    } catch (err) {
+      set({ loading: false, error: (err as Error).message });
+      throw err;
     }
   },
   deleteWorkoutsFromProgram: async (

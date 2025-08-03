@@ -4,8 +4,15 @@ module Coaches
   
       # GET /coaches/warmups
       def index
-        warmups = current_coach.warmups.includes(:exercises)
-        render json: warmups.map { |w| serialize_warmup(w) }
+        rel = current_coach.warmups.includes(:exercises)
+        if params.key?(:custom)
+          # allow ?custom=true or ?custom=false
+          rel = rel.where(custom: ActiveModel::Type::Boolean.new.cast(params[:custom]))
+        else
+          rel = rel.where(custom: false)   # default to library
+        end
+      
+        render json: rel.map { |w| serialize_warmup(w) }
       end
 
       def show

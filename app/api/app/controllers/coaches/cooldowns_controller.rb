@@ -4,8 +4,15 @@ module Coaches
 
     # GET /coaches/cooldowns
     def index
-      cooldowns = current_coach.cooldowns.includes(:exercises)
-      render json: cooldowns.map { |c| serialize_cooldown(c) }
+      rel = current_coach.cooldowns.includes(:exercises)
+      if params.key?(:custom)
+        # allow ?custom=true or ?custom=false
+        rel = rel.where(custom: ActiveModel::Type::Boolean.new.cast(params[:custom]))
+      else
+        rel = rel.where(custom: false) 
+      end
+    
+      render json: rel.map { |c| serialize_cooldown(c) }
     end
 
     def show

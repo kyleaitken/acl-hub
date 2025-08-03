@@ -3,7 +3,7 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Checkbox, Tooltip } from '@mui/material';
 import { useState } from 'react';
-import { useProgramActions } from '../hooks/useProgramActions';
+import { useProgramActions } from '../hooks/useProgramStoreActions';
 import TooltipIconButton from '../../core/components/TooltipIconButton';
 
 interface SelectedWorkoutsProps {
@@ -55,6 +55,7 @@ const SelectedWorkoutsFooter = ({
             value={selectAllSelected}
             disableFocusRipple 
             disableTouchRipple 
+            disabled={selectAllSelected}
             size="large" 
             id="select-all-workouts-checkbox"
             onChange={() => handleToggleSelect()}
@@ -86,7 +87,10 @@ const SelectedWorkoutsFooter = ({
 
         <TooltipIconButton 
           title="Copy workouts"
-          onClick={() => setCopiedWorkoutIds(selectedWorkoutIds)}
+          onClick={() => {
+            setCopiedWorkoutIds(selectedWorkoutIds)
+            setSelectedWorkoutIds([]);
+          }}
           aria-label="Copy workouts"
           buttonClassName={"cursor-pointer mx-3"}
           tooltipPosition="top"

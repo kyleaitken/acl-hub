@@ -10,8 +10,8 @@ import Checkbox from '@mui/material/Checkbox';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import OpenWithIcon from '@mui/icons-material/OpenWith';
 import ExerciseTagsContainer from "../../libraries/features/exercises/components/ExerciseTagsContainer";
-import { useProgramActions } from "../hooks/useProgramActions";
-import { useProgramData } from "../hooks/useProgramData";
+import { useProgramActions } from "../hooks/useProgramStoreActions";
+import { useProgramData } from "../hooks/useProgramStoreData";
 
 export interface DragItem {
   id: number;
@@ -33,6 +33,7 @@ interface ProgramWorkoutCardProps {
     toIndex: number
   ) => void;
   onDrop: () => void;
+  onSelect: (workoutId: number, shiftKey: boolean, clickedPosition: number) => void;
 }
 
 const WorkoutCard = ({
@@ -43,12 +44,13 @@ const WorkoutCard = ({
   canDrag,
   moveWorkout,
   onDrop,
+  onSelect
 }: ProgramWorkoutCardProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
   const handleRef = useRef<HTMLButtonElement>(null);
 
-  const { setCopiedWorkoutIds, setSelectedWorkoutIds } = useProgramActions();
+  const { setCopiedWorkoutIds } = useProgramActions();
   const { selectedWorkoutIds } = useProgramData();
 
   const isSelected = selectedWorkoutIds.includes(workout.id);
@@ -103,17 +105,11 @@ const WorkoutCard = ({
     drag(handleRef);
   }
 
-  const handleToggleWorkoutSelect = () => {(
-    isSelected 
-      ? setSelectedWorkoutIds(selectedWorkoutIds.filter((id) => id !== workout.id))
-      : setSelectedWorkoutIds([...selectedWorkoutIds, workout.id])
-  )}
-
   return (
     <div
       ref={cardRef}
       style={{ opacity: isDragging ? 0.5 : 1 }}
-      className="mb-5 border shadow-md p-1 bg-white"
+      className="mb-10 border shadow-sm rounded-md p-1 bg-white"
     >
       <div className="workout-card-header flex items-start mb-2">
         <Checkbox 
@@ -121,7 +117,11 @@ const WorkoutCard = ({
           disableRipple 
           size="medium" 
           sx={{p:0, pb: 1, pr: 1}} 
-          onChange={handleToggleWorkoutSelect}
+          onClick={(e) => {
+            e.stopPropagation();
+            const clickedPosition = (week - 1) * 7 + day;
+            onSelect(workout.id, e.shiftKey, clickedPosition);
+          }}
         />
         <span className="text-md font-semibold flex-grow">{workout.name || `Workout`}</span>
         <div className="copy-and-move-buttons flex items-center">
@@ -167,7 +167,7 @@ const WorkoutCard = ({
           {workout.program_workout_exercises.map((ex, idx) => (
             <div key={ex.id ?? idx} className="flex flex-col py-2">
               <div className="exercise-title font-semibold">
-                {ex.order}) {ex.exercise.name}
+                {ex.order} {ex.exercise.name}
               </div>
               <p className="text-sm text-gray-600">
                 {ex.instructions}
