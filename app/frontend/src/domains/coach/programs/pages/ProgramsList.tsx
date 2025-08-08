@@ -1,7 +1,7 @@
 import { Input, InputAdornment, Menu, MenuItem } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Program } from '../types';
+import { Program } from '../types/models';
 import { useProgramActions } from '../hooks/useProgramStoreActions';
 import { useProgramData } from '../hooks/useProgramStoreData';
 import React from 'react';

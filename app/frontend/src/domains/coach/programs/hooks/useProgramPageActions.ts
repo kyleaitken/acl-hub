@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useProgramActions } from "./useProgramStoreActions";
 import { useProgramData, useProgramDetails } from "./useProgramStoreData";
-import { ProgramWorkout } from "../types";
+import { ProgramWorkout } from "../types/models";
 import toast from "react-hot-toast";
 import { useShiftRangeSelect } from "../../core/hooks/useShiftRangeSelect";
 

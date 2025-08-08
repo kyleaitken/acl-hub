@@ -1,7 +1,7 @@
 import { useTagStore } from '../store/tagStore';
 import { useAuthenticatedUser } from '../../../shared/auth/hooks/useAuthenticatedUser'; 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Program, ProgramTag } from '../types';
+import { Program, ProgramTag } from '../types/models';
 import {
   Dialog,
   Input,

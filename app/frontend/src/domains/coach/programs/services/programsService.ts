@@ -1,14 +1,12 @@
 import { 
   AddProgramDTO, 
   UpdateProgramDTO, 
-  Program, 
-  ProgramDetails, 
   BulkReorderProgramWorkoutsDTO, 
   AddWorkoutDTO, 
-  ProgramWorkout, 
   BulkCopyWorkoutsDTO, 
   UpdateWorkoutDTO
-} from '../types';
+} from '../types/dtos';
+import { Program, ProgramDetails, ProgramWorkout } from "../types/models"
 import { apiRequest } from '../../core/api/api';
 
 const baseUrl = `${import.meta.env.VITE_API_BASE_URL}/coaches/programs`;

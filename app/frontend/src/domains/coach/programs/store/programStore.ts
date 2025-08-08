@@ -1,7 +1,14 @@
-import { BulkCopyWorkoutsDTO, ProgramWorkout } from './../types';
+import { ProgramWorkout, Program, ProgramDetails } from '../types/models';
 import { create } from 'zustand';
 import programsService from '../services/programsService';
-import { Program, AddProgramDTO, UpdateProgramDTO, ProgramDetails, BulkReorderProgramWorkoutsDTO, AddWorkoutDTO, UpdateWorkoutDTO } from '../types';
+import { 
+  AddProgramDTO, 
+  UpdateProgramDTO, 
+  BulkReorderProgramWorkoutsDTO, 
+  AddWorkoutDTO, 
+  UpdateWorkoutDTO,
+  BulkCopyWorkoutsDTO
+} from '../types/dtos';
 
 interface ProgramStore {
   programs: Record<number, Program>;

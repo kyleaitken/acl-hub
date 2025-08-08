@@ -2,16 +2,20 @@ import { Exercise } from '../libraries/features/exercises/types'
 import { RoutineType } from '../libraries/features/routines/types'
 import {
   CreateNewProgramWorkoutPayload,
+  UpdateProgramWorkoutPayload,
+  ProgramWorkoutExerciseAttrs,
+  DeletePWE,
+  UpdatePWE,
+  CreateFromLibrary,
+  CreateNewCustom
+} from './types/payloads'
+import { 
   WorkoutStackItem,
   CreateFormItem,
   EditFormItem,
   WorkoutCardItem,
-  CreateWorkoutExerciseAttributes,
-  UpdateProgramWorkoutPayload,
-  UpdateWorkoutExerciseAttributes,
-  UpdateExistingProgramWorkoutExercise,
-} from './types'
-import { RawWorkoutData } from './types'
+  RawWorkoutData
+ } from './types/ui'
 
 /*
   Builds the payload for createing a new workout in a program
@@ -33,92 +37,102 @@ export function buildNewWorkoutPayload(
     exercisesStack
   } = raw
 
-  const warmup_attrs = warmupId == null
-    ? { instructions: warmupInstructions, exercise_ids: warmupExercises.map((ex) => ex.id), custom: true }
-    : undefined
+  const exercises = exercisesStack.map<ProgramWorkoutExerciseAttrs>((ex) => {
+    const base = { order: ex.order, instructions: ex.instructions }
 
-  const cooldown_attrs = cooldownId == null
-    ? { instructions: cooldownInstructions, exercise_ids: cooldownExercises.map((ex) => ex.id), custom: true }
-    : undefined
-
-  const exercises = exercisesStack.map<CreateWorkoutExerciseAttributes>((ex) => {
-    const base = {
-      order: ex.order,
-      instructions: ex.instructions,
+    if (ex.exerciseId != null) {
+      return { ...base, exercise_id: ex.exerciseId };
+    } else {
+      return {
+        ...base,
+        exercise_attributes: { name: ex.name!, custom: true }
+      };
     }
-    return ex.exerciseId
-    ? { ...base, exercise_id: ex.exerciseId }
-    : { ...base, exercise_attributes: { name: ex.name!, custom: true } }
   })
 
-  const payload: CreateNewProgramWorkoutPayload = {
+  const warmupPart = warmupId != null
+    ? { warmup_id: warmupId }
+    : {
+        warmup_attributes: {
+          instructions: warmupInstructions,
+          exercise_ids: warmupExercises.map(e => e.id),
+          custom: true
+        }
+      };
+
+  const cooldownPart = cooldownId != null
+    ? { cooldown_id: cooldownId }
+    : {
+        cooldown_attributes: {
+          instructions: cooldownInstructions,
+          exercise_ids: cooldownExercises.map(e => e.id),
+          custom: true
+        }
+      };
+
+  return {
     name,
-    warmup_id: warmupId,
-    warmup_attributes: warmup_attrs,
-    cooldown_id: cooldownId,
-    cooldown_attributes: cooldown_attrs,
+    ...warmupPart,
+    ...cooldownPart,
     program_workout_exercises_attributes: exercises,
+    ...(week !== undefined && { week }),
+    ...(day  !== undefined && { day  }),
+    ...(order!== undefined && { order })
   };
-
-  // Only add week/day/order if they are defined (for create)
-  if (week !== undefined) payload.week = week;
-  if (day !== undefined) payload.day = day;
-  if (order !== undefined) payload.order = order;
-
-  return payload;
 }
 
 /*
   Builds the payload for updating an existing workout in a program
 */
-export function buildUpdateWorkoutPayload(
-  raw: RawWorkoutData
-): UpdateProgramWorkoutPayload {
+export function buildUpdateWorkoutPayload(raw: RawWorkoutData): UpdateProgramWorkoutPayload {
+  const exercises: ProgramWorkoutExerciseAttrs[] = []
 
-  const exercises = raw.exercisesStack.map<UpdateWorkoutExerciseAttributes>(ex => {
-    const baseWorkoutExerciseData = {
-      order: ex.order,
-      instructions: ex.instructions
-    }
+  raw.exercisesStack.forEach(ex => {
+    const base = { order: ex.order, instructions: ex.instructions };
 
-    // editing an existing workout exercise
-    if (ex.programWorkoutExerciseId) {
-      const baseExistingExeriseData = {
-        ...baseWorkoutExerciseData,
-        id: ex.programWorkoutExerciseId
-      }
+    if (ex.programWorkoutExerciseId != null) {
+      if (ex.exerciseId != null) {
 
-      // if has an exerciseId, keep that id and update metadata if needed
-      // otherwise create a new custom exercise
-      return ex.exerciseId
-        ? { 
-            exercise_id: ex.exerciseId,
-            ...baseExistingExeriseData
-          }
-        : {
-          exercise_attributes: { name: ex.name, custom: true },
-          ...baseExistingExeriseData
-        } 
-    }
-
-    /*
-      No Workout Exercise ID - 2 conditions:
-      1) has an exerciseId - adding a new exercise from library, should create a pwe with that exerciseId
-      2) no exerciseId - creating a new pwe with a custom exercise
-    */
-    return ex.exerciseId
-      ? {
+        exercises.push({
+          ...base,
+          id: ex.programWorkoutExerciseId,
           exercise_id: ex.exerciseId,
-          ...baseWorkoutExerciseData
-        }
-      : {
-          exercise_attributes: { name: ex.name, custom: true },
-          ...baseWorkoutExerciseData
-        }  
+        } as UpdatePWE)
+
+      } else {
+
+        exercises.push({
+          ...base,
+          id: ex.programWorkoutExerciseId,
+          exercise_attributes: { name: ex.name!, custom: true }
+        } as UpdatePWE)
+      }
+    } else {
+      if (ex.exerciseId != null) {
+
+        exercises.push({
+          ...base,
+          exercise_id: ex.exerciseId
+        } as CreateFromLibrary)
+
+      } else {
+
+        exercises.push({
+          ...base,
+          exercise_attributes: { name: ex.name!, custom: true }
+        } as CreateNewCustom)
+      }
+    }
   });
 
-  const deletes: UpdateExistingProgramWorkoutExercise[] =
-    raw.deletedWorkoutExerciseIds.map(id => ({ id, _destroy: true }));
+  for (const id of raw.deletedWorkoutExerciseIds) {
+    exercises.push({
+      id,
+      order: "__unused__",    
+      instructions: "__unused__",
+      _destroy: true
+    } as DeletePWE)
+  }
 
   const warmup_attrs = raw.warmupId == null
     ? { instructions: raw.warmupInstructions, exercise_ids: raw.warmupExercises.map((ex) => ex.id), custom: true }
@@ -134,10 +148,7 @@ export function buildUpdateWorkoutPayload(
     warmup_attributes: warmup_attrs,
     cooldown_id: raw.cooldownId,
     cooldown_attributes: cooldown_attrs,
-    program_workout_exercises_attributes: [
-      ...exercises,
-      ...deletes
-    ],
+    program_workout_exercises_attributes: exercises
   };
 }
 

@@ -1,7 +1,13 @@
-import { BulkCopyWorkoutsDTO, UpdateWorkoutDTO } from '../types';
+import { 
+  BulkCopyWorkoutsDTO,
+  UpdateWorkoutDTO, 
+  UpdateProgramDTO, 
+  AddProgramDTO, 
+  BulkReorderProgramWorkoutsDTO, 
+  AddWorkoutDTO 
+} from '../types/dtos';
 import { useAuthenticatedUser } from '../../../shared/auth/hooks/useAuthenticatedUser';
 import { useProgramStore } from '../store/programStore';
-import { UpdateProgramDTO, AddProgramDTO, BulkReorderProgramWorkoutsDTO, AddWorkoutDTO } from '../types';
 
 export const useProgramActions = () => {
   const { token } = useAuthenticatedUser();

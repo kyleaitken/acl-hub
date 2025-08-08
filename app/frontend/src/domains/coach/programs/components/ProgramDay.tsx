@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import WorkoutCard from "./WorkoutCard";
-import { CreateFormItem, EditFormItem, ProgramWorkout, WorkoutStackItem } from "../types";
+import { CreateFormItem, EditFormItem, WorkoutStackItem } from "../types/ui";
+import { ProgramWorkout } from "../types/models";
 import { useProgramData } from "../hooks/useProgramStoreData";
 import WorkoutForm from "./WorkoutForm";
 import { useProgramActions } from "../hooks/useProgramStoreActions";

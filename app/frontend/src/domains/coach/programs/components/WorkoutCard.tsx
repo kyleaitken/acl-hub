@@ -5,7 +5,7 @@ import {
   DragSourceMonitor,
   DropTargetMonitor,
 } from "react-dnd";
-import { ProgramWorkout } from "../types";
+import { ProgramWorkout } from "../types/models";
 import Checkbox from '@mui/material/Checkbox';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import OpenWithIcon from '@mui/icons-material/OpenWith';

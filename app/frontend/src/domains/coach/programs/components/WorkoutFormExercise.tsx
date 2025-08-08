@@ -10,7 +10,7 @@ import ExercisePreview from "../../libraries/features/exercises/components/Exerc
 import { getEmbedUrl } from "../../core/utils/text";
 import AddNewExerciseDialog from "./AddNewExerciseDialog";
 import { useDisableScroll } from "../../core/hooks/useDisableScroll";
-import { ExerciseStackItem } from "../types";
+import { ExerciseStackItem } from "../types/ui";
 import DeleteIcon from '@mui/icons-material/Delete';
 import OpenWithIcon from '@mui/icons-material/OpenWith';
 

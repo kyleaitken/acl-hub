@@ -1,7 +1,7 @@
 // src/components/ProgramWeek.tsx
 import { useMemo } from "react";
 import ProgramDay from "./ProgramDay";
-import { ProgramWorkout } from "../types";
+import { ProgramWorkout } from "../types/models";
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useProgramData } from "../hooks/useProgramStoreData";
 

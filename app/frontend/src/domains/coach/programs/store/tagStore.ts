@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import tagsService from '../services/tagsService';
-import { ProgramTag } from '../types';
+import { ProgramTag } from '../types/models';
 
 interface TagStore {
   tags: Record<number, ProgramTag>;

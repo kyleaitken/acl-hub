@@ -1,4 +1,4 @@
-import { Program } from '../types';
+import { Program } from '../types/models';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import SendIcon from '@mui/icons-material/Send';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';

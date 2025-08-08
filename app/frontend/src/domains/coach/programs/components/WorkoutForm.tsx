@@ -9,7 +9,7 @@ import { useCooldownsSearch } from "../../libraries/features/routines/hooks/useC
 import { useWarmupsActions } from "../../libraries/features/routines/hooks/useWarmupsActions";
 import { useCooldownsActions } from "../../libraries/features/routines/hooks/useCooldownsActions";
 import toast from "react-hot-toast";
-import { RawWorkoutData, WorkoutCardItem } from "../types";
+import { RawWorkoutData, WorkoutCardItem } from "../types/ui";
 import { Exercise } from "../../libraries/features/exercises/types";
 import TooltipIconButton from "../../core/components/TooltipIconButton";
 import { mapWorkoutCardToRawFormData, updateRoutineData } from "../utils";
