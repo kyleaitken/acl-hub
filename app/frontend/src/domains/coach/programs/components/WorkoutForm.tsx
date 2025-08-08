@@ -1,18 +1,18 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import OpenInFullIcon from '@mui/icons-material/OpenInFull';
-import BatteryChargingFullIcon from '@mui/icons-material/BatteryChargingFull';
 import WorkoutFormExercise from "./WorkoutFormExercise";
 import DeleteIcon from '@mui/icons-material/Delete';
 import WorkoutFormWarmupOrCooldown from "./WorkoutFormWarmupOrCooldown";
-import { LibraryWarmupOrCooldown } from "../../libraries/features/routines/types";
+import { DetailedRoutine, LibraryRoutine, RoutineType } from "../../libraries/features/routines/types";
 import { useWarmupsSearch } from "../../libraries/features/routines/hooks/useWarmupsSearch";
 import { useCooldownsSearch } from "../../libraries/features/routines/hooks/useCooldownsSearch";
 import { useWarmupsActions } from "../../libraries/features/routines/hooks/useWarmupsActions";
 import { useCooldownsActions } from "../../libraries/features/routines/hooks/useCooldownsActions";
 import toast from "react-hot-toast";
-import { RawWorkoutData } from "../types";
+import { RawWorkoutData, WorkoutCardItem } from "../types";
 import { Exercise } from "../../libraries/features/exercises/types";
 import TooltipIconButton from "../../core/components/TooltipIconButton";
+import { mapWorkoutCardToRawFormData, updateRoutineData } from "../utils";
 
 const initialExerciseStack = [{
   name: '',
@@ -22,35 +22,53 @@ const initialExerciseStack = [{
 
 const initialRawData: RawWorkoutData = {
   name: '',
+  workoutId: undefined,
   warmupId: undefined,
   warmupInstructions: '',
-  warmupExerciseIds: [],
+  warmupExercises: [],
+  isCustomWarmup: true,
   cooldownId: undefined,
   cooldownInstructions: '',
-  cooldownExerciseIds: [],
-  exercisesStack: initialExerciseStack
+  cooldownExercises: [],
+  isCustomCooldown: true,
+  exercisesStack: initialExerciseStack,
+  deletedWorkoutExerciseIds: []
 };
 
 interface WorkoutFormProps {
-  initialData?: {}; // when updating an existing workout, fill the form with the initial data 
-  existingExercise: boolean;
-  handleCancelCreate: (stackIndex: number) => void;
-  handleAddNewWorkout: (rawData: RawWorkoutData) => void;
+  mode: "create" | "edit";
   stackIndex: number;
+  existingCard?: WorkoutCardItem;
+  onCancel: (index: number) => void;
+  onSave: (raw: RawWorkoutData) => void;
 }
 
-const WorkoutForm = ({initialData, stackIndex, existingExercise, handleCancelCreate, handleAddNewWorkout}: WorkoutFormProps) => {
-  const [rawData, setRawData] = useState<RawWorkoutData>(initialRawData);
+const WorkoutForm = ({mode, stackIndex, existingCard, onCancel, onSave}: WorkoutFormProps) => {
+  const [rawData, setRawData] = useState<RawWorkoutData>(() =>
+    mode === "edit" && existingCard
+      ? mapWorkoutCardToRawFormData(existingCard)
+      : initialRawData
+  );
 
   const { warmupSearchResults, searchWarmups } = useWarmupsSearch();
   const { cooldownSearchResults, searchCooldowns } = useCooldownsSearch();
-  const { addWarmup } = useWarmupsActions();
-  const { addCooldown } = useCooldownsActions();
+  const { addWarmup, fetchDetailedWarmup } = useWarmupsActions();
+  const { addCooldown, fetchDetailedCooldown } = useCooldownsActions();
+
+  const titleRef = useRef<HTMLInputElement>(null);
+
+  const isExistingExercise = Boolean(existingCard);
 
   // Disable save until there's at least one exercise 
   const saveButtonDisabled = !rawData.exercisesStack.every(
     item => item.name.trim() !== ""
   )
+
+  useEffect(() => {
+    if (titleRef.current) {
+      titleRef.current.focus();
+    }
+  }, [])
 
   // Warmup search results
   useEffect(() => {
@@ -78,7 +96,7 @@ const WorkoutForm = ({initialData, stackIndex, existingExercise, handleCancelCre
     return () => clearTimeout(h);
   }, [rawData.cooldownInstructions]);
 
-  const handleAddExerciseIdToStackItem = (ex: Exercise, idx: number) => {
+  const handleAddLibraryExerciseToStack = (ex: Exercise, idx: number) => {
     setRawData(prev => ({
       ...prev,
       exercisesStack: prev.exercisesStack.map((item, i) => 
@@ -94,7 +112,7 @@ const WorkoutForm = ({initialData, stackIndex, existingExercise, handleCancelCre
     }))
   };
 
-  const handleAddNewExerciseToStack = () => {
+  const handleAddNewEmptyExerciseToStack = () => {
     const lastItem = rawData.exercisesStack[rawData.exercisesStack.length - 1];
     const lastOrder = lastItem.order;
     const newOrder = String.fromCharCode(lastOrder.charCodeAt(0) + 1);
@@ -111,67 +129,67 @@ const WorkoutForm = ({initialData, stackIndex, existingExercise, handleCancelCre
     }))
   }
 
-  const handleClearExerciseFromStackItem = (stackIndex: number) => {
-    setRawData(prev => ({
-      ...prev,
-      exercisesStack: prev.exercisesStack.map((item, i) => 
-        i === stackIndex
-          ? { ...item, exerciseId: undefined}
-          : item
-      )
-    }))
-  }
-
-  const handleAddExistingRoutineToWorkout = (
-    type: "warmup" | "cooldown",
-    routine: LibraryWarmupOrCooldown
+  const handleAddLibraryRoutineToWorkout = async (
+    type: RoutineType,
+    routine: LibraryRoutine
   ) => {
-    console.log('adding routine', routine)
-    setRawData(prev => ({
-      ...prev,
-      ...(type === "warmup"
-        ? {
-            warmupId: routine.id,
-            warmupInstructions: routine.instructions ?? "",
-            warmupExerciseIds: routine.exerciseIds ?? []
-          }
-        : {
-            cooldownId: routine.id,
-            cooldownInstructions: routine.instructions ?? "",
-            cooldownExerciseIds: routine.exerciseIds ?? []
-          }
+    try {
+      let detailedRoutine: DetailedRoutine | null = null;
+  
+      if (type === "warmup") {
+        detailedRoutine = await fetchDetailedWarmup(routine.id);
+      } else {
+        detailedRoutine = await fetchDetailedCooldown(routine.id);
+      }
+  
+      if (!detailedRoutine) {
+        throw new Error("Could not fetch detailed routine");
+      }
+
+      setRawData((prev) =>
+        updateRoutineData(prev, type, {
+          isCustom: false,
+          id: detailedRoutine.id,
+          instructions: detailedRoutine.instructions,
+          exercises: detailedRoutine.exercises
+        })
       )
-    }));
+  
+    } catch (err) {
+      console.error("Failed to load routine:", err);
+      toast.error(`Failed to load full ${type} routine`);
+    }
   };
 
-  const handleRemoveExerciseFromRoutine = (type: "warmup" | "cooldown", idToRemove: number) => {
-    setRawData(prev => ({
-      ...prev,
-      warmupExerciseIds: type === "warmup" ? prev.warmupExerciseIds.filter((item) => item !== idToRemove) : prev.warmupExerciseIds,
-      cooldownExerciseIds: type === "cooldown" ? prev.cooldownExerciseIds.filter((item) => item !== idToRemove) : prev.cooldownExerciseIds,
-    }));
-  }
+  const handleRemoveExerciseFromRoutine = (type: RoutineType, exercise: Exercise) => {
+    setRawData((prev) =>
+      updateRoutineData(prev, type, {
+        exercises: type === "warmup"
+          ? prev.warmupExercises.filter((item) => item.id !== exercise.id)
+          : prev.cooldownExercises.filter((item) => item.id !== exercise.id)
+      })
+    );
+  };
 
-  const handleAddExerciseToRoutine = ( type: "warmup" | "cooldown", idToAdd: number) => {
-    setRawData(prev => ({
-      ...prev,
-      warmupExerciseIds: type === "warmup" ? [...prev.warmupExerciseIds, idToAdd] : prev.warmupExerciseIds,
-      cooldownExerciseIds: type === "cooldown" ? [...prev.cooldownExerciseIds, idToAdd] : prev.cooldownExerciseIds,
-    }));
-  }
+  const handleAddExerciseToRoutine = ( type: RoutineType, exercise: Exercise) => {
+    setRawData((prev) => 
+      updateRoutineData(prev, type, {
+        exercises: type === "warmup" 
+          ? [...prev.warmupExercises, exercise]
+          : [...prev.cooldownExercises, exercise],
+      })
+    );
+  };
 
-  const handleSaveRoutineToLibrary = async ( type: "warmup" | "cooldown", name: string, instructions: string, exerciseIds: number[]) => {
+  const handleSaveRoutineToLibrary = async ( type: RoutineType, name: string, instructions: string, exerciseIds: number[]) => {
     try {
       const added = type === "warmup"
         ? await addWarmup({ name, instructions, exerciseIds })
         : await addCooldown({ name, instructions, exerciseIds });
 
-      setRawData(prev => ({
-        ...prev,
-        ...(type === "warmup"
-          ? { warmupId: added.id }
-          : { cooldownId: added.id })
-      }));
+      setRawData((prev) =>
+        updateRoutineData(prev, type, { id: added.id, isCustom: false })
+      );
 
       toast.success(`${type} saved!`);
     } catch (err) {
@@ -180,16 +198,16 @@ const WorkoutForm = ({initialData, stackIndex, existingExercise, handleCancelCre
     }
   };
 
-  const handleChangeRoutineInstructions = (type: "warmup" | "cooldown", newValue: string) => {
-    setRawData(prev => ({
-      ...prev, 
-      warmupId:     type === "warmup"   ? undefined : prev.warmupId,
-      warmupInstructions: type === "warmup" ? newValue   : prev.warmupInstructions,
-      cooldownId:   type === "cooldown" ? undefined : prev.cooldownId,
-      cooldownInstructions: type === "cooldown" ? newValue : prev.cooldownInstructions,
-    }));
-  }
+  const handleChangeRoutineInstructions = (type: RoutineType, newValue: string) => {
+    setRawData((prev) =>
+      updateRoutineData(prev, type, {
+        instructions: newValue,
+      })
+    );
+  };
 
+  // When a user edits an exercise name, it clears the previous 
+  // exerciseId from the stack, since it's a new/different exercise - will create a new custom one if left as is
   const handleExerciseNameChange = (idx: number, newName: string) => {
     setRawData(prev => ({
       ...prev,
@@ -212,7 +230,7 @@ const WorkoutForm = ({initialData, stackIndex, existingExercise, handleCancelCre
     }))
   }
 
-  const handleSetNewlyAddedExercise = (ex: Exercise, idx: number) => {
+  const handleSetNewlySavedExercise = (ex: Exercise, idx: number) => {
     setRawData(prev => ({
       ...prev,
       exercisesStack: prev.exercisesStack.map((item, i) =>
@@ -225,26 +243,28 @@ const WorkoutForm = ({initialData, stackIndex, existingExercise, handleCancelCre
 
   const handleRemoveExerciseFromWorkout = (idx: number) => {
     setRawData(prev => {
-      const newStack = rawData.exercisesStack.filter((_, i) => i !== idx);
-
-      const reOrdered = newStack.map((item, i) => ({
-        ...item,
-        order: String.fromCharCode("A".charCodeAt(0) + i),
-      }));
-
+      const removed = prev.exercisesStack[idx];
       return {
         ...prev,
-        exercisesStack: reOrdered,
+        deletedWorkoutExerciseIds: removed.programWorkoutExerciseId 
+          ? [...prev.deletedWorkoutExerciseIds, removed.programWorkoutExerciseId] 
+          : prev.deletedWorkoutExerciseIds,
+        exercisesStack: prev.exercisesStack
+          .filter((_, i) => i !== idx)
+          .map((item, i) => ({ ...item, order: String.fromCharCode(65 + i) })),
       };
-    })
+    });
   };
+
+  console.log(rawData)
 
   return (
     <form
-      className="mb-5 border-2 py-2 border-red-500 shadow-md bg-white w-[350px]"
+      className="mb-5 border-2 py-2 border-blue-500 shadow-md bg-white w-[350px]"
     >
       <div id="workout-form-header" className="flex items-center mb-3 px-3">
         <input
+          ref={titleRef}
           type="text"
           placeholder="Name (optional)"
           value={rawData.name}
@@ -252,16 +272,15 @@ const WorkoutForm = ({initialData, stackIndex, existingExercise, handleCancelCre
           className="outline-none font-semibold flex-1"
         />
         <button><OpenInFullIcon/></button>
-        <button><BatteryChargingFullIcon/></button>
       </div>
 
       <WorkoutFormWarmupOrCooldown
         type="warmup"
-        addRoutineFromLibrary={handleAddExistingRoutineToWorkout}
+        addRoutineFromLibrary={handleAddLibraryRoutineToWorkout}
         routineSegmentSearchResults={warmupSearchResults}
         instructions={rawData.warmupInstructions}
         onChange={handleChangeRoutineInstructions}
-        exerciseIds={rawData.warmupExerciseIds}
+        exercises={rawData.warmupExercises}
         removeExerciseFromRoutine={handleRemoveExerciseFromRoutine}
         addExerciseToRoutine={handleAddExerciseToRoutine}
         saveRoutineToLibrary={handleSaveRoutineToLibrary}
@@ -277,11 +296,10 @@ const WorkoutForm = ({initialData, stackIndex, existingExercise, handleCancelCre
               exerciseItem={ex}
               stackIndex={i}
               stackSize={stackLength}
-              addExerciseToStackItem={handleAddExerciseIdToStackItem}
-              clearExerciseFromStackItem={handleClearExerciseFromStackItem}
+              onAddLibraryExercise={handleAddLibraryExerciseToStack}
               onNameChange={(name) => handleExerciseNameChange(i, name)}
               onInstructionsChange={(inst) => handleExerciseInstructionsChange(i, inst)}
-              setNewlyAddedExercise={handleSetNewlyAddedExercise}
+              addNewlySavedExerciseToWorkout={handleSetNewlySavedExercise}
               removeExerciseFromWorkout={handleRemoveExerciseFromWorkout}
             />
             <div className="relative">
@@ -289,7 +307,7 @@ const WorkoutForm = ({initialData, stackIndex, existingExercise, handleCancelCre
               {isLast && (
                 <button
                   type="button"
-                  onClick={handleAddNewExerciseToStack}
+                  onClick={handleAddNewEmptyExerciseToStack}
                   className="absolute left-1/2 -translate-x-1/2 -top-3 text-xs border-1 rounded-md cursor-pointer bg-white px-2 py-1"
                 >
                   + Add Exercise
@@ -302,11 +320,11 @@ const WorkoutForm = ({initialData, stackIndex, existingExercise, handleCancelCre
 
       <WorkoutFormWarmupOrCooldown
         type="cooldown"
-        addRoutineFromLibrary={handleAddExistingRoutineToWorkout}
+        addRoutineFromLibrary={handleAddLibraryRoutineToWorkout}
         routineSegmentSearchResults={cooldownSearchResults}
         instructions={rawData.cooldownInstructions}
         onChange={handleChangeRoutineInstructions}
-        exerciseIds={rawData.cooldownExerciseIds}
+        exercises={rawData.cooldownExercises}
         removeExerciseFromRoutine={handleRemoveExerciseFromRoutine}
         addExerciseToRoutine={handleAddExerciseToRoutine}
         saveRoutineToLibrary={handleSaveRoutineToLibrary}
@@ -323,7 +341,7 @@ const WorkoutForm = ({initialData, stackIndex, existingExercise, handleCancelCre
               disabled:opacity-50 
               disabled:cursor-not-allowed 
             "
-            onClick={() => handleAddNewWorkout(rawData)}
+            onClick={() => onSave(rawData)}
             disabled={saveButtonDisabled}
           >
             Save
@@ -331,12 +349,12 @@ const WorkoutForm = ({initialData, stackIndex, existingExercise, handleCancelCre
           <button
             type="button"
             className="rounded bg-white text-sm px-2 py-1 cursor-pointer mr-2 hover:bg-gray-200"
-            onClick={() => handleCancelCreate(stackIndex)}
+            onClick={() => onCancel(stackIndex)}
           >
             Cancel
           </button>
         </div>
-        {!existingExercise &&
+        {isExistingExercise &&
         <TooltipIconButton 
           title="Delete workout"
           aria-label="Delete workout"

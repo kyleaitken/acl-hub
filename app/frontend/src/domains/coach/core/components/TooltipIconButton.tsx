@@ -10,8 +10,10 @@ interface TooltipIconButtonProps
   onClick?: React.MouseEventHandler<HTMLButtonElement>;
   "aria-label": string;
   buttonClassName?: string;
-  tooltipPosition: TooltipPosition;
+  tooltipPosition?: TooltipPosition;
+  disabled?: boolean;
   children: React.ReactNode;
+  placementOffset?: [number, number];
 }
 
 const offsetMap: Record<TooltipPosition, [number, number]> = {
@@ -27,7 +29,9 @@ const TooltipIconButton = ({
   "aria-label": ariaLabel,
   buttonClassName,
   children,
-  tooltipPosition,
+  tooltipPosition = "top",
+  placementOffset,
+  disabled = false,
   ...tooltipProps
 }: TooltipIconButtonProps) => {
   return (
@@ -40,7 +44,7 @@ const TooltipIconButton = ({
           modifiers: [
             {
               name: "offset",
-              options: { offset: offsetMap[tooltipPosition] },
+              options: { offset: placementOffset ?? offsetMap[tooltipPosition] },
             },
           ],
         },
@@ -52,6 +56,7 @@ const TooltipIconButton = ({
         aria-label={ariaLabel}
         onClick={onClick}
         className={`${buttonClassName}`}
+        disabled={disabled}
       >
         {children}
       </button>

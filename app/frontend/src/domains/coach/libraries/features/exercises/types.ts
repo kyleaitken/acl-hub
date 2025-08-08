@@ -20,6 +20,7 @@ export interface Exercise {
   name: string;
   created_at: string;
   updated_at: string;
+  custom: boolean;
   description?: string;
   category?: string;
   video_url?: string;

@@ -1,34 +1,33 @@
 import { TextareaAutosize } from "@mui/material";
 import BookmarkIcon from '@mui/icons-material/Bookmark';
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useOutsideClickDismiss } from "../../core/hooks/useOutsideClickDismiss";
 import ExerciseSearchResults from "../../libraries/features/exercises/components/ExerciseSearchResults";
 import { useExerciseSearch } from "../../libraries/features/exercises/hooks/useExerciseSearch";
 import ExerciseTagsContainer from "../../libraries/features/exercises/components/ExerciseTagsContainer";
-import { LibraryWarmupOrCooldown } from "../../libraries/features/routines/types";
+import { LibraryRoutine } from "../../libraries/features/routines/types";
 import { highlightQuery } from "../../core/utils/text";
-import { useExercisesData } from "../../libraries/features/exercises/hooks/useExercisesData";
 import TooltipIconButton from "../../core/components/TooltipIconButton";
 import { useDisableScroll } from "../../core/hooks/useDisableScroll";
 import AddNewRoutineDialog from "./AddNewRoutineDialog";
-import { useExercisesActions } from "../../libraries/features/exercises/hooks/useExercisesActions";
+import { Exercise } from "../../libraries/features/exercises/types";
 
 interface WorkoutFormWarmupOrCooldownProps {
   type: "warmup" | "cooldown";
-  routineSegmentSearchResults: LibraryWarmupOrCooldown[];
+  routineSegmentSearchResults: LibraryRoutine[];
   instructions: string;
+  exercises: Exercise[];
   onChange: (type: "warmup" | "cooldown", value: string) => void;
-  addRoutineFromLibrary: (type: "warmup" | "cooldown", routine: LibraryWarmupOrCooldown) => void;
-  exerciseIds: number[];
-  removeExerciseFromRoutine: (type: "warmup" | "cooldown", exerciseId: number) => void;
-  addExerciseToRoutine: (type: "warmup" | "cooldown", exerciseId: number) => void;
+  addRoutineFromLibrary: (type: "warmup" | "cooldown", routine: LibraryRoutine) => void;
+  removeExerciseFromRoutine: (type: "warmup" | "cooldown", exercise: Exercise) => void;
+  addExerciseToRoutine: (type: "warmup" | "cooldown", exercise: Exercise) => void;
   saveRoutineToLibrary: (type: "warmup" | "cooldown", name: string, instructions: string, exerciseIds: number[]) => void;
 }
 
 const WorkoutFormWarmupOrCooldown = ({type, 
   routineSegmentSearchResults, 
   instructions = '', 
-  exerciseIds,
+  exercises,
   onChange, 
   addRoutineFromLibrary,
   removeExerciseFromRoutine,
@@ -44,11 +43,8 @@ const WorkoutFormWarmupOrCooldown = ({type,
   const exerciseContainerRef = useRef<HTMLDivElement>(null);
   const instructionsContainerRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLDivElement>(null);
-  const fetchedRef = useRef<Set<number>>(new Set());
 
   const { results: searchResults, search } = useExerciseSearch();
-  const { fetchExercise } = useExercisesActions();
-  const { exercisesMap } = useExercisesData();
   useDisableScroll(showSaveRoutineDialog);
   
   useOutsideClickDismiss(
@@ -57,23 +53,6 @@ const WorkoutFormWarmupOrCooldown = ({type,
       setIsSearchingExercises(false);
       setIsSearchingRoutines(false);
     }
-  );
-
-  useEffect(() => {
-    exerciseIds.forEach((id) => {
-      const alreadyInStore = Boolean(exercisesMap[id]);
-      const alreadyRequested = fetchedRef.current.has(id);
-
-      if (!alreadyInStore && !alreadyRequested) {
-        fetchedRef.current.add(id);
-        fetchExercise(id);
-      }
-    });
-  }, [exerciseIds, fetchExercise]);
-
-  const addedExercises = useMemo(
-    () => exerciseIds.map(id => exercisesMap[id]).filter(Boolean),
-    [exerciseIds, exercisesMap]
   );
 
   useEffect(() => {
@@ -96,7 +75,7 @@ const WorkoutFormWarmupOrCooldown = ({type,
     return () => document.removeEventListener('keydown', handleEsc);
   }, []);
 
-  const exerciseIdSet = new Set(exerciseIds);
+  const exerciseIdSet = new Set(exercises.map((item) => item.id));
   const filteredExercises = searchResults.filter((res) => !exerciseIdSet.has(res.id));
 
   const showRoutineSearchResults = isSearchingRoutines && instructions.length > 2 && routineSegmentSearchResults.length > 0;
@@ -137,7 +116,7 @@ const WorkoutFormWarmupOrCooldown = ({type,
         <AddNewRoutineDialog 
           anchorRect={anchorRect}
           handleDismiss={() => setShowSaveRoutineeDialog(false)}
-          handleSave={(name: string) => saveRoutineToLibrary(type, name.trim(), instructions, exerciseIds)}
+          handleSave={(name: string) => saveRoutineToLibrary(type, name.trim(), instructions, Array.from(exerciseIdSet))}
         />
         }
 
@@ -188,15 +167,15 @@ const WorkoutFormWarmupOrCooldown = ({type,
                 searchResults={filteredExercises}
                 searchString={exerciseSearchString}
                 handleAddExercise={(ex) => {
-                  addExerciseToRoutine(type, ex.id);
+                  addExerciseToRoutine(type, ex);
                   setExerciseSearchString('');
                 }}
               />
             )}
           </div>
           <ExerciseTagsContainer
-            addedExercises={addedExercises}
-            handleRemoveExercise={(id) => removeExerciseFromRoutine(type, id)}
+            addedExercises={exercises}
+            onRemoveExercise={(ex) => removeExerciseFromRoutine(type, ex)}
             size="small"
           />
         </div>

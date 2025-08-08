@@ -18,9 +18,8 @@ interface WorkoutFormExerciseProps {
   stackIndex: number;
   stackSize: number;
   exerciseItem: ExerciseStackItem;
-  addExerciseToStackItem: (exercise: Exercise, stackIndex: number) => void;
-  clearExerciseFromStackItem: (stackIndex: number) => void;
-  setNewlyAddedExercise: (ex: Exercise, idx: number) => void;
+  onAddLibraryExercise: (exercise: Exercise, stackIndex: number) => void;
+  addNewlySavedExerciseToWorkout: (ex: Exercise, idx: number) => void;
   onNameChange: (newName: string) => void;
   onInstructionsChange: (newInst: string) => void;
   removeExerciseFromWorkout: (index: number) => void;
@@ -30,11 +29,10 @@ const WorkoutFormExercise = ({
   stackIndex,
   stackSize,
   exerciseItem, 
-  addExerciseToStackItem, 
-  clearExerciseFromStackItem,
+  onAddLibraryExercise, 
   onNameChange,
   onInstructionsChange,
-  setNewlyAddedExercise,
+  addNewlySavedExerciseToWorkout,
   removeExerciseFromWorkout,
 }: WorkoutFormExerciseProps) => {
   const [hovered, setHovered] = useState(false);
@@ -70,7 +68,7 @@ const WorkoutFormExercise = ({
 
   const handleSelectExercise = (ex: Exercise) => {
     setIsSearching(false);           
-    addExerciseToStackItem(ex, stackIndex);
+    onAddLibraryExercise(ex, stackIndex);
     titleInputRef.current?.blur();
     instrRef.current?.focus();
   };  
@@ -111,7 +109,6 @@ const WorkoutFormExercise = ({
             className=" outline-none font-semibold w-full"
             value={exerciseItem.name}
             onChange={e => {
-              clearExerciseFromStackItem(stackIndex);
               onNameChange(e.target.value);
               setIsSearching(true);
             }}
@@ -171,10 +168,9 @@ const WorkoutFormExercise = ({
         <AddNewExerciseDialog
           anchorRect={anchorRect}
           handleDismiss={() => setShowSaveExerciseDialog(false)}
-          handleSetExercise={(ex: Exercise) => setNewlyAddedExercise(ex, stackIndex)}
+          onSaveExercise={(ex: Exercise) => addNewlySavedExerciseToWorkout(ex, stackIndex)}
           title={exerciseItem.name}
         />
-        
         }
       </div>
       <div id="workout-form-exercise-inst" >

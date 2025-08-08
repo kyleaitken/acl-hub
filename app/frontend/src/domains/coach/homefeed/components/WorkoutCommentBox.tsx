@@ -231,7 +231,6 @@ const WorkoutCommentBox = (props: WorkoutCommentBoxProps) => {
       <form
         onSubmit={async (e) => {
           e.preventDefault();
-          console.log('form submit'); // ← does this appear?
           await handleAddComment();
         }}
       >

@@ -7,6 +7,7 @@ export const useCooldownsActions = () => {
 
   const fetchCooldowns = useCooldownsStore((s) => s.fetchCooldowns);
   const fetchCooldown = useCooldownsStore((s) => s.fetchCooldown);
+  const fetchDetailedCooldown = useCooldownsStore((s) => s.fetchDetailedCooldown);
   const addCooldown = useCooldownsStore((s) => s.addCooldown);
   const deleteCooldown = useCooldownsStore((s) => s.deleteCooldown);
   const updateCooldown = useCooldownsStore((s) => s.updateCooldown);
@@ -14,6 +15,7 @@ export const useCooldownsActions = () => {
   return {
     fetchCooldowns: () => fetchCooldowns(token),
     fetchCooldown: (id: number) => fetchCooldown(token, id),
+    fetchDetailedCooldown: (id: number) => fetchDetailedCooldown(token, id),
     addCooldown: (cooldownData: AddWarmupCooldownDTO) => addCooldown(token, cooldownData),
     updateCooldown: (cooldownData: UpdateWarmupCooldownDTO) => updateCooldown(token, cooldownData),
     deleteCooldown: (id: number) => deleteCooldown(token, id)

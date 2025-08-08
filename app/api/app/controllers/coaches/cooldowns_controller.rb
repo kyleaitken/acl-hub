@@ -20,6 +20,11 @@ module Coaches
       render json: serialize_cooldown(cooldown)
     end
 
+    def detailed
+      cooldown = current_coach.cooldowns.includes(:exercises).find(params[:id])
+      render json: serialize_detailed_cooldown(cooldown)
+    end
+
     def create
       cooldown = current_coach.cooldowns.new(cooldown_params.except(:exercise_ids))
     
@@ -62,6 +67,26 @@ module Coaches
         instructions: cooldown.instructions,
         exercise_ids: cooldown.exercise_ids,
         custom: cooldown.custom
+      }
+    end
+
+    def serialize_detailed_cooldown(cooldown)
+      {
+        id: cooldown.id,
+        name: cooldown.name,
+        instructions: cooldown.instructions,
+        custom: cooldown.custom,
+        coach_id: cooldown.coach_id,
+        created_at: cooldown.created_at.iso8601,
+        updated_at: cooldown.updated_at.iso8601,
+        exercises: cooldown.exercises.map do |ex|
+          {
+            id: ex.id,
+            name: ex.name,
+            description: ex.description,
+            video_url: ex.video_url,
+          }
+        end
       }
     end
 

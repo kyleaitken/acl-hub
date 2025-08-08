@@ -8,7 +8,7 @@ import { getEmbedUrl } from "../../../../core/utils/text";
 
 interface ExerciseTagsContainerProps {
   addedExercises: Exercise[];
-  handleRemoveExercise: (id: number) => void;
+  onRemoveExercise: (ex: Exercise) => void;
   size?: Size;
   className?: string;
 }
@@ -48,7 +48,7 @@ const sizeConfig: Record<
   },
 };
 
-const ExerciseTagsContainer = ({addedExercises, handleRemoveExercise, size = "medium", className}: ExerciseTagsContainerProps) => {
+const ExerciseTagsContainer = ({addedExercises, onRemoveExercise, size = "medium", className}: ExerciseTagsContainerProps) => {
   const [anchorRect, setAnchorRect] = useState<DOMRect | null>(null);
   const [previewExercise, setPreviewExercise] = useState<Exercise | null>(null);
   
@@ -110,7 +110,7 @@ const ExerciseTagsContainer = ({addedExercises, handleRemoveExercise, size = "me
             </span>
             <IconButton 
               size="small"
-              onClick={() => handleRemoveExercise(exercise.id)}
+              onClick={() => onRemoveExercise(exercise)}
               sx={{
               p: 0.5,
               '&:hover': {

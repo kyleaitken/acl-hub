@@ -22,7 +22,6 @@ const EditExercise = () => {
     }, [id, exercise]);
 
     const handleUpdateExercise = async (formData: ExerciseFormValues) => {
-        console.log(formData);
         try {
             await updateExercise({exerciseId: id, ...formData});
             navigate('/coach/library/exercises'); 

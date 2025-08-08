@@ -8,12 +8,12 @@ import toast from "react-hot-toast";
 
 interface AddNewExerciseDialogProps {
   handleDismiss: () => void;
-  handleSetExercise: (exercise: Exercise) => void;
+  onSaveExercise: (exercise: Exercise) => void;
   anchorRect: DOMRect;
   title: string;
 }
 
-const AddNewExerciseDialog = ({anchorRect, title, handleDismiss, handleSetExercise}: AddNewExerciseDialogProps) => {
+const AddNewExerciseDialog = ({anchorRect, title, handleDismiss, onSaveExercise}: AddNewExerciseDialogProps) => {
   const [videoUrl, setVideoUrl] = useState('');
   const { addExercise } = useExercisesActions();
 
@@ -27,7 +27,7 @@ const AddNewExerciseDialog = ({anchorRect, title, handleDismiss, handleSetExerci
     try {
       await addExercise({ name: title.trim(), videoUrl: embedUrl })
       .then((newEx) => {
-        handleSetExercise(newEx);     
+        onSaveExercise(newEx);     
         handleDismiss();                
       })
     } catch (e) {

@@ -2,7 +2,7 @@ import { useCallback } from "react";
 import { BulkCopyWorkoutsDTO, RawWorkoutData } from "../types";
 import { useProgramData } from "./useProgramStoreData";
 import { useProgramActions } from "./useProgramStoreActions";
-import { buildWorkoutPayload } from "../utils";
+import { buildNewWorkoutPayload, buildUpdateWorkoutPayload } from "../utils";
 import toast from "react-hot-toast";
 
 export function useProgramDayActions(opts: {
@@ -16,6 +16,7 @@ export function useProgramDayActions(opts: {
     bulkCopyWorkoutsToProgram,
     addWorkoutToProgram,
     setIsEditingWorkout,
+    updateWorkout
   } = useProgramActions();
 
   const pasteCopied = useCallback(async () => {
@@ -41,10 +42,10 @@ export function useProgramDayActions(opts: {
     bulkCopyWorkoutsToProgram,
   ]);
 
-  const submitNew = useCallback(
-    async (raw: RawWorkoutData) => {
+  const submitNewWorkout = useCallback(async (raw: RawWorkoutData) => {
       setIsEditingWorkout(false);
-      const payload = buildWorkoutPayload(raw, week, day, 0);
+      const payload = buildNewWorkoutPayload(raw, week, day, 0);
+      console.log("create new workout payload", payload);
       try {
         await addWorkoutToProgram({
           programId,
@@ -59,8 +60,25 @@ export function useProgramDayActions(opts: {
     [programId, week, day, addWorkoutToProgram, setIsEditingWorkout]
   );
 
+  const submitWorkoutEdits = useCallback(async (raw: RawWorkoutData) => {
+    setIsEditingWorkout(false);
+    if (!raw.workoutId) return;
+
+    const workoutId = raw.workoutId;
+    const payload = buildUpdateWorkoutPayload(raw);
+    console.log('edit workout payload', payload)
+    try {
+      await updateWorkout({workoutId, programId, program_workout: payload});
+      toast.success("Workout updated!");
+    } catch (err) {
+      console.error(err);
+      toast.error("Error updating workout.");
+    }
+  }, [updateWorkout, setIsEditingWorkout]);
+
   return {
     pasteCopied,
-    submitNew,
+    submitNewWorkout,
+    submitWorkoutEdits
   };
 }

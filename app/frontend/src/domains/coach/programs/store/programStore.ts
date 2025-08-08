@@ -36,9 +36,8 @@ interface ProgramStore {
   setCopiedWorkoutIds: (workoutIds: number[]) => void;
   setSelectedWorkoutIds: (workoutIds: number[]) => void;
   addWorkoutToProgram: (token: string, workoutData: AddWorkoutDTO) => Promise<void>;
+  updateWorkout: (token: string, workoutData: UpdateWorkoutDTO) => Promise<void>;
   deleteWorkoutsFromProgram: (token: string, programId: number, workoutIds: number[]) => Promise<void>;
-  updateWorkout: (workoutData: UpdateWorkoutDTO) => Promise<void>;
-
   setIsEditingWorkout: (flag: boolean) => void;
   setError: (message: string) => void;
   resetError: () => void;
@@ -301,8 +300,33 @@ export const useProgramStore = create<ProgramStore>((set) => ({
       set({ error: "Failed to delete workouts", loading: false });
     }
   },
-  updateWorkout: async () => {
+  updateWorkout: async (token: string, workoutData: UpdateWorkoutDTO) => {
+    set({ loading: true });
+    try {
+      const programId = workoutData.programId;
+      const workoutId = workoutData.workoutId;
+      const updatedWorkout = await programsService.updateWorkout(token, workoutData);
 
+      set((state) => {
+        const detailed = state.detailedPrograms[programId]!
+        return {
+          detailedPrograms: {
+            ...state.detailedPrograms,
+            [programId]: {
+              ...detailed,
+              program_workouts: detailed.program_workouts.map(w =>
+                w.id === workoutId ? updatedWorkout : w
+              ),
+            },
+          },
+          loading: false,
+        }
+      })
+  
+    } catch (err) {
+      set({ loading: false, error: (err as Error).message })
+      throw err
+    }
   },
   setIsEditingWorkout: (flag) => set({isEditingWorkout: flag}),
   setCopiedWorkoutIds: (workoutIds) => set({ copiedWorkoutIds: workoutIds }),

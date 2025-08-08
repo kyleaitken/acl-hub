@@ -1,27 +1,30 @@
-import { LibraryWarmupOrCooldown, AddWarmupCooldownDTO, UpdateWarmupCooldownDTO } from '../types';
+import { LibraryRoutine, AddWarmupCooldownDTO, UpdateWarmupCooldownDTO, DetailedRoutine } from '../types';
 import { create } from 'zustand';
 import warmupsService from '../services/warmupsService';
 
 interface WarmupsStore {
-  warmups: Record<number, LibraryWarmupOrCooldown>;
+  warmups: Record<number, LibraryRoutine>;
+  detailedWarmups: Record<number, DetailedRoutine>;
   loading: boolean;
   error?: string;
 
-  fetchWarmups: (token: string) => Promise<LibraryWarmupOrCooldown[]>;
+  fetchWarmups: (token: string) => Promise<LibraryRoutine[]>;
   fetchWarmup: (token: string, warmupId: number) => Promise<void>;
+  fetchDetailedWarmup: (token: string, warmupId: number) => Promise<DetailedRoutine>;
   updateWarmup: (
     token: string,
     warmupData: UpdateWarmupCooldownDTO,
   ) => Promise<void>;
   deleteWarmup: (token: string, warmupId: number) => Promise<void>;
-  addWarmup: (token: string, warmupData: AddWarmupCooldownDTO) => Promise<LibraryWarmupOrCooldown>;
+  addWarmup: (token: string, warmupData: AddWarmupCooldownDTO) => Promise<LibraryRoutine>;
 
   setError: (message: string) => void;
   resetError: () => void;
 }
 
-export const useWarmupsStore = create<WarmupsStore>((set) => ({
+export const useWarmupsStore = create<WarmupsStore>((set, get) => ({
   warmups: {},
+  detailedWarmups: {},
   loading: false,
   error: undefined,
 
@@ -65,6 +68,29 @@ export const useWarmupsStore = create<WarmupsStore>((set) => ({
         error: `Failed to fetch warmup with id: ${warmupId}`,
         loading: false,
       });
+    }
+  },
+  fetchDetailedWarmup: async (token: string, warmupId: number) => {
+    const state = get();
+    const cached = state.detailedWarmups[warmupId];
+    if (cached) {
+      return cached;
+    }
+    
+    set({ loading: true });
+    try {
+      const warmup = await warmupsService.fetchDetailedWarmup(token, warmupId);
+      set((state) => ({
+        detailedWarmups: { ...state.detailedWarmups, [warmupId]: warmup },
+        loading: false,
+      }));
+      return warmup;
+    } catch (err) {
+      set({
+        error: `Failed to fetch warmup with id: ${warmupId}`,
+        loading: false,
+      });
+      throw (err);
     }
   },
   updateWarmup: async (token: string, warmupData: UpdateWarmupCooldownDTO) => {
@@ -137,7 +163,7 @@ export const useWarmupsStore = create<WarmupsStore>((set) => ({
 }));
 
 
-const normalizeWarmup = (raw: any): LibraryWarmupOrCooldown => ({
+const normalizeWarmup = (raw: any): LibraryRoutine => ({
   id: raw.id,
   name: raw.name,
   instructions: raw.instructions,

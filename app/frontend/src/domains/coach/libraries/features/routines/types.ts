@@ -1,6 +1,6 @@
 import { Exercise } from "../exercises/types";
 
-export interface LibraryWarmupOrCooldown {
+export interface LibraryRoutine {
   id: number;
   name: string;
   instructions?: string;
@@ -8,7 +8,7 @@ export interface LibraryWarmupOrCooldown {
   custom: boolean;
 }
 
-export interface DetailedWarmupOrCooldown extends LibraryWarmupOrCooldown {
+export interface DetailedRoutine extends Omit<LibraryRoutine, 'exerciseIds'> {
   exercises: Exercise[];
   coach_id: number;
   created_at: string;
@@ -27,3 +27,5 @@ export type AddWarmupCooldownDTO = {
   instructions?: string;
   exerciseIds?: Array<number>;
 }
+
+export type RoutineType = "warmup" | "cooldown";

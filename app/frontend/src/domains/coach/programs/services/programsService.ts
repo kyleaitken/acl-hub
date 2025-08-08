@@ -6,7 +6,8 @@ import {
   BulkReorderProgramWorkoutsDTO, 
   AddWorkoutDTO, 
   ProgramWorkout, 
-  BulkCopyWorkoutsDTO 
+  BulkCopyWorkoutsDTO, 
+  UpdateWorkoutDTO
 } from '../types';
 import { apiRequest } from '../../core/api/api';
 
@@ -111,6 +112,24 @@ const addWorkoutToProgram = (
   );
 }
 
+const updateWorkout = (token: string, dto: UpdateWorkoutDTO): Promise<ProgramWorkout> => {
+  const { programId, workoutId, program_workout } = dto;
+  const url = `${baseUrl}/${programId}/program_workouts/${workoutId}`;
+
+  const cleaned = Object.fromEntries(
+    Object.entries(program_workout).filter(
+      ([, v]) => v !== undefined
+    )
+  );
+
+  return apiRequest(
+    url,
+    'PATCH',
+    token,
+    { program_workout: cleaned }
+  );
+};
+
 const bulkCopyWorkoutsToProgram = (
   token: string,
   dto: BulkCopyWorkoutsDTO
@@ -138,5 +157,6 @@ export default {
   addTagToProgram,
   removeTagFromProgram,
   deleteWorkoutsFromProgram,
-  addWorkoutToProgram
+  addWorkoutToProgram,
+  updateWorkout
 };

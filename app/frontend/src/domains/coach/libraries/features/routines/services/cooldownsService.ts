@@ -1,20 +1,25 @@
-import { AddWarmupCooldownDTO, LibraryWarmupOrCooldown, UpdateWarmupCooldownDTO } from '../types';
+import { AddWarmupCooldownDTO, DetailedRoutine, LibraryRoutine, UpdateWarmupCooldownDTO } from '../types';
 import { apiRequest } from '../../../../core/api/api';
 
 const baseUrl = `${import.meta.env.VITE_API_BASE_URL}/coaches/cooldowns`;
 
-const fetchCooldowns = (token: string): Promise<LibraryWarmupOrCooldown[]> =>
+const fetchCooldowns = (token: string): Promise<LibraryRoutine[]> =>
   apiRequest(`${baseUrl}`, 'GET', token);
 
 const fetchCooldown = (
   token: string,
   cooldownId: number,
-): Promise<LibraryWarmupOrCooldown> => apiRequest(`${baseUrl}/${cooldownId}`, 'GET', token);
+): Promise<LibraryRoutine> => apiRequest(`${baseUrl}/${cooldownId}`, 'GET', token);
+
+const fetchDetailedCooldown = (
+  token: string,
+  cooldownId: number
+): Promise<DetailedRoutine> => apiRequest(`${baseUrl}/${cooldownId}/detailed`, 'GET', token);
 
 const addCooldown = (
   token: string,
   dto: AddWarmupCooldownDTO,
-): Promise<LibraryWarmupOrCooldown> => {
+): Promise<LibraryRoutine> => {
   const { name, instructions, exerciseIds } = dto;
 
   const body = Object.fromEntries(
@@ -35,7 +40,7 @@ export const deleteCooldown = async (token: string, cooldownId: number) => {
 export const updateCooldown = async (
   token: string,
   dto: UpdateWarmupCooldownDTO,
-): Promise<LibraryWarmupOrCooldown> => {
+): Promise<LibraryRoutine> => {
   const { id, name, instructions, exerciseIds } = dto;
   const url = `${baseUrl}/${id}`;
 
@@ -52,6 +57,7 @@ export const updateCooldown = async (
 export default {
   fetchCooldowns,
   fetchCooldown,
+  fetchDetailedCooldown,
   addCooldown,
   deleteCooldown,
   updateCooldown,

@@ -1,11 +1,11 @@
-import { LibraryWarmupOrCooldown } from './../types';
+import { LibraryRoutine } from './../types';
 import { useAuthenticatedUser } from '../../../../../shared/auth/hooks/useAuthenticatedUser';
 import { useState } from 'react';
 import { useCooldownsActions } from './useCooldownsActions';
 
 export const useCooldownsSearch = () => {
   const { token } = useAuthenticatedUser();
-  const [cooldownSearchResults, setCooldownsSearchResults] = useState<LibraryWarmupOrCooldown[]>([]);
+  const [cooldownSearchResults, setCooldownsSearchResults] = useState<LibraryRoutine[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>();
 

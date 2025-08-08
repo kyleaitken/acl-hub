@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import {
   useDrag,
   useDrop,
@@ -34,6 +34,7 @@ interface ProgramWorkoutCardProps {
   ) => void;
   onDrop: () => void;
   onSelect: (workoutId: number, shiftKey: boolean, clickedPosition: number) => void;
+  onEditWorkout: (index: number) => void;
 }
 
 const WorkoutCard = ({
@@ -45,9 +46,9 @@ const WorkoutCard = ({
   isLastWorkout,
   moveWorkout,
   onDrop,
-  onSelect
+  onSelect,
+  onEditWorkout
 }: ProgramWorkoutCardProps) => {
-  const [isExpanded, setIsExpanded] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
   const handleRef = useRef<HTMLButtonElement>(null);
 
@@ -110,8 +111,8 @@ const WorkoutCard = ({
     <div
       ref={cardRef}
       style={{ opacity: isDragging ? 0.5 : 1 }}
-      className={`border-b py-1 bg-white cursor-pointer pb-0 ${isLastWorkout ? 'border-b-0' : ''}`}
-      onClick={() => console.log("Workout card clicked")}
+      className={`border-b py-1 bg-white cursor-pointer pb-0 ${isLastWorkout ? 'flex-grow border-b-0' : ''}`}
+      onClick={() => onEditWorkout(index)}
     >
       <div className="workout-card-header flex items-start mt-1 mb-2 mx-1">
         <Checkbox 
@@ -151,7 +152,7 @@ const WorkoutCard = ({
       </div>
 
       {workout.warmup?.instructions && 
-        <div className="flex flex-col px-1">
+        <div className="flex flex-col px-2">
           <div className="text-xs text-gray-600 whitespace-pre-line">
             {workout.warmup.instructions}
           </div>
@@ -162,7 +163,7 @@ const WorkoutCard = ({
       {workout.program_workout_exercises?.length > 0 && (
         <div>
           {workout.program_workout_exercises.map((ex, idx) => (
-            <div key={ex.id ?? idx} className="flex flex-col py-2 px-1 min-h-15 hover:bg-gray-200">
+            <div key={ex.id ?? idx} className="flex flex-col py-2 px-2 min-h-15 hover:bg-gray-200">
               <div className="exercise-title font-semibold">
                 {`${ex.order}) ${ex.exercise.name}`}
               </div>
@@ -175,7 +176,7 @@ const WorkoutCard = ({
       )}
 
       {workout.cooldown?.instructions && 
-        <div className="flex flex-col px-1 pb-8">
+        <div className="flex flex-col px-2 pb-8">
           <div className="divider mb-1 w-full border-t border-gray-400" />
           <div className="text-xs text-gray-600 whitespace-pre-line">
             {workout.cooldown.instructions}

@@ -10,6 +10,10 @@ import ExercisesSearch from '../../exercises/components/ExercisesSearch';
 import ExerciseTagsContainer from '../../exercises/components/ExerciseTagsContainer';
 import { useCooldownsActions } from '../hooks/useCooldownsActions';
 
+// TODO: Could refactor this to make use of detailed route from backend 
+// so that we don't store the exerciseIds, but rather the full exercises like the WorkoutForm does.
+// Wouldn't need to fetch the exercises that way.
+
 export interface WarmupCooldownFormValues {
   name: string;
   instructions?: string;
@@ -124,7 +128,7 @@ const WarmupCooldownForm = ({
 
         <ExerciseTagsContainer 
           addedExercises={addedExercises}
-          handleRemoveExercise={(id) => setExerciseIds(exerciseIds.filter((ex) => ex !== id))}
+          onRemoveExercise={(ex) => setExerciseIds(exerciseIds.filter((id) => id !== ex.id))}
         />
 
         <div className="flex px-5 pb-6 pt-2">

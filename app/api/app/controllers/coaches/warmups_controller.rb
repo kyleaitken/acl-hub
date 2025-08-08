@@ -20,6 +20,11 @@ module Coaches
         render json: serialize_warmup(warmup)
       end
 
+      def detailed
+        warmup = current_coach.warmups.includes(:exercises).find(params[:id])
+        render json: serialize_detailed_warmup(warmup)
+      end
+
       def create
         warmup = current_coach.warmups.new(warmup_params.except(:exercise_ids))
       
@@ -64,6 +69,26 @@ module Coaches
           custom: warmup.custom
         }
       end
-  
+
+      def serialize_detailed_warmup(warmup)
+        {
+          id: warmup.id,
+          name: warmup.name,
+          instructions: warmup.instructions,
+          custom: warmup.custom,
+          coach_id: warmup.coach_id,
+          created_at: warmup.created_at.iso8601,
+          updated_at: warmup.updated_at.iso8601,
+          exercises: warmup.exercises.map do |ex|
+            {
+              id: ex.id,
+              name: ex.name,
+              description: ex.description,
+              video_url: ex.video_url,
+            }
+          end
+        }
+      end
+
     end
   end

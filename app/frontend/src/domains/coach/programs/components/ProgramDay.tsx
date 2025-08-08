@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import WorkoutCard from "./WorkoutCard";
-import { ProgramWorkout, WorkoutFormItem, WorkoutStackItem } from "../types";
+import { CreateFormItem, EditFormItem, ProgramWorkout, WorkoutStackItem } from "../types";
 import { useProgramData } from "../hooks/useProgramStoreData";
 import WorkoutForm from "./WorkoutForm";
 import { useProgramActions } from "../hooks/useProgramStoreActions";
 import { useWorkoutDrop } from '../hooks/useWorkoutDrop';
 import ProgramDayHeader from "./ProgramDayHeader";
 import { useProgramDayActions } from "../hooks/useProgramDayActions";
+import { isCardItem, isCreateForm, isEditForm } from "../utils";
 
 interface ProgramDayProps {
   programId: number;
@@ -39,7 +40,7 @@ const ProgramDay = ({
   const [stack, setStack] = useState<WorkoutStackItem[]>(() => workouts.map(w => ({ __type: 'card', ...w })));
   const { copiedWorkoutIds, isEditingWorkout } = useProgramData(); // TODO maybe have a flag in state like idsCopied so that I don't need to pull this into each program day
   const {setIsEditingWorkout} = useProgramActions();
-  const { pasteCopied, submitNew } 
+  const { pasteCopied, submitNewWorkout, submitWorkoutEdits } 
     = useProgramDayActions({ programId: programId, week, day: dayIndex+1 });
 
   const { dropContainer, dropPlaceholder } = useWorkoutDrop({
@@ -61,14 +62,10 @@ const ProgramDay = ({
   const handleAddNewWorkout = () => {
     setIsEditingWorkout(true);
     const tempId = crypto.randomUUID();
-    const newForm: WorkoutFormItem = {
+    const newForm: CreateFormItem = {
       __type: "form",
-      tempId,
-      initialData: {
-        day: dayIndex + 1,
-        week,
-        order: 0,
-      },
+      mode: "create",
+      tempId
     };
   
     setStack(prev => [
@@ -81,13 +78,33 @@ const ProgramDay = ({
     ]);
   };
 
-  // const handleEditWorkoutCard = (id: number) => {
-  //   // when clicked, temporarily replace the workout card with a workout form that's given initial data?
-  // };
+  const handleEditWorkout = (index: number) => {
+    const card = stack[index];
+    if (!isCardItem(card) || isEditingWorkout) return;
+    setIsEditingWorkout(true);
+  
+    const editForm: EditFormItem = {
+      __type: "form",
+      mode: "edit",
+      existingCard: card,
+    }
 
-  const handleCancelCreateWorkout = (index: number) => {
+    setStack(s => s.map((w,i) => i === index ? editForm : w));
+  };
+
+  const handleCancelCreateOrEditWorkout = (index: number) => {
     setIsEditingWorkout(false);
-    setStack(prev => prev.filter((_, i) => i !== index));
+    const form = stack[index];
+    if (form.__type !== "form") return;
+
+    if (form.mode === "edit") {
+      const originalCard = form.existingCard;
+      setStack(s =>
+        s.map((w,i) => i === index ? originalCard : w)
+      );
+    } else {
+      setStack(prev => prev.filter((_, i) => i !== index));
+    }
   };
 
   const isLastDay = dayIndex === 6;
@@ -112,17 +129,29 @@ const ProgramDay = ({
       />
       <div className="flex-grow bg-white flex flex-col py-0 px-0">
         {stack.map((w, i) => {
-          if (w.__type === 'form') {
+          if (isCreateForm(w)) {
             return (
-              <WorkoutForm 
-                key={w.tempId} 
-                stackIndex={i} 
-                existingExercise={false} 
-                handleCancelCreate={handleCancelCreateWorkout} 
-                handleAddNewWorkout={submitNew}
+              <WorkoutForm
+                key={w.tempId}
+                mode="create"
+                stackIndex={i}
+                onCancel={handleCancelCreateOrEditWorkout}
+                onSave={submitNewWorkout}
               />
             )
-          } else {
+          } else if (isEditForm(w)) {
+            return (
+              <WorkoutForm
+                key={w.existingCard.id}
+                mode="edit"
+                stackIndex={i}
+                existingCard={w.existingCard}
+                onCancel={handleCancelCreateOrEditWorkout}
+                onSave={submitWorkoutEdits} 
+              />
+            )
+          }
+          else {
             return (
               <WorkoutCard
                 key={w.id}
@@ -135,6 +164,7 @@ const ProgramDay = ({
                 onDrop={onDrop}
                 canDrag={!isEditingWorkout} // disable dragging while editing workouts
                 onSelect={onSelectWorkout}
+                onEditWorkout={handleEditWorkout}
               />
             )
           }
@@ -142,8 +172,8 @@ const ProgramDay = ({
 
         <div
           ref={dropPlaceholder}
-          style={{ height: 20 }}
-          className="mt-2 flex-grow"
+          style={{ height: 50 }}
+          className="mt-2"
         />
       </div>
     </div>

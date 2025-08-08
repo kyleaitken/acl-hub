@@ -75,12 +75,29 @@ module Coaches
         # PATCH/PUT coaches/programs/:program_id/program_workouts/:id
         def update
           @program_workout = @program.program_workouts.find(params[:id])
-          if @program_workout.update(scrubbed_params)
-            render json: @program_workout, status: :ok
-          else
-            render json: { errors: @program_workout.errors.full_messages },
-                   status: :unprocessable_entity
+
+          # pick up any nested warmup/cooldown…
+          if @program_workout.warmup&.custom?
+            @program_workout.warmup.coach = current_coach
           end
+
+          if @program_workout.cooldown&.custom?
+            @program_workout.cooldown.coach = current_coach
+          end
+
+          old_ids = @program_workout.program_workout_exercises.pluck(:exercise_id)
+
+          if @program_workout.update(scrubbed_params)
+            new_ids = @program_workout.program_workout_exercises.pluck(:exercise_id)
+            # find which exercises were removed
+            to_destroy = old_ids - new_ids
+            Exercise.where(id: to_destroy, custom: true).destroy_all
+        
+            render json: detailed_payload(@program_workout), status: :ok
+          else
+            render json: { errors: @program_workout.errors.full_messages }, status: :unprocessable_entity
+          end
+
         end
 
         # DELETE coaches/programs/:program_id/program_workouts/
@@ -178,24 +195,18 @@ module Coaches
         def scrubbed_params
           p = raw_params.to_h
 
-          if wa = p.delete("warmup_attributes")
-            # If they referenced a library warmup, drop its id so we create new
-            if wa["id"].present? && !Warmup.find(wa["id"]).custom?
-              wa.delete("id")
-            end
+          if p["warmup_id"].blank? && wa = p.delete("warmup_attributes")
+            # Creating a new custom warmup only if no warmup_id is given
             wa["custom"] = true
             wa["coach_id"] = current_coach.id
             p["warmup_attributes"] = wa
-            p.delete("warmup_id")
           end
-        
-          if ca = p.delete("cooldown_attributes")
-            ca.delete("id") if ca["id"].present? && !Cooldown.find(ca["id"]).custom?
-            ca["custom"]     = true
-            ca["coach_id"]   = current_coach.id
-        
+          # else if warmup_id present, leave it untouched so it references existing routine
+          
+          if p["cooldown_id"].blank? && ca = p.delete("cooldown_attributes")
+            ca["custom"] = true
+            ca["coach_id"] = current_coach.id
             p["cooldown_attributes"] = ca
-            p.delete("cooldown_id")
           end
         
           # 3️⃣ Exercises logic

@@ -7,6 +7,7 @@ export const useWarmupsActions = () => {
 
   const fetchWarmups = useWarmupsStore((s) => s.fetchWarmups);
   const fetchWarmup = useWarmupsStore((s) => s.fetchWarmup);
+  const fetchDetailedWarmup = useWarmupsStore((s) => s.fetchDetailedWarmup);
   const addWarmup = useWarmupsStore((s) => s.addWarmup);
   const deleteWarmup = useWarmupsStore((s) => s.deleteWarmup);
   const updateWarmup = useWarmupsStore((s) => s.updateWarmup);
@@ -14,6 +15,7 @@ export const useWarmupsActions = () => {
   return {
     fetchWarmups: () => fetchWarmups(token),
     fetchWarmup: (id: number) => fetchWarmup(token, id),
+    fetchDetailedWarmup: (id: number) => fetchDetailedWarmup(token, id),
     addWarmup: (warmupData: AddWarmupCooldownDTO) => addWarmup(token, warmupData),
     updateWarmup: (warmupData: UpdateWarmupCooldownDTO) => updateWarmup(token, warmupData),
     deleteWarmup: (id: number) => deleteWarmup(token, id)

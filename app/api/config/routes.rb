@@ -64,8 +64,18 @@ Rails.application.routes.draw do
 
     resource :account, only: [:show, :update, :destroy]
     resources :tags, only: [:index, :create, :update, :destroy]
-    resources :warmups
-    resources :cooldowns
+
+    resources :warmups do
+      member do
+        get 'detailed'
+      end
+    end
+
+    resources :cooldowns do
+      member do
+        get 'detailed'
+      end
+    end
 
     resources :programs do
       member do
