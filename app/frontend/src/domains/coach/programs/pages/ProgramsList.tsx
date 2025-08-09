@@ -2,7 +2,7 @@ import { Input, InputAdornment, Menu, MenuItem } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Program } from '../types/models';
-import { useProgramActions } from '../hooks/useProgramStoreActions';
+import { useProgramStoreActions } from '../hooks/useProgramStoreActions';
 import { useProgramData } from '../hooks/useProgramStoreData';
 import React from 'react';
 import Snackbar from '@mui/material/Snackbar';
@@ -43,7 +43,7 @@ const ProgramsList = () => {
     resetError, 
     addTagToProgram,
     removeTagFromProgram
-  } = useProgramActions();
+  } = useProgramStoreActions();
 
   useEffect(() => {
     fetchPrograms();

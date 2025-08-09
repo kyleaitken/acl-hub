@@ -4,7 +4,7 @@ import { CreateFormItem, EditFormItem, WorkoutStackItem } from "../types/ui";
 import { ProgramWorkout } from "../types/models";
 import { useProgramData } from "../hooks/useProgramStoreData";
 import WorkoutForm from "./WorkoutForm";
-import { useProgramActions } from "../hooks/useProgramStoreActions";
+import { useProgramStoreActions } from "../hooks/useProgramStoreActions";
 import { useWorkoutDrop } from '../hooks/useWorkoutDrop';
 import ProgramDayHeader from "./ProgramDayHeader";
 import { useProgramDayActions } from "../hooks/useProgramDayActions";
@@ -40,7 +40,7 @@ const ProgramDay = ({
 }: ProgramDayProps) => {
   const [stack, setStack] = useState<WorkoutStackItem[]>(() => workouts.map(w => ({ __type: 'card', ...w })));
   const { copiedWorkoutIds, isEditingWorkout } = useProgramData(); // TODO maybe have a flag in state like idsCopied so that I don't need to pull this into each program day
-  const {setIsEditingWorkout} = useProgramActions();
+  const {setIsEditingWorkout} = useProgramStoreActions();
   const { pasteCopied, submitNewWorkout, submitWorkoutEdits } 
     = useProgramDayActions({ programId: programId, week, day: dayIndex+1 });
 

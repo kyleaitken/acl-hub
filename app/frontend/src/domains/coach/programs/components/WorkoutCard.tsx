@@ -9,7 +9,7 @@ import { ProgramWorkout } from "../types/models";
 import Checkbox from '@mui/material/Checkbox';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import OpenWithIcon from '@mui/icons-material/OpenWith';
-import { useProgramActions } from "../hooks/useProgramStoreActions";
+import { useProgramStoreActions } from "../hooks/useProgramStoreActions";
 import { useProgramData } from "../hooks/useProgramStoreData";
 
 export interface DragItem {
@@ -52,7 +52,7 @@ const WorkoutCard = ({
   const cardRef = useRef<HTMLDivElement>(null);
   const handleRef = useRef<HTMLButtonElement>(null);
 
-  const { setCopiedWorkoutIds } = useProgramActions();
+  const { setCopiedWorkoutIds } = useProgramStoreActions();
   const { selectedWorkoutIds } = useProgramData();
 
   const isSelected = selectedWorkoutIds.includes(workout.id);

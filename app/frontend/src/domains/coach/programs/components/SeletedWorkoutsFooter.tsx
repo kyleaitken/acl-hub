@@ -3,7 +3,7 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Checkbox, Tooltip } from '@mui/material';
 import { useState } from 'react';
-import { useProgramActions } from '../hooks/useProgramStoreActions';
+import { useProgramStoreActions } from '../hooks/useProgramStoreActions';
 import TooltipIconButton from '../../core/components/TooltipIconButton';
 
 interface SelectedWorkoutsProps {
@@ -34,7 +34,7 @@ const SelectedWorkoutsFooter = ({
   handleSelectAllClicked}: SelectedWorkoutsProps) => {
 
   const [selectAllSelected, setSelectAllSelected] = useState(false);
-  const { setSelectedWorkoutIds, setCopiedWorkoutIds } = useProgramActions();
+  const { setSelectedWorkoutIds, setCopiedWorkoutIds } = useProgramStoreActions();
   
   const handleToggleSelect = () => {
     if (!selectAllSelected) {

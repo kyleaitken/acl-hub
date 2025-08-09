@@ -2,7 +2,7 @@ import { useCallback } from "react";
 import { BulkCopyWorkoutsDTO } from "../types/dtos";
 import { RawWorkoutData } from "../types/ui";
 import { useProgramData } from "./useProgramStoreData";
-import { useProgramActions } from "./useProgramStoreActions";
+import { useProgramStoreActions } from "./useProgramStoreActions";
 import { buildNewWorkoutPayload, buildUpdateWorkoutPayload } from "../utils";
 import toast from "react-hot-toast";
 
@@ -18,7 +18,7 @@ export function useProgramDayActions(opts: {
     addWorkoutToProgram,
     setIsEditingWorkout,
     updateWorkout
-  } = useProgramActions();
+  } = useProgramStoreActions();
 
   const pasteCopied = useCallback(async () => {
     if (!copiedWorkoutIds.length) return;

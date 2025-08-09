@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useProgramActions } from "./useProgramStoreActions";
+import { useProgramStoreActions } from "./useProgramStoreActions";
 import { useProgramData, useProgramDetails } from "./useProgramStoreData";
 import { ProgramWorkout } from "../types/models";
 import toast from "react-hot-toast";
@@ -16,7 +16,7 @@ export function useProgramPageActions(programId: number) {
     bulkCopyWorkoutsToProgram,
     updateProgramDetails,
     setSelectedWorkoutIds,
-  } = useProgramActions();
+  } = useProgramStoreActions();
 
   const { copiedWorkoutIds, selectedWorkoutIds } = useProgramData();
   const { program } = useProgramDetails(programId);
