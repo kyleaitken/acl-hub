@@ -167,7 +167,7 @@ const TagManager = ({ isOpen, handleClose, selectedProgram, handleAddTagToProgra
                       <div>
                         <button
                           type="button"
-                          className="w-[140px] rounded-md bg-[#4e4eff] px-3 py-2 text-white cursor-pointer text-sm"
+                          className="w-[140px] rounded-md bg-[var(--blue-button)] px-3 py-2 text-white cursor-pointer text-sm"
                           onClick={() => {
                             handleAddTagToProgram(activeProgram.id, tag.id)
                             setAddedTagIds((prev) => new Set(prev).add(tag.id));
@@ -216,7 +216,7 @@ const TagManager = ({ isOpen, handleClose, selectedProgram, handleAddTagToProgra
             />
             <button 
               type='button' onClick={handleAddTag}
-              className="h-[45px] w-[100px] rounded-md bg-[#4e4eff] px-3 py-2 text-white cursor-pointer"
+              className="h-[45px] w-[100px] rounded-md bg-[var(--blue-button)] px-3 py-2 text-white cursor-pointer"
             >
               Add Tag
             </button>

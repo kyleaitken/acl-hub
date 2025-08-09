@@ -236,7 +236,7 @@ const ProgramsList = () => {
             <button
               onClick={() => handleStartCreateProgram()}
               type="button"
-              className="h-[45px] w-[170px] rounded-md bg-[#4e4eff] px-3 py-2 text-white cursor-pointer"
+              className="h-[45px] w-[170px] rounded-md bg-[var(--blue-button)] px-3 py-2 text-white cursor-pointer"
             >
               + Create Program
             </button>

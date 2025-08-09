@@ -90,7 +90,7 @@ const CreateOrEditProgramDialog = ({
         <div className="mt-5">
           <button
             type="submit"
-            className="mr-5 h-[40px] w-[150px] rounded-md border bg-[#4e4eff] px-3 py-2 text-white cursor-pointer"
+            className="mr-5 h-[40px] w-[150px] rounded-md border bg-[var(--blue-button)] px-3 py-2 text-white cursor-pointer"
           >
             Save Program
           </button>

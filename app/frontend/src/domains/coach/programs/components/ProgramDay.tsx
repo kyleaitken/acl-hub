@@ -41,7 +41,7 @@ const ProgramDay = ({
   const [stack, setStack] = useState<WorkoutStackItem[]>(() => workouts.map(w => ({ __type: 'card', ...w })));
   const { copiedWorkoutIds, isEditingWorkout } = useProgramData(); // TODO maybe have a flag in state like idsCopied so that I don't need to pull this into each program day
   const {setIsEditingWorkout} = useProgramStoreActions();
-  const { pasteCopied, submitNewWorkout, submitWorkoutEdits } 
+  const { isSaving, pasteCopied, submitNewWorkout, submitWorkoutEdits } 
     = useProgramDayActions({ programId: programId, week, day: dayIndex+1 });
 
   const { dropContainer, dropPlaceholder } = useWorkoutDrop({
@@ -138,6 +138,7 @@ const ProgramDay = ({
                 stackIndex={i}
                 onCancel={handleCancelCreateOrEditWorkout}
                 onSave={submitNewWorkout}
+                isSaving={isSaving}
               />
             )
           } else if (isEditForm(w)) {
@@ -149,6 +150,7 @@ const ProgramDay = ({
                 existingCard={w.existingCard}
                 onCancel={handleCancelCreateOrEditWorkout}
                 onSave={submitWorkoutEdits} 
+                isSaving={isSaving}
               />
             )
           }

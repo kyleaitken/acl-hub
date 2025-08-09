@@ -13,7 +13,7 @@ const LibraryHeader = ({title, subtitle, buttonText, addHandler}: LibraryHeaderP
             <div className="flex justify-between">
                 <p className="font-semibold text-2xl">{title}</p>
                 <button               
-                    className="h-[45px] min-w-[170px] rounded-md bg-[#4e4eff] px-3 py-2 text-white cursor-pointer flex items-center justify-center"
+                    className="h-[45px] min-w-[170px] rounded-md bg-[var(--blue-button)] px-3 py-2 text-white cursor-pointer flex items-center justify-center"
                     onClick={addHandler}
                 >
                     <AddIcon sx={{mr: 1}}/>

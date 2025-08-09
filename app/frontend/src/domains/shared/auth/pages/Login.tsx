@@ -58,7 +58,7 @@ const LoginPage = () => {
           <div className="mt-3 flex self-center">
             <button
               className={`mr-4 w-[100px] cursor-pointer rounded-md ${
-                coachSelected && 'bg-[#4e4eff]'
+                coachSelected && 'bg-[var(--blue-button)]'
               }`}
               onClick={() => setCoachSelected(true)}
             >
@@ -68,7 +68,7 @@ const LoginPage = () => {
             </button>
             <button
               className={`mr-4 h-8 w-[100px] cursor-pointer rounded-md ${
-                !coachSelected && 'bg-[#4e4eff]'
+                !coachSelected && 'bg-[var(--blue-button)]'
               }`}
               onClick={() => setCoachSelected(false)}
             >
@@ -107,7 +107,7 @@ const LoginPage = () => {
               )}
               <button
                 type="submit"
-                className="mt-5 h-10 cursor-pointer rounded-md bg-[#4e4eff] text-md text-white hover:bg-blue-700"
+                className="mt-5 h-10 cursor-pointer rounded-md bg-[var(--blue-button)] text-md text-white hover:bg-blue-700"
               >
                 Log In
               </button>

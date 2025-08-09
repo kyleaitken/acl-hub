@@ -41,9 +41,10 @@ interface WorkoutFormProps {
   existingCard?: WorkoutCardItem;
   onCancel: (index: number) => void;
   onSave: (raw: RawWorkoutData) => void;
+  isSaving: boolean;
 }
 
-const WorkoutForm = ({mode, stackIndex, existingCard, onCancel, onSave}: WorkoutFormProps) => {
+const WorkoutForm = ({mode, stackIndex, existingCard, onCancel, onSave, isSaving}: WorkoutFormProps) => {
   const [rawData, setRawData] = useState<RawWorkoutData>(() =>
     mode === "edit" && existingCard
       ? mapWorkoutCardToRawFormData(existingCard)
@@ -59,9 +60,9 @@ const WorkoutForm = ({mode, stackIndex, existingCard, onCancel, onSave}: Workout
 
   const isExistingExercise = Boolean(existingCard);
 
-  // Disable save until there's at least one exercise 
-  const saveButtonDisabled = !rawData.exercisesStack.every(
-    item => item.name.trim() !== ""
+  // Disable save until there's at least one exercise and if currently saving
+  const saveButtonDisabled = isSaving || (!rawData.exercisesStack.every(
+    item => item.name.trim() !== "")
   )
 
   useEffect(() => {
@@ -337,7 +338,7 @@ const WorkoutForm = ({mode, stackIndex, existingCard, onCancel, onSave}: Workout
         <div className="flex flex-1">
           <button
             type="button"
-            className="rounded bg-[#4e4eff] text-white text-sm px-2 py-1 cursor-pointer mr-2 hover:bg-blue-800
+            className="rounded bg-[var(--blue-button)] text-white text-sm px-2 py-1 cursor-pointer mr-2 hover:bg-blue-800
               disabled:opacity-50 
               disabled:cursor-not-allowed 
             "
@@ -365,6 +366,9 @@ const WorkoutForm = ({mode, stackIndex, existingCard, onCancel, onSave}: Workout
         </TooltipIconButton>
         }
       </div>
+      {isSaving && 
+      <p className="px-3 py-1 text-sm">Saving...</p>
+      }
     </form>
   );
 };

@@ -136,7 +136,7 @@ const WarmupCooldownForm = ({
             type="submit"
             disabled={!name.trim()}
             className={`h-[45px] w-[170px] rounded-md px-3 py-2 text-white flex items-center justify-center mr-5
-              ${name.trim() ? 'bg-[#4e4eff] cursor-pointer hover:bg-blue-800' : 'bg-gray-400 cursor-not-allowed'}`}
+              ${name.trim() ? 'bg-[var(--blue-button)] cursor-pointer hover:bg-blue-800' : 'bg-gray-400 cursor-not-allowed'}`}
           >
             {submitLabel}
           </button>

@@ -120,7 +120,7 @@ const WorkoutCommentBox = (props: WorkoutCommentBoxProps) => {
   const buttonBase = 'h-9 w-20 cursor-pointer rounded-sm py-1';
   const buttonVariants = {
     cancel: `${buttonBase} border border-blue-500 text-blue-500 px-2`,
-    save: `${buttonBase} bg-[#4e4eff] text-white`,
+    save: `${buttonBase} bg-[var(--blue-button)] text-white`,
     delete: `${buttonBase} bg-red-500 text-white`,
   };
 

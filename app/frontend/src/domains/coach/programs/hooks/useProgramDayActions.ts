@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { BulkCopyWorkoutsDTO } from "../types/dtos";
 import { RawWorkoutData } from "../types/ui";
 import { useProgramData } from "./useProgramStoreData";
@@ -19,6 +19,8 @@ export function useProgramDayActions(opts: {
     setIsEditingWorkout,
     updateWorkout
   } = useProgramStoreActions();
+
+  const [isSaving, setIsSaving] = useState(false);
 
   const pasteCopied = useCallback(async () => {
     if (!copiedWorkoutIds.length) return;
@@ -44,9 +46,9 @@ export function useProgramDayActions(opts: {
   ]);
 
   const submitNewWorkout = useCallback(async (raw: RawWorkoutData) => {
-      setIsEditingWorkout(false);
       const payload = buildNewWorkoutPayload(raw, week, day, 0);
-      console.log("create new workout payload", payload);
+      setIsSaving(true);
+
       try {
         await addWorkoutToProgram({
           programId,
@@ -56,28 +58,36 @@ export function useProgramDayActions(opts: {
       } catch (err) {
         console.error(err);
         toast.error("Error adding workout.");
+      } finally {
+        debugger;
+        setIsSaving(false);
+        setIsEditingWorkout(false);
       }
     },
     [programId, week, day, addWorkoutToProgram, setIsEditingWorkout]
   );
 
   const submitWorkoutEdits = useCallback(async (raw: RawWorkoutData) => {
-    setIsEditingWorkout(false);
     if (!raw.workoutId) return;
-
     const workoutId = raw.workoutId;
     const payload = buildUpdateWorkoutPayload(raw);
-    console.log('edit workout payload', payload)
+    setIsSaving(true);
+
     try {
       await updateWorkout({workoutId, programId, program_workout: payload});
       toast.success("Workout updated!");
     } catch (err) {
       console.error(err);
       toast.error("Error updating workout.");
+    } finally {
+      debugger;
+      setIsSaving(false);
+      setIsEditingWorkout(false);
     }
   }, [updateWorkout, setIsEditingWorkout]);
 
   return {
+    isSaving,
     pasteCopied,
     submitNewWorkout,
     submitWorkoutEdits

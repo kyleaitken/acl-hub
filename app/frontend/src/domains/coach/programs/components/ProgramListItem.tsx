@@ -70,7 +70,7 @@ const ProgramListItem = ({
       <div className="tags-buttons-container ml-24 flex flex-wrap items-center gap-2 pb-4 px-5 w-[800px]">
       <button
           type="button"
-          className='text-xs rounded-lg px-2 py-1 cursor-pointer mr-5 h-7 bg-[#4e4eff] text-white'
+          className='text-xs rounded-lg px-2 py-1 cursor-pointer mr-5 h-7 bg-[var(--blue-button)] text-white'
           onClick={() => handleAddTagsToProgram(program)}
         >
           <span className='flex justify-center'>

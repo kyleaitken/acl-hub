@@ -41,7 +41,7 @@ const AddNewRoutineDialog = ({anchorRect, handleDismiss, handleSave}: AddNewRout
       <div className="flex mt-3">
         <button
           type="button"
-          className="rounded bg-[#4e4eff] text-white text-sm px-2 py-1 cursor-pointer mr-2 hover:bg-blue-800"
+          className="rounded bg-[var(--blue-button)] text-white text-sm px-2 py-1 cursor-pointer mr-2 hover:bg-blue-800"
           onClick={() => {
             handleSave(name)
             handleDismiss();
