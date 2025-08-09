@@ -1,7 +1,6 @@
 module Coaches   
   module ProgramWorkouts
     class NestedExercises
-      include ::Callable
 
       def self.assign!(workout, entries)
         workout.program_workout_exercises.destroy_all if entries.blank?

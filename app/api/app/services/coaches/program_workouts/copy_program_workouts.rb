@@ -2,7 +2,7 @@
 module Coaches
   module ProgramWorkouts
     class CopyProgramWorkouts
-      include ::Callable
+      include ::CoreServices::Callable
 
       def initialize(coach, program, opts)
         @coach = coach

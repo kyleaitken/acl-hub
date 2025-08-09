@@ -1,7 +1,7 @@
 module Coaches
   module ProgramWorkouts
     class UpdateProgramWorkout
-      include ::Callable
+      include ::CoreServices::Callable
 
       def initialize(coach, program, id, attrs)
         @coach, @program, @id, @attrs = coach, program, id, attrs

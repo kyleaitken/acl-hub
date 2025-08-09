@@ -1,7 +1,8 @@
 class ExercisesController < ApplicationController
     # GET /exercises
+
     def index
-        query = ExerciseQuery.new(params)
+        query = CoreServices::ExerciseQuery.new(params)
         @exercises = query.results
     
         if query.paginated?

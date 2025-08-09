@@ -1,7 +1,6 @@
 module Coaches    
   module ProgramWorkouts
     class NestedCooldown
-      include ::Callable
 
       def self.assign!(workout, cooldown_id, cooldown_attrs, coach)
         if cooldown_id.present?
