@@ -128,7 +128,7 @@ const SignupPage = () => {
       await signupCoach(form as CoachSignupData);
       navigate('/login');
     } catch (error) {
-      console.log('Error processing signup: ', error);
+      console.error('Error processing signup: ', error);
     }
   };
 
@@ -188,7 +188,6 @@ const SignupPage = () => {
               <div></div>
               <form
                 onSubmit={(e) => {
-                  console.log('here');
                   e.preventDefault();
                   const newValid = validateForm(form);
                   setValid(newValid);

@@ -1,7 +1,7 @@
 import { useTagStore } from '../store/tagStore';
 import { useAuthenticatedUser } from '../../../shared/auth/hooks/useAuthenticatedUser'; 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { CoachProgram, ProgramTag } from '../../core/types/models';
+import { Program, ProgramTag } from '../types/models';
 import {
   Dialog,
   Input,
@@ -13,7 +13,7 @@ import React from 'react';
 interface TagManagerProps {
   isOpen: boolean;
   handleClose: () => void;
-  selectedProgram: CoachProgram | null;
+  selectedProgram: Program | null;
   handleAddTagToProgram: (programId: number, tagId: number) => void;
 }
 
@@ -26,7 +26,7 @@ const TagManager = ({ isOpen, handleClose, selectedProgram, handleAddTagToProgra
   const [editTagName, setEditTagName] = useState('');
   const [newTagName, setNewTagName] = useState('');
   const [addedTagIds, setAddedTagIds] = useState<Set<number>>(new Set());
-  const [activeProgram, setActiveProgram] = useState<CoachProgram | null>(null);
+  const [activeProgram, setActiveProgram] = useState<Program | null>(null);
 
   const inputRef = useRef<HTMLInputElement | null>(null);
   

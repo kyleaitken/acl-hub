@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import tagsService from '../services/tagsService';
-import { ProgramTag } from '../../core/types/models';
+import { ProgramTag } from '../types/models';
 
 interface TagStore {
   tags: Record<number, ProgramTag>;
@@ -25,7 +25,6 @@ export const useTagStore = create<TagStore>((set) => ({
     set({ loading: true });
     try {
       const list = await tagsService.fetchTags(token);
-      console.log('tag list', list);
       const normalized = Object.fromEntries(list.map((p) => [p.id, p]));
       set({ tags: normalized, loading: false });
     } catch (err) {

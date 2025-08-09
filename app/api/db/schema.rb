@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_06_22_135451) do
+ActiveRecord::Schema[7.2].define(version: 2025_07_27_132145) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -115,6 +115,26 @@ ActiveRecord::Schema[7.2].define(version: 2025_06_22_135451) do
     t.index ["reset_password_token"], name: "index_coaches_on_reset_password_token", unique: true
   end
 
+  create_table "cooldown_exercises", force: :cascade do |t|
+    t.bigint "cooldown_id", null: false
+    t.bigint "exercise_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["cooldown_id", "exercise_id"], name: "index_cooldown_exercises_on_cooldown_id_and_exercise_id", unique: true
+    t.index ["cooldown_id"], name: "index_cooldown_exercises_on_cooldown_id"
+    t.index ["exercise_id"], name: "index_cooldown_exercises_on_exercise_id"
+  end
+
+  create_table "cooldowns", force: :cascade do |t|
+    t.string "name"
+    t.text "instructions"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "coach_id", null: false
+    t.boolean "custom", default: false, null: false
+    t.index ["coach_id"], name: "index_cooldowns_on_coach_id"
+  end
+
   create_table "exercise_images", force: :cascade do |t|
     t.bigint "exercise_id", null: false
     t.integer "order"
@@ -133,6 +153,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_06_22_135451) do
     t.string "video_url"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "custom", default: false, null: false
   end
 
   create_table "oauth_access_grants", force: :cascade do |t|
@@ -190,11 +211,6 @@ ActiveRecord::Schema[7.2].define(version: 2025_06_22_135451) do
     t.bigint "exercise_id", null: false
     t.string "order"
     t.string "instructions"
-    t.integer "sets"
-    t.integer "reps"
-    t.float "weight"
-    t.string "duration"
-    t.string "hold"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["exercise_id"], name: "index_program_workout_exercises_on_exercise_id"
@@ -208,7 +224,12 @@ ActiveRecord::Schema[7.2].define(version: 2025_06_22_135451) do
     t.integer "order"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "warmup_id"
+    t.bigint "cooldown_id"
+    t.string "name"
+    t.index ["cooldown_id"], name: "index_program_workouts_on_cooldown_id"
     t.index ["program_id"], name: "index_program_workouts_on_program_id"
+    t.index ["warmup_id"], name: "index_program_workouts_on_warmup_id"
   end
 
   create_table "programs", force: :cascade do |t|
@@ -235,6 +256,26 @@ ActiveRecord::Schema[7.2].define(version: 2025_06_22_135451) do
     t.index ["coach_id"], name: "index_tags_on_coach_id"
   end
 
+  create_table "warmup_exercises", force: :cascade do |t|
+    t.bigint "warmup_id", null: false
+    t.bigint "exercise_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["exercise_id"], name: "index_warmup_exercises_on_exercise_id"
+    t.index ["warmup_id", "exercise_id"], name: "index_warmup_exercises_on_warmup_id_and_exercise_id", unique: true
+    t.index ["warmup_id"], name: "index_warmup_exercises_on_warmup_id"
+  end
+
+  create_table "warmups", force: :cascade do |t|
+    t.string "name"
+    t.text "instructions"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "coach_id", null: false
+    t.boolean "custom", default: false, null: false
+    t.index ["coach_id"], name: "index_warmups_on_coach_id"
+  end
+
   create_table "workout_comments", force: :cascade do |t|
     t.bigint "client_program_workout_id", null: false
     t.text "content"
@@ -253,15 +294,23 @@ ActiveRecord::Schema[7.2].define(version: 2025_06_22_135451) do
   add_foreign_key "client_program_workouts", "client_programs"
   add_foreign_key "client_programs", "clients"
   add_foreign_key "clients", "coaches"
+  add_foreign_key "cooldown_exercises", "cooldowns"
+  add_foreign_key "cooldown_exercises", "exercises"
+  add_foreign_key "cooldowns", "coaches"
   add_foreign_key "exercise_images", "exercises"
   add_foreign_key "oauth_access_grants", "oauth_applications", column: "application_id"
   add_foreign_key "oauth_access_tokens", "oauth_applications", column: "application_id"
   add_foreign_key "program_workout_exercises", "exercises"
   add_foreign_key "program_workout_exercises", "program_workouts"
+  add_foreign_key "program_workouts", "cooldowns"
   add_foreign_key "program_workouts", "programs"
+  add_foreign_key "program_workouts", "warmups"
   add_foreign_key "programs", "coaches"
   add_foreign_key "programs_tags", "programs"
   add_foreign_key "programs_tags", "tags"
   add_foreign_key "tags", "coaches"
+  add_foreign_key "warmup_exercises", "exercises"
+  add_foreign_key "warmup_exercises", "warmups"
+  add_foreign_key "warmups", "coaches"
   add_foreign_key "workout_comments", "client_program_workouts"
 end

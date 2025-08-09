@@ -1,7 +1,7 @@
 import { Navigate, Route, Routes, useNavigate } from 'react-router-dom';
 import Login from './domains/shared/auth/pages/Login';
-import CoachHomePage from './domains/coach/homepage/pages/CoachHomePage';
-import CoachPrograms from './domains/coach/programs/pages/CoachPrograms';
+import CoachHomePage from './domains/coach/homefeed/pages/CoachHomePage';
+import ProgramsList from './domains/coach/programs/pages/ProgramsList';
 import NavigationBar from './domains/coach/core/components/NavigationBar';
 import SignupPage from './domains/shared/auth/pages/SignupPage';
 import './styles/styles.css';
@@ -9,15 +9,20 @@ import { useAuthStore } from './domains/shared/auth/store/authStore';
 import ProtectedRoute from './domains/shared/auth/components/ProtectedRoute';
 import { useEffect } from 'react';
 import { Role } from './domains/shared/auth/types';
-import CoachLibrary from './domains/coach/library/layout/CoachLibrary';
-import EditExercise from './domains/coach/library/pages/EditExercise';
-import ExercisesView from './domains/coach/library/pages/ExercisesView';
-import WarmupsView from './domains/coach/library/pages/WarmupsView';
-import CooldownsView from './domains/coach/library/pages/CooldownsView';
-import MetricsView from './domains/coach/library/pages/MetricsView';
-import AddExercise from './domains/coach/library/pages/AddExercise';
+import CoachLibrary from './domains/coach/libraries/layout/CoachLibrary';
+import EditExercise from './domains/coach/libraries/features/exercises/pages/EditExercise';
+import ExercisesView from './domains/coach/libraries/features/exercises/pages/ExercisesView';
+import Warmups from './domains/coach/libraries/features/routines/pages/Warmups';
+import Cooldowns from './domains/coach/libraries/features/routines/pages/Cooldowns';
+import MetricsView from './domains/coach/libraries/features/metrics/pages/MetricsView';
+import AddExercise from './domains/coach/libraries/features/exercises/pages/AddExercise';
 import { Toaster } from 'react-hot-toast';
 import ScrollToTop from './domains/coach/core/components/ScrollToTop';
+import AddWarmup from './domains/coach/libraries/features/routines/pages/AddWarmup';
+import EditWarmup from './domains/coach/libraries/features/routines/pages/EditWarmup';
+import AddCooldown from './domains/coach/libraries/features/routines/pages/AddCooldown';
+import EditCooldown from './domains/coach/libraries/features/routines/pages/EditCooldown';
+import ProgramPage from './domains/coach/programs/pages/ProgramPage';
 
 function App() {
   const { isLoggedIn, role } = useAuthStore();
@@ -48,15 +53,24 @@ function App() {
             path="/coach/programs"
             element={
               <ProtectedRoute allowedRoles={['coach']}>
-                <CoachPrograms />
+                <ProgramsList />
               </ProtectedRoute>
             }
           />
           <Route
+            path="/coach/programs/:programId"
+            element={
+              <ProtectedRoute allowedRoles={['coach']}>
+                <ProgramPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
             path="/testRoute"
             element={
               <ProtectedRoute allowedRoles={['client']}>
-                <CoachPrograms />
+                <ProgramsList />
               </ProtectedRoute>
             }
           />
@@ -69,17 +83,25 @@ function App() {
             }
           >
             <Route index element={<ExercisesView />} />
+            <Route path="*" element={<Navigate to="/coach/library/exercises" replace />} />
+
             <Route path="exercises" element={<ExercisesView />} />
-            <Route path="warmups" element={<WarmupsView />} />
-            <Route path="cooldowns" element={<CooldownsView />} />
-            <Route path="metrics" element={<MetricsView />} />
             <Route path="exercises/:exerciseId/edit" element={<EditExercise />} />
             <Route path="exercises/add" element={<AddExercise />} />
-            <Route path="*" element={<Navigate to="/coach/library/exercises" replace />} />
+
+            <Route path="warmups" element={<Warmups />} />
+            <Route path="warmups/add" element={<AddWarmup />} />
+            <Route path="warmups/:warmupId/edit" element={<EditWarmup />} />
+
+            <Route path="cooldowns" element={<Cooldowns />} />
+            <Route path="cooldowns/add" element={<AddCooldown />} />
+            <Route path="cooldowns/:cooldownId/edit" element={<EditCooldown />} />
+
+            <Route path="metrics" element={<MetricsView />} />
           </Route>
         </Routes>
       </div>
-      <Toaster position="bottom-center" />
+      <Toaster position="top-center" />
     </div>
   );
 }

@@ -63,15 +63,31 @@ Rails.application.routes.draw do
     end
 
     resource :account, only: [:show, :update, :destroy]
-
     resources :tags, only: [:index, :create, :update, :destroy]
+
+    resources :warmups do
+      member do
+        get 'detailed'
+      end
+    end
+
+    resources :cooldowns do
+      member do
+        get 'detailed'
+      end
+    end
 
     resources :programs do
       member do
         post 'add_tag/:tag_id', to: 'programs#add_tag'
         delete 'remove_tag/:tag_id', to: 'programs#remove_tag'
+        patch 'update_positions', to: 'programs#update_positions'
       end
       resources :program_workouts do
+        collection do
+          delete :destroy_multiple
+          post :copy_workouts
+        end
         resources :program_workout_exercises
       end
     end

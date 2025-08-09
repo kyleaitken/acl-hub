@@ -63,3 +63,14 @@ would still run the api/db in a container, but access it thru local host, not fr
 # Building for Prod
 - run deploy.sh script which, build/tag/pushes the docker containers 
 
+
+# BE/CI Challenges
+- dockerizing/setting up network connections between the containers, especially in cloud - required configuring some CORS middleware for the backend
+- cloud infrastructure - selecting the correct resource types to avoid high, unnecessary costs - defaults were excessive and expensive (especially the db)
+- configuring doorkeeper/devise gems for oauth authentication and api request authorization - ie configuring routes to be accessible to coaches to retrieve data from clients assigned to them (and not other clients)
+- setting up github actions to build containers on commit and deploy to Azure container registry on merge to master 
+
+# FE Challenges
+- configuring vite for running the FE locally vs as a container 
+- migrating from redux to zustand 
+- establishing the most effective project structure - juggling domain specific FE components and trying to utilize a vertical slice architecture

@@ -1,6 +1,6 @@
 export const apiRequest = async (
   url: string,
-  method: 'GET' | 'POST' | 'PUT' | 'DELETE',
+  method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH',
   token: string,
   body?: any,
 ) => {
@@ -25,6 +25,5 @@ export const apiRequest = async (
   }
 
   const data = await response.json();
-  console.log('response for: ', url, data);
   return data;
 };
