@@ -182,6 +182,7 @@ export function mapWorkoutCardToRawFormData(card: WorkoutCardItem): RawWorkoutDa
       programWorkoutExerciseId: pwe.id,
       name: pwe.exercise.name,
       instructions: pwe.instructions ?? "",
+      customExercise: pwe.exercise.custom,
       order: pwe.order,
       exerciseId: pwe.exercise.id,
       videoUrl: pwe.exercise.video_url,
@@ -210,18 +211,13 @@ export function updateRoutineData(
   payload: RoutineUpdatePayload
 ): RawWorkoutData {
   const isWarmup = type === "warmup";
-  const wasCustom = isWarmup ? prev.isCustomWarmup : prev.isCustomCooldown;
 
   let idToSet: number | undefined;
   
-  if (payload.id !== undefined) {
-    // If payload provides an id, always use it
+  if (payload.id !== null) {
     idToSet = payload.id;
-  } else if (wasCustom) {
-    // If it was custom before, keep existing id
-    idToSet = isWarmup ? prev.warmupId : prev.cooldownId;
   } else {
-    // Previously non-custom but now changed -> clear the id
+    // making an edit, clear the id/create a new one (custom or not)
     idToSet = undefined;
   }
 

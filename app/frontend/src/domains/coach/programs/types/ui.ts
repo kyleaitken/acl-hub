@@ -26,6 +26,7 @@ export interface ExerciseStackItem {
   instructions: string;
   order: string;
   exerciseId?: number;
+  customExercise?: boolean;
   programWorkoutExerciseId?: number; 
   tempId?: number;
   videoUrl?: string;
