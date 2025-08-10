@@ -1,10 +1,11 @@
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 import { BulkCopyWorkoutsDTO } from "../types/dtos";
 import { RawWorkoutData } from "../types/ui";
 import { useProgramData } from "./useProgramStoreData";
 import { useProgramStoreActions } from "./useProgramStoreActions";
 import { buildNewWorkoutPayload, buildUpdateWorkoutPayload } from "../utils";
 import toast from "react-hot-toast";
+import { useProgramStore } from "../store/programStore";
 
 export function useProgramDayActions(opts: {
   programId: number;
@@ -20,7 +21,7 @@ export function useProgramDayActions(opts: {
     updateWorkout
   } = useProgramStoreActions();
 
-  const [isSaving, setIsSaving] = useState(false);
+  const isSaving = useProgramStore(s => s.updatingWorkout);
 
   const pasteCopied = useCallback(async () => {
     if (!copiedWorkoutIds.length) return;
@@ -47,7 +48,6 @@ export function useProgramDayActions(opts: {
 
   const submitNewWorkout = useCallback(async (raw: RawWorkoutData) => {
       const payload = buildNewWorkoutPayload(raw, week, day, 0);
-      setIsSaving(true);
 
       try {
         await addWorkoutToProgram({
@@ -59,8 +59,6 @@ export function useProgramDayActions(opts: {
         console.error(err);
         toast.error("Error adding workout.");
       } finally {
-        debugger;
-        setIsSaving(false);
         setIsEditingWorkout(false);
       }
     },
@@ -71,7 +69,6 @@ export function useProgramDayActions(opts: {
     if (!raw.workoutId) return;
     const workoutId = raw.workoutId;
     const payload = buildUpdateWorkoutPayload(raw);
-    setIsSaving(true);
 
     try {
       await updateWorkout({workoutId, programId, program_workout: payload});
@@ -80,8 +77,6 @@ export function useProgramDayActions(opts: {
       console.error(err);
       toast.error("Error updating workout.");
     } finally {
-      debugger;
-      setIsSaving(false);
       setIsEditingWorkout(false);
     }
   }, [updateWorkout, setIsEditingWorkout]);

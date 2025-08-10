@@ -120,6 +120,7 @@ const WorkoutFormExercise = ({
               handleAddExercise={ex => {
                 handleSelectExercise(ex);
               }}
+              onEscape={() => setIsSearching(false)}
             />
           )}
         </div>

@@ -13,6 +13,8 @@ import { RawWorkoutData, WorkoutCardItem } from "../types/ui";
 import { Exercise } from "../../libraries/features/exercises/types";
 import TooltipIconButton from "../../core/components/TooltipIconButton";
 import { mapWorkoutCardToRawFormData, updateRoutineData } from "../utils";
+import { workoutDataEqual } from "../utils/workoutDataEqual";
+import { useOutsideClickDismiss } from "../../core/hooks/useOutsideClickDismiss";
 
 const initialExerciseStack = [{
   name: '',
@@ -45,11 +47,13 @@ interface WorkoutFormProps {
 }
 
 const WorkoutForm = ({mode, stackIndex, existingCard, onCancel, onSave, isSaving}: WorkoutFormProps) => {
-  const [rawData, setRawData] = useState<RawWorkoutData>(() =>
-    mode === "edit" && existingCard
+  const originalRef = useRef<RawWorkoutData>(
+    mode === 'edit' && existingCard
       ? mapWorkoutCardToRawFormData(existingCard)
       : initialRawData
-  );
+  )
+  const [rawData, setRawData] = useState<RawWorkoutData>(originalRef.current)
+  const [hasChanges, setHasChanges] = useState(false);
 
   const { warmupSearchResults, searchWarmups } = useWarmupsSearch();
   const { cooldownSearchResults, searchCooldowns } = useCooldownsSearch();
@@ -57,19 +61,28 @@ const WorkoutForm = ({mode, stackIndex, existingCard, onCancel, onSave, isSaving
   const { addCooldown, fetchDetailedCooldown } = useCooldownsActions();
 
   const titleRef = useRef<HTMLInputElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
 
   const isExistingExercise = Boolean(existingCard);
 
-  // Disable save until there's at least one exercise and if currently saving
-  const saveButtonDisabled = isSaving || (!rawData.exercisesStack.every(
-    item => item.name.trim() !== "")
-  )
+  useOutsideClickDismiss([formRef], () => {
+    if (disableSave) {
+      onCancel(stackIndex);
+    } else {
+      onSave(rawData);
+    }
+  });
 
   useEffect(() => {
     if (titleRef.current) {
       titleRef.current.focus();
     }
-  }, [])
+  }, []);
+
+  useEffect(() => {
+    if (mode !== "edit" || !existingCard) return;
+    setHasChanges(!workoutDataEqual(existingCard, rawData))
+  }, [rawData])
 
   // Warmup search results
   useEffect(() => {
@@ -257,11 +270,15 @@ const WorkoutForm = ({mode, stackIndex, existingCard, onCancel, onSave, isSaving
     });
   };
 
-  console.log(rawData)
+  const disableSave = 
+    isSaving 
+    || (!rawData.exercisesStack.every(item => item.name.trim() !== ""))
+    || !hasChanges
 
   return (
     <form
       className="mb-5 border-2 py-2 border-blue-500 shadow-md bg-white w-[350px]"
+      ref={formRef}
     >
       <div id="workout-form-header" className="flex items-center mb-3 px-3">
         <input
@@ -343,7 +360,7 @@ const WorkoutForm = ({mode, stackIndex, existingCard, onCancel, onSave, isSaving
               disabled:cursor-not-allowed 
             "
             onClick={() => onSave(rawData)}
-            disabled={saveButtonDisabled}
+            disabled={disableSave}
           >
             Save
           </button>

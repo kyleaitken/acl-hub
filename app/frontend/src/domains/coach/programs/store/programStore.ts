@@ -18,6 +18,7 @@ interface ProgramStore {
 
   isEditingWorkout: boolean;
   loading: boolean;
+  updatingWorkout: boolean;
   error?: string;
 
   fetchPrograms: (token: string) => Promise<void>;
@@ -58,6 +59,7 @@ export const useProgramStore = create<ProgramStore>((set) => ({
   error: undefined,
   copiedWorkoutIds: [],
   isEditingWorkout: false,
+  updatingWorkout: false,
 
   fetchPrograms: async (token: string) => {
     set({ loading: true });
@@ -308,27 +310,31 @@ export const useProgramStore = create<ProgramStore>((set) => ({
     }
   },
   updateWorkout: async (token: string, workoutData: UpdateWorkoutDTO) => {
-    set({ loading: true });
+    set({ updatingWorkout: true });
     try {
       const programId = workoutData.programId;
       const workoutId = workoutData.workoutId;
       const updatedWorkout = await programsService.updateWorkout(token, workoutData);
 
-      set((state) => {
-        const detailed = state.detailedPrograms[programId]!
-        return {
-          detailedPrograms: {
-            ...state.detailedPrograms,
-            [programId]: {
-              ...detailed,
-              program_workouts: detailed.program_workouts.map(w =>
-                w.id === workoutId ? updatedWorkout : w
-              ),
+      try {   
+        set((state) => {
+          const detailed = state.detailedPrograms[programId]!
+          return {
+            detailedPrograms: {
+              ...state.detailedPrograms,
+              [programId]: {
+                ...detailed,
+                program_workouts: detailed.program_workouts.map(w =>
+                  w.id === workoutId ? updatedWorkout : w
+                ),
+              },
             },
-          },
-          loading: false,
-        }
-      })
+            loading: false,
+          }
+        })
+      } finally {
+        set({ updatingWorkout: false });
+      }
   
     } catch (err) {
       set({ loading: false, error: (err as Error).message })

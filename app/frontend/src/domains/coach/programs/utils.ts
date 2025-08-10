@@ -1,5 +1,6 @@
 import { Exercise } from '../libraries/features/exercises/types'
-import { RoutineType } from '../libraries/features/routines/types'
+import { DetailedRoutine, RoutineType } from '../libraries/features/routines/types'
+import { ProgramWorkoutExercise } from './types/models'
 import {
   CreateNewProgramWorkoutPayload,
   UpdateProgramWorkoutPayload,
@@ -14,8 +15,10 @@ import {
   CreateFormItem,
   EditFormItem,
   WorkoutCardItem,
-  RawWorkoutData
+  RawWorkoutData,
+  ExerciseStackItem
  } from './types/ui'
+
 
 /*
   Builds the payload for createing a new workout in a program
@@ -238,3 +241,46 @@ export function updateRoutineData(
         }),
   };
 }
+
+// function equalExericses(original: ProgramWorkoutExercise[], form: ExerciseStackItem[]) {
+//   if (original.length !== form.length) return false
+
+//   for (let i = 0; i < original.length; i++) {
+//     const x = original[i], y = form[i]
+
+//     if (x.id !== y.programWorkoutExerciseId) return false;
+//     if (x.order !== y.order) return false
+//     if (x.exercise.name !== y.name) return false;
+//     if (x.instructions !== y.instructions) return false
+//   }
+//   return true
+// }
+
+// function equalRoutineExercises(a: Exercise[], b: Exercise[]) {
+//   if (a.length !== b.length) return false
+
+//   for (let i = 0; i < a.length; i++) {
+//     const x = a[i], y = b[i]
+//     if (x.id !== y.id) return false
+//   }
+//   return true;
+// }
+
+// export function workoutDataEqual(original: WorkoutCardItem, formData: RawWorkoutData) {
+//   // name
+//   if (original.name !== formData.name) return false
+
+//   // warmup: only compare instructions & exercises, ignore warmupId
+//   if (original.warmup?.instructions !== formData.warmupInstructions) return false
+//   if (!equalRoutineExercises(original.warmup.exercises, formData.warmupExercises)) return false
+
+//   // cooldown: same
+//   if (original.cooldown?.instructions !== formData.cooldownInstructions) return false
+//   if (!equalRoutineExercises(original.cooldown.exercises, formData.cooldownExercises)) return false
+
+//   // main stack
+//   if (!equalExericses(original.program_workout_exercises, formData.exercisesStack)) return false
+
+//   return true
+// }
+

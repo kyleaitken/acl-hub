@@ -12,6 +12,7 @@ interface ExercisesSearchProps {
 }
 
 const ExercisesSearch = ({handleAddExercise, exerciseIds}: ExercisesSearchProps) => {
+  const [isSearching, setIsSearching] = useState(false);
   const [searchString, setSearchString] = useState('');
   const searchContainerRef = useRef<HTMLDivElement>(null);
   const { results: searchResults, search } = useExerciseSearch();
@@ -40,17 +41,22 @@ const ExercisesSearch = ({handleAddExercise, exerciseIds}: ExercisesSearchProps)
     return () => clearTimeout(delayDebounce); 
   }, [searchString]);
 
+  const handleSearch = (newValue: string) => {
+    setIsSearching(true);
+    setSearchString(newValue);
+  }
+
   return (
     <FormField label="Demo videos" id="demo-videos">
       <div ref={searchContainerRef} className="relative">
         <SearchBar
           searchString={searchString}
-          searchHandler={setSearchString}
+          searchHandler={handleSearch}
           placeholder="Add exercise demo videos (optional)"
           className="mt-1"
         />
 
-        {searchString.length >= 4 && (
+        {isSearching && searchString.length >= 3 && (
         <ExerciseSearchResults 
           searchResults={filteredSearchResults}
           searchString={searchString}
@@ -58,6 +64,7 @@ const ExercisesSearch = ({handleAddExercise, exerciseIds}: ExercisesSearchProps)
             setSearchString('');
             handleAddExercise(ex);
           }}
+          onEscape={() => setIsSearching(false)}
         />
         )}
       </div>

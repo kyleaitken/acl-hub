@@ -10,6 +10,7 @@ import SendIcon from '@mui/icons-material/Send';
 import AddIcon from '@mui/icons-material/Add';
 import SelectedWorkoutsFooter from "../components/SeletedWorkoutsFooter";
 import { useProgramPageActions } from "../hooks/useProgramPageActions";
+import { useProgramMetaData } from "../hooks/useProgramMetaData";
 
 const ProgramPage = () => {
   const navigate = useNavigate();
@@ -18,13 +19,15 @@ const ProgramPage = () => {
   const { selectedWorkoutIds } = useProgramData();
 
   const {
-    program, workoutsByWeek,
+    workoutsByWeek,
     moveWorkout, handleDrop, onDayHover,
     deleteSelected, copyLastWeek, addWeek, removeWeek,
     handleSelectAll, handleShiftSelect
   } = useProgramPageActions(id);
 
-  if (!program) return <ProgramSkeleton />;
+  const { name, description, numWeeks } = useProgramMetaData(id);
+
+  if (name === undefined) return <ProgramSkeleton />;
 
   return (
     <>
@@ -43,8 +46,8 @@ const ProgramPage = () => {
         >
           <div className="flex" id="program-header">
             <div id="program-title-and-description" className="flex flex-col flex-grow">
-              <div className='text-3xl font-bold'>{program.name}</div>
-              <div className='mt-4 text-md'>{program.description}</div>
+              <div className='text-3xl font-bold'>{name}</div>
+              <div className='mt-4 text-md'>{description}</div>
             </div>
             <div id="top-program-buttons" className='flex flex-col'>
               <button className='border-1 py-1 px-8 h-[40px] rounded-md cursor-pointer flex items-center mb-2 hover:bg-gray-200'>
@@ -59,7 +62,7 @@ const ProgramPage = () => {
           </div>
           <hr className="w-full border-t border-gray-400 my-4" />
           <p className="font-semibold text-xl mb-2">Workouts</p>
-          {[...Array(program.num_weeks)].map((_, i) => {
+          {[...Array(numWeeks)].map((_, i) => {
             const weekNum = i + 1;
             const workouts = workoutsByWeek[weekNum] || [];
             return (
@@ -68,7 +71,7 @@ const ProgramPage = () => {
                 key={weekNum}
                 week={weekNum}
                 workouts={workouts}
-                isLastWeek={weekNum === program.num_weeks}
+                isLastWeek={weekNum === numWeeks}
                 moveWorkout={moveWorkout}
                 onDrop={handleDrop}
                 onDayHover={onDayHover}

@@ -170,6 +170,7 @@ const WorkoutFormWarmupOrCooldown = ({type,
                   addExerciseToRoutine(type, ex);
                   setExerciseSearchString('');
                 }}
+                onEscape={() => setIsSearchingExercises(false)}
               />
             )}
           </div>
