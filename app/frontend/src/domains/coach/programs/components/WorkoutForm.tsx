@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import OpenInFullIcon from '@mui/icons-material/OpenInFull';
 import WorkoutFormExercise from "./WorkoutFormExercise";
-import DeleteIcon from '@mui/icons-material/Delete';
 import WorkoutFormWarmupOrCooldown from "./WorkoutFormWarmupOrCooldown";
 import { DetailedRoutine, LibraryRoutine, RoutineType } from "../../libraries/features/routines/types";
 import { useWarmupsSearch } from "../../libraries/features/routines/hooks/useWarmupsSearch";
@@ -11,10 +10,10 @@ import { useCooldownsActions } from "../../libraries/features/routines/hooks/use
 import toast from "react-hot-toast";
 import { RawWorkoutData, WorkoutCardItem } from "../types/ui";
 import { Exercise } from "../../libraries/features/exercises/types";
-import TooltipIconButton from "../../core/components/TooltipIconButton";
 import { mapWorkoutCardToRawFormData, updateRoutineData } from "../utils";
 import { workoutDataEqual } from "../utils/workoutDataEqual";
 import { useOutsideClickDismiss } from "../../core/hooks/useOutsideClickDismiss";
+import { ConfirmDeleteButton } from "../../core/components/ConfirmDeleteButton";
 
 const initialExerciseStack = [{
   name: '',
@@ -44,9 +43,10 @@ interface WorkoutFormProps {
   onCancel: (index: number) => void;
   onSave: (raw: RawWorkoutData) => void;
   isSaving: boolean;
+  onDelete?: (id: number, index: number) => void;
 }
 
-const WorkoutForm = ({mode, stackIndex, existingCard, onCancel, onSave, isSaving}: WorkoutFormProps) => {
+const WorkoutForm = ({mode, stackIndex, existingCard, onCancel, onSave, isSaving, onDelete}: WorkoutFormProps) => {
   const originalRef = useRef<RawWorkoutData>(
     mode === 'edit' && existingCard
       ? mapWorkoutCardToRawFormData(existingCard)
@@ -62,8 +62,7 @@ const WorkoutForm = ({mode, stackIndex, existingCard, onCancel, onSave, isSaving
 
   const titleRef = useRef<HTMLInputElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
-
-  const isExistingExercise = Boolean(existingCard);
+  const deleteButtonRef = useRef<HTMLDivElement>(null);
 
   useOutsideClickDismiss([formRef], () => {
     if (disableSave) {
@@ -270,6 +269,10 @@ const WorkoutForm = ({mode, stackIndex, existingCard, onCancel, onSave, isSaving
     });
   };
 
+  const handleDeleteWorkoutClicked = (id: number) => {
+    if (onDelete) onDelete(id, stackIndex);
+  }
+
   const disableSave = 
     isSaving 
     || (!rawData.exercisesStack.every(item => item.name.trim() !== ""))
@@ -372,15 +375,17 @@ const WorkoutForm = ({mode, stackIndex, existingCard, onCancel, onSave, isSaving
             Cancel
           </button>
         </div>
-        {isExistingExercise &&
-        <TooltipIconButton 
-          title="Delete workout"
-          aria-label="Delete workout"
-          buttonClassName={"cursor-pointer"}
-          tooltipPosition="top"
-        >
-          <DeleteIcon sx={{color: '#545454', cursor: 'pointer'}}/>
-        </TooltipIconButton>
+        {existingCard !== undefined &&
+          <div
+            ref={deleteButtonRef}
+            className='relative'
+          >
+            <ConfirmDeleteButton
+              tooltipText="Delete workout"
+              confirmText="Delete workoutfrom the program?"
+              onDeleteConfirmed={() => handleDeleteWorkoutClicked(existingCard.id)}
+            />
+          </div>
         }
       </div>
       {isSaving && 

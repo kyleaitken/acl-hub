@@ -12,8 +12,7 @@ interface TooltipIconButtonProps
   buttonClassName?: string;
   tooltipPosition?: TooltipPosition;
   disabled?: boolean;
-  children: React.ReactNode;
-  placementOffset?: [number, number];
+  children: React.ReactNode;     
 }
 
 const offsetMap: Record<TooltipPosition, [number, number]> = {
@@ -23,28 +22,27 @@ const offsetMap: Record<TooltipPosition, [number, number]> = {
   right: [-8, 0],
 };
 
-const TooltipIconButton = ({
+export default function TooltipIconButton({
   title,
   onClick,
   "aria-label": ariaLabel,
   buttonClassName,
   children,
   tooltipPosition = "top",
-  placementOffset,
   disabled = false,
   ...tooltipProps
-}: TooltipIconButtonProps) => {
+}: TooltipIconButtonProps) {
+
   return (
     <Tooltip
       title={title}
       slotProps={{
         tooltip: { sx: { fontSize: "1em", backgroundColor: "black" } },
         popper: {
-          style: { pointerEvents: 'none' }, 
           modifiers: [
             {
               name: "offset",
-              options: { offset: placementOffset ?? offsetMap[tooltipPosition] },
+              options: { offset: offsetMap[tooltipPosition] },
             },
           ],
         },
@@ -55,13 +53,11 @@ const TooltipIconButton = ({
         type="button"
         aria-label={ariaLabel}
         onClick={onClick}
-        className={`${buttonClassName}`}
+        className={buttonClassName}
         disabled={disabled}
       >
         {children}
       </button>
     </Tooltip>
   );
-};
-
-export default TooltipIconButton;
+}

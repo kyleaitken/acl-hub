@@ -9,6 +9,7 @@ import { useWorkoutDrop } from '../hooks/useWorkoutDrop';
 import ProgramDayHeader from "./ProgramDayHeader";
 import { useProgramDayActions } from "../hooks/useProgramDayActions";
 import { isCardItem, isCreateForm, isEditForm } from "../utils";
+import toast from "react-hot-toast";
 
 interface ProgramDayProps {
   programId: number;
@@ -43,6 +44,7 @@ const ProgramDay = ({
   const {setIsEditingWorkout} = useProgramStoreActions();
   const { isSaving, pasteCopied, submitNewWorkout, submitWorkoutEdits } 
     = useProgramDayActions({ programId: programId, week, day: dayIndex+1 });
+  const { deleteWorkoutsFromProgram } = useProgramStoreActions();
 
   const { dropContainer, dropPlaceholder } = useWorkoutDrop({
     week,
@@ -108,6 +110,19 @@ const ProgramDay = ({
     }
   };
 
+  const handleDeleteWorkoutClicked = (workoutId: number, stackIndex: number) => {
+    try {
+      deleteWorkoutsFromProgram(programId, [workoutId]);
+      toast.success("Workout deleted")
+    } catch (err) {
+      handleCancelCreateOrEditWorkout(stackIndex);
+      toast.error("Error deleting workout");
+      console.error("Error occurred while deleting the workout");
+    } finally {
+      setStack(prev => prev.filter((_, i) => i !== stackIndex));
+    }
+  };
+
   const isLastDay = dayIndex === 6;
   const borderRight = isLastDay ? "" : "border-r-0";
   const borderBottom = isLastWeek ? "" : "border-b-0";
@@ -151,6 +166,7 @@ const ProgramDay = ({
                 onCancel={handleCancelCreateOrEditWorkout}
                 onSave={submitWorkoutEdits} 
                 isSaving={isSaving}
+                onDelete={handleDeleteWorkoutClicked}
               />
             )
           }

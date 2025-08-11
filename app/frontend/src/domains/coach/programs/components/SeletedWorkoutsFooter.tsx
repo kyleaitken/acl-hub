@@ -1,10 +1,10 @@
 import PeopleIcon from '@mui/icons-material/People';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import DeleteIcon from '@mui/icons-material/Delete';
 import { Checkbox, Tooltip } from '@mui/material';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useProgramStoreActions } from '../hooks/useProgramStoreActions';
 import TooltipIconButton from '../../core/components/TooltipIconButton';
+import { ConfirmDeleteButton } from '../../core/components/ConfirmDeleteButton';
 
 interface SelectedWorkoutsProps {
   selectedWorkoutIds: number[];
@@ -32,9 +32,10 @@ const SelectedWorkoutsFooter = ({
   selectedWorkoutIds, 
   handleDeleteWorkoutsClicked, 
   handleSelectAllClicked}: SelectedWorkoutsProps) => {
-
   const [selectAllSelected, setSelectAllSelected] = useState(false);
   const { setSelectedWorkoutIds, setCopiedWorkoutIds } = useProgramStoreActions();
+
+  const deleteButtonRef = useRef<HTMLDivElement>(null);
   
   const handleToggleSelect = () => {
     if (!selectAllSelected) {
@@ -44,6 +45,7 @@ const SelectedWorkoutsFooter = ({
   }
 
   const numSelected = selectedWorkoutIds.length;
+  const deleteString = `Delete ${numSelected} workout ${numSelected > 1 ? 's' : ''} from the program?`
     
   return (
     <div id="selected-workouts-footer" className="bottom-0 border-t-1 flex items-center sticky w-full z-100 h-[80px] p-5 bg-white">
@@ -98,15 +100,16 @@ const SelectedWorkoutsFooter = ({
           <ContentCopyIcon sx={{fontSize: '28px'}}/>
         </TooltipIconButton>
       
-        <TooltipIconButton 
-          title="Delete workouts"
-          onClick={handleDeleteWorkoutsClicked}
-          aria-label="Delete workouts"
-          buttonClassName={"cursor-pointer ml-3"}
-          tooltipPosition="top"
+        <div
+          ref={deleteButtonRef}
+          className='relative'
         >
-          <DeleteIcon sx={{color: 'red', fontSize: '28px'}}/>
-        </TooltipIconButton>
+          <ConfirmDeleteButton
+            tooltipText="Delete workouts"
+            confirmText={deleteString}
+            onDeleteConfirmed={handleDeleteWorkoutsClicked}
+          />
+        </div>
       </div>
       <div className="flex-grow"></div>
     </div>
