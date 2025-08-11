@@ -11,6 +11,7 @@ interface TooltipIconButtonProps
   "aria-label": string;
   buttonClassName?: string;
   tooltipPosition?: TooltipPosition;
+  placementOffset: [number, number];
   disabled?: boolean;
   children: React.ReactNode;     
 }
@@ -30,6 +31,7 @@ export default function TooltipIconButton({
   children,
   tooltipPosition = "top",
   disabled = false,
+  placementOffset,
   ...tooltipProps
 }: TooltipIconButtonProps) {
 
@@ -42,7 +44,7 @@ export default function TooltipIconButton({
           modifiers: [
             {
               name: "offset",
-              options: { offset: offsetMap[tooltipPosition] },
+              options: { offset: placementOffset ?? offsetMap[tooltipPosition] },
             },
           ],
         },

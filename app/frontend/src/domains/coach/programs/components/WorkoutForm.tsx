@@ -67,7 +67,7 @@ const WorkoutForm = ({mode, stackIndex, existingCard, onCancel, onSave, isSaving
   const deleteButtonRef = useRef<HTMLDivElement>(null);
 
   useOutsideClickDismiss([formRef], () => {
-    if (disableSave) {
+    if (isSaveDisabled) {
       onCancel(stackIndex);
     } else {
       onSave(rawData);
@@ -275,10 +275,11 @@ const WorkoutForm = ({mode, stackIndex, existingCard, onCancel, onSave, isSaving
     if (onDelete) onDelete(id, stackIndex);
   }
 
-  const disableSave = 
-    isSaving 
-    || (!rawData.exercisesStack.every(item => item.name.trim() !== ""))
-    || !hasChanges
+  const isExercisesStackEmpty = rawData.exercisesStack.every(item => item.name.trim() === "")
+  const isSaveDisabled =
+    isSaving ||
+    isExercisesStackEmpty ||
+    (mode === "edit" && !hasChanges)
 
   return (
     <form
@@ -365,7 +366,7 @@ const WorkoutForm = ({mode, stackIndex, existingCard, onCancel, onSave, isSaving
               disabled:cursor-not-allowed 
             "
             onClick={() => onSave(rawData)}
-            disabled={disableSave}
+            disabled={isSaveDisabled}
           >
             Save
           </button>
@@ -373,9 +374,8 @@ const WorkoutForm = ({mode, stackIndex, existingCard, onCancel, onSave, isSaving
             type="button"
             className="rounded bg-white text-sm px-2 py-1 cursor-pointer mr-2 hover:bg-gray-200"
             onClick={() => {
-                !disableSave ? setShowConfirmCancel(true) : onCancel(stackIndex)
-              }
-            }
+              (!isSaveDisabled) ? setShowConfirmCancel(true) : onCancel(stackIndex)
+            }}
           >
             Cancel
           </button>
