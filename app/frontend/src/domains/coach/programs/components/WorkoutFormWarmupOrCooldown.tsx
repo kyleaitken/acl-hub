@@ -50,7 +50,7 @@ const WorkoutFormWarmupOrCooldown = ({type,
   useOutsideClickDismiss(
     [exerciseContainerRef, instructionsContainerRef],
     () => {
-      setIsSearchingExercises(false);
+      handleEscapeCloseExercisesSearch();
       setIsSearchingRoutines(false);
     }
   );
@@ -74,6 +74,11 @@ const WorkoutFormWarmupOrCooldown = ({type,
     document.addEventListener('keydown', handleEsc);
     return () => document.removeEventListener('keydown', handleEsc);
   }, []);
+
+  const handleEscapeCloseExercisesSearch = () => {
+    setIsSearchingExercises(false);
+    setExerciseSearchString('');
+  };  
 
   const exerciseIdSet = new Set(exercises.map((item) => item.id));
   const filteredExercises = searchResults.filter((res) => !exerciseIdSet.has(res.id));
@@ -170,7 +175,7 @@ const WorkoutFormWarmupOrCooldown = ({type,
                   addExerciseToRoutine(type, ex);
                   setExerciseSearchString('');
                 }}
-                onEscape={() => setIsSearchingExercises(false)}
+                onEscape={handleEscapeCloseExercisesSearch}
               />
             )}
           </div>
