@@ -14,6 +14,7 @@ import { mapWorkoutCardToRawFormData, updateRoutineData } from "../utils";
 import { workoutDataEqual } from "../utils/workoutDataEqual";
 import { useOutsideClickDismiss } from "../../core/hooks/useOutsideClickDismiss";
 import { ConfirmDeleteButton } from "../../core/components/ConfirmDeleteButton";
+import ConfirmModal from "../../core/components/ConfirmModal";
 
 const initialExerciseStack = [{
   name: '',
@@ -54,6 +55,7 @@ const WorkoutForm = ({mode, stackIndex, existingCard, onCancel, onSave, isSaving
   )
   const [rawData, setRawData] = useState<RawWorkoutData>(originalRef.current)
   const [hasChanges, setHasChanges] = useState(false);
+  const [showConfirmCancel, setShowConfirmCancel] = useState(false);
 
   const { warmupSearchResults, searchWarmups } = useWarmupsSearch();
   const { cooldownSearchResults, searchCooldowns } = useCooldownsSearch();
@@ -370,7 +372,10 @@ const WorkoutForm = ({mode, stackIndex, existingCard, onCancel, onSave, isSaving
           <button
             type="button"
             className="rounded bg-white text-sm px-2 py-1 cursor-pointer mr-2 hover:bg-gray-200"
-            onClick={() => onCancel(stackIndex)}
+            onClick={() => {
+                !disableSave ? setShowConfirmCancel(true) : onCancel(stackIndex)
+              }
+            }
           >
             Cancel
           </button>
@@ -391,6 +396,16 @@ const WorkoutForm = ({mode, stackIndex, existingCard, onCancel, onSave, isSaving
       {isSaving && 
       <p className="px-3 py-1 text-sm">Saving...</p>
       }
+      {showConfirmCancel && (
+        <ConfirmModal
+          title="Discard changes to this workout?"
+          confirmButtonText="Discard Changes"
+          cancelButtonText="Never mind"
+          confirmHandler={() => onCancel(stackIndex)}
+          cancelHandler={() => setShowConfirmCancel(false)}
+          isDanger={true}
+        />
+      )}
     </form>
   );
 };
