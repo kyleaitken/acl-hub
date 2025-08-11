@@ -302,7 +302,8 @@ export const useProgramStore = create<ProgramStore>((set) => ({
               program_workouts: prog.program_workouts.filter((w) => !workoutIds.includes(w.id)) 
             }
           },
-          loading: false
+          loading: false,
+          copiedWorkoutIds: state.copiedWorkoutIds.filter((id) => !workoutIds.includes(id))
         }
       })
     } catch (err) {
