@@ -1,18 +1,46 @@
-import { useRef, useState } from "react";
+import { useRef, useState, forwardRef } from "react";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useOutsideClickDismiss } from "../hooks/useOutsideClickDismiss";
+import clsx from "clsx";
 
-interface ConfirmDeleteProps {
-  onDeleteConfirmed: () => void;
+export interface ConfirmDeleteButtonProps {
   tooltipText: string;
   confirmText: string;
+  onDeleteConfirmed: () => void;
+  iconSize?: number | string;
+  iconColor?: string;
+  iconClassName?: string;
+  className?: string;
+  buttonClassName?: string;
+  cancelButtonClassName?: string;
+  confirmButtonClassName?: string;
+  dialogClassName?: string;
+  tooltipClassName?: string;
 }
 
-export function ConfirmDeleteButton({
-  onDeleteConfirmed,
-  tooltipText,
-  confirmText,
-}: ConfirmDeleteProps) {
+/**
+ * A delete-button + tooltip + confirm-dialog combo.
+ */
+export const ConfirmDeleteButton = forwardRef<
+  HTMLDivElement,
+  ConfirmDeleteButtonProps
+>(function ConfirmDeleteButton(
+  {
+    tooltipText,
+    confirmText,
+    onDeleteConfirmed,
+    iconSize = 28,
+    iconColor = "red",
+    iconClassName,
+    className,
+    buttonClassName,
+    cancelButtonClassName,
+    confirmButtonClassName,
+    dialogClassName,
+    tooltipClassName,
+  },
+  ref
+) {
   const [hovered, setHovered] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const dialogRef = useRef<HTMLDivElement>(null);
@@ -23,42 +51,54 @@ export function ConfirmDeleteButton({
 
   return (
     <div
-      className="relative inline-block"
+      ref={ref}
+      className={clsx("relative inline-block", className)}
       onMouseEnter={() => !confirmOpen && setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
       <button
         type="button"
         onClick={() => {
-          setHovered(false);  
+          setHovered(false);
           setConfirmOpen(true);
         }}
-        className="p-2 cursor-pointer"
+        className={clsx("cursor-pointer", buttonClassName ?? "p-2")}
         aria-label={tooltipText}
       >
-        <DeleteIcon sx={{ color: "red", fontSize: 28 }} />
+        <DeleteIcon
+          className={iconClassName}
+          sx={{ fontSize: iconSize, color: iconColor }}
+        />
       </button>
 
-      {/* Tooltip */}
       {hovered && !confirmOpen && (
-        <div className="absolute bottom-full mb-2 px-2 py-2 bg-black text-white text-sm rounded whitespace-nowrap">
+        <div
+          className={clsx(
+            "absolute bottom-full mb-2 px-2 py-1 bg-black text-white text-sm rounded whitespace-nowrap",
+            tooltipClassName
+          )}
+        >
           {tooltipText}
         </div>
       )}
 
       {confirmOpen && (
-        <div 
-          className="absolute bottom-full mb-1 w-[240px] p-3 bg-white border rounded shadow-lg"
+        <div
           ref={dialogRef}
+          className={clsx(
+            "absolute bottom-full mb-1 w-[240px] p-3 bg-white border rounded shadow-lg",
+            dialogClassName
+          )}
         >
-          <p className="mb-4 text-center">
-            {confirmText}
-          </p>
+          <p className="mb-4 text-center">{confirmText}</p>
           <div className="flex justify-around">
             <button
               type="button"
               onClick={() => setConfirmOpen(false)}
-              className="px-3 py-1 border rounded hover:bg-gray-100 cursor-pointer"
+              className={clsx(
+                "px-3 py-1 border rounded hover:bg-gray-100 cursor-pointer",
+                cancelButtonClassName
+              )}
             >
               Cancel
             </button>
@@ -68,7 +108,10 @@ export function ConfirmDeleteButton({
                 onDeleteConfirmed();
                 setConfirmOpen(false);
               }}
-              className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 cursor-pointer"
+              className={clsx(
+                "px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 cursor-pointer",
+                confirmButtonClassName
+              )}
             >
               Delete
             </button>
@@ -77,4 +120,4 @@ export function ConfirmDeleteButton({
       )}
     </div>
   );
-}
+});

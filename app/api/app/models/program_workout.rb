@@ -13,21 +13,25 @@ class ProgramWorkout < ApplicationRecord
 
   validates :day, :week, :order, presence: true
 
+  before_destroy :stash_old_routine_ids
   after_destroy_commit :cleanup_orphaned_routines
 
   private
 
-  def cleanup_orphaned_routines
-    # if we dropped a warmup, delete it when orphaned
-    if (old = Warmup.find_by(id: previous_changes["warmup_id"]&.first))&.custom? &&
-       old.program_workouts.reload.empty?
-      old.destroy
-    end
+  def stash_old_routine_ids
+    @old_warmup_id   = warmup_id
+    @old_cooldown_id = cooldown_id
+  end
 
-    # same for cooldown
-    if (old = Cooldown.find_by(id: previous_changes["cooldown_id"]&.first))&.custom? &&
-       old.program_workouts.reload.empty?
-      old.destroy
+  def cleanup_orphaned_routines
+    [ [@old_warmup_id, Warmup],
+      [@old_cooldown_id, Cooldown]
+    ].each do |old_id, klass|
+      next unless old_id
+      r = klass.find_by(id: old_id)
+      if r&.custom? && r.program_workouts.empty?
+        r.destroy
+      end
     end
   end
 

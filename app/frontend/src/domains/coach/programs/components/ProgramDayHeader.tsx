@@ -2,6 +2,7 @@ import ContentPasteIcon from '@mui/icons-material/ContentPaste';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import { useProgramData } from "../hooks/useProgramStoreData";
 import TooltipIconButton from "../../core/components/TooltipIconButton";
+import { ConfirmDeleteButton } from '../../core/components/ConfirmDeleteButton';
 
 interface ProgramDayHeaderProps {
   label: string;
@@ -10,14 +11,29 @@ interface ProgramDayHeaderProps {
   showPasteWorkouts: boolean;
   onPasteWorkouts: () => void;
   onAddWorkout: () => void;
+  onDeleteWeek: () => void;
 }
 
-const ProgramDayHeader = ({label, isFirstDay, week, onPasteWorkouts, showPasteWorkouts, onAddWorkout}: ProgramDayHeaderProps) => {
+const ProgramDayHeader = ({label, isFirstDay, week, onPasteWorkouts, showPasteWorkouts, onAddWorkout, onDeleteWeek}: ProgramDayHeaderProps) => {
   const { isEditingWorkout } = useProgramData();
 
   return (
-    <div className="text-md bg-[#d0ccdb] font-semibold px-2 py-1 flex items-center justify-between">
-      <span>{isFirstDay && `Week ${week} `}</span>
+    <div className="text-md bg-[#d0ccdb] font-semibold px-2 py-1 flex items-center justify-between min-h-9">
+      {isFirstDay &&
+      <div className='flex items-center'>
+        {!isEditingWorkout &&
+        <ConfirmDeleteButton 
+          onDeleteConfirmed={() => onDeleteWeek()}
+          tooltipText='Delete week'
+          confirmText='Delete this week and its workouts?'
+          iconSize={20}
+          iconColor='black'
+          buttonClassName='p-0 mr-2 pb-1'
+        />
+        }
+        <span>{isFirstDay && `Week ${week} `}</span>
+      </div>
+      }
       <div className="flex items-center justify-center">
         {showPasteWorkouts &&
           <TooltipIconButton 

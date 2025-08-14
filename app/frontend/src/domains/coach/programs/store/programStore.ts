@@ -30,6 +30,7 @@ interface ProgramStore {
   updateWorkoutPositions: (token: string, programData: BulkReorderProgramWorkoutsDTO) => Promise<void>;
   deleteProgram: (token: string, programId: number) => Promise<void>;
   addProgram: (token: string, programData: AddProgramDTO) => Promise<void>;
+  deleteWeekFromProgram: (token: string, programId: number, weekNum: number) => Promise<void>;
   addTagToProgram: (
     token: string,
     programId: number,
@@ -128,31 +129,23 @@ export const useProgramStore = create<ProgramStore>((set) => ({
     }
   },
   updateWorkoutPositions: async (token: string, programData: BulkReorderProgramWorkoutsDTO) => {
-    set({ loading: true });
     const { programId } = programData;
+    set({ loading: true });
     try {
       const updatedProgram = await programsService.updateWorkoutPositions(token, programData);
-      set((state) => {
-        const existingProgram = state.detailedPrograms[programId];
-        return {
-          detailedPrograms: {
-            ...state.detailedPrograms,
-            [programId]: {
-              ...existingProgram,
-              ...updatedProgram,
-              tags: existingProgram?.tags ?? [],
-            },
-          },
-          loading: false,
-        };
-      });
+      set(state => ({
+        detailedPrograms: {
+          ...state.detailedPrograms,
+          [programId]: updatedProgram,
+        },
+      }));
     } catch (err) {
-      set({
-        error: `Failed to bulk update program with id: ${programId}`,
-        loading: false,
-      });
+      set({ error: `Failed to bulk update program with id: ${programId}` });
+      throw err; 
+    } finally {
+      set({ loading: false });
     }
-  },
+  },  
   deleteProgram: async (token: string, programId: number) => {
     set({ loading: true });
     try {
@@ -193,6 +186,24 @@ export const useProgramStore = create<ProgramStore>((set) => ({
       set({ error: `Failed to add new program`, loading: false });
     }
   },
+  deleteWeekFromProgram: async (token, programId, weekNum) => {
+    set({ loading: true });
+    try {
+      const updated: ProgramDetails = await programsService.deleteWeekFromProgram(
+        token, programId, weekNum
+      );
+      set(state => ({
+        detailedPrograms: {
+          ...state.detailedPrograms,
+          [programId]: updated
+        },
+        loading: false
+      }));
+    } catch (err) {
+      set({ error: "Failed to delete week", loading: false });
+      throw err;
+    }
+  },  
   addTagToProgram: async (token: string, programId: number, tagId: number) => {
     try {
       const updated = await programsService.addTagToProgram(
@@ -207,7 +218,6 @@ export const useProgramStore = create<ProgramStore>((set) => ({
       set({ error: 'Failed to add tag to program' });
     }
   },
-
   removeTagFromProgram: async (
     token: string,
     programId: number,

@@ -26,6 +26,7 @@ interface ProgramDayProps {
   onDrop: () => void;
   onHover: (week: number, day: number) => void;
   onSelectWorkout: (workoutId: number, shiftKey: boolean, clickedPosition: number) => void;
+  onDeleteWeek: () => void;
 }
 
 const ProgramDay = ({
@@ -37,7 +38,8 @@ const ProgramDay = ({
   moveWorkout,
   onDrop,
   onHover,
-  onSelectWorkout
+  onSelectWorkout,
+  onDeleteWeek
 }: ProgramDayProps) => {
   const [stack, setStack] = useState<WorkoutStackItem[]>(() => workouts.map(w => ({ __type: 'card', ...w })));
   const { copiedWorkoutIds, isEditingWorkout } = useProgramData(); // TODO maybe have a flag in state like idsCopied so that I don't need to pull this into each program day
@@ -53,6 +55,8 @@ const ProgramDay = ({
     moveWorkout,
     onDrop,
   });
+
+  console.log(workouts)
 
   useEffect(() => {
     // early return if editing, don't need to re-render the stack
@@ -142,6 +146,7 @@ const ProgramDay = ({
         showPasteWorkouts={copiedWorkoutIds.length > 0}
         onPasteWorkouts={pasteCopied}
         onAddWorkout={handleAddNewWorkout}
+        onDeleteWeek={onDeleteWeek}
       />
       <div className="flex-grow bg-white flex flex-col py-0 px-0">
         {stack.map((w, i) => {

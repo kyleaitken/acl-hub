@@ -8,6 +8,7 @@ import ProgramWeek from "../components/ProgramWeek";
 import EditIcon from '@mui/icons-material/Edit';
 import SendIcon from '@mui/icons-material/Send';
 import AddIcon from '@mui/icons-material/Add';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import SelectedWorkoutsFooter from "../components/SeletedWorkoutsFooter";
 import { useProgramPageActions } from "../hooks/useProgramPageActions";
 import { useProgramMetaData } from "../hooks/useProgramMetaData";
@@ -21,8 +22,8 @@ const ProgramPage = () => {
   const {
     workoutsByWeek,
     moveWorkout, handleDrop, onDayHover,
-    deleteSelected, copyLastWeek, addWeek, removeWeek,
-    handleSelectAll, handleShiftSelect
+    deleteSelected, copyLastWeek, addWeek,
+    handleSelectAll, handleShiftSelect, deleteWeek
   } = useProgramPageActions(id);
 
   const { name, description, numWeeks } = useProgramMetaData(id);
@@ -76,7 +77,7 @@ const ProgramPage = () => {
                 onDrop={handleDrop}
                 onDayHover={onDayHover}
                 onSelectWorkout={handleShiftSelect}
-                deleteLastWeek={removeWeek}
+                deleteWeek={deleteWeek}
               />
             );
           })}
@@ -91,18 +92,18 @@ const ProgramPage = () => {
 
           <div className="mt-10 ml-3 flex">
             <button
+              onClick={copyLastWeek}
+              className="border-1 rounded-md py-2 px-5 flex items-center cursor-pointer hover:bg-gray-100 mr-5"
+            >
+              <ContentCopyIcon />
+              <span className="px-2">Copy Previous Week</span>
+            </button>
+            <button
               onClick={addWeek}
               className="border-1 rounded-md py-2 px-5 flex items-center cursor-pointer hover:bg-gray-100"
             >
               <AddIcon />
-              <span className="px-2">Add Week</span>
-            </button>
-            <button
-              onClick={copyLastWeek}
-              className="border-1 rounded-md py-2 px-5 flex items-center cursor-pointer hover:bg-gray-100 ml-5"
-            >
-              <AddIcon />
-              <span className="px-2">Copy Last Week</span>
+              <span className="px-2">Add Empty Week</span>
             </button>
           </div>
         </div>

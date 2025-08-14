@@ -8,6 +8,7 @@ import { useShiftRangeSelect } from "../../core/hooks/useShiftRangeSelect";
 export function useProgramPageActions(programId: number) {
   const [localWorkouts, setLocalWorkouts] = useState<ProgramWorkout[]>([]);
   const pasteTarget = useRef<{week:number;day:number} | null>(null);
+  const prevWorkouts = useRef<ProgramWorkout[] | null>(null);
 
   const {
     fetchProgram,
@@ -16,6 +17,7 @@ export function useProgramPageActions(programId: number) {
     bulkCopyWorkoutsToProgram,
     updateProgramDetails,
     setSelectedWorkoutIds,
+    deleteWeekFromProgram
   } = useProgramStoreActions();
 
   const { copiedWorkoutIds, selectedWorkoutIds } = useProgramData();
@@ -67,6 +69,9 @@ export function useProgramPageActions(programId: number) {
     toDay: number,
     toIndex: number
   ) => {
+    if (!prevWorkouts.current) {
+      prevWorkouts.current = localWorkouts.map((w) => ({...w}));
+    }
     setLocalWorkouts((prev) => {
       const dragged = prev.find((w) => w.id === workoutId);
       if (!dragged) return prev;
@@ -102,8 +107,13 @@ export function useProgramPageActions(programId: number) {
       });
       toast.success("Workouts updated");
     } catch (err) {
+      if (prevWorkouts.current) {
+        setLocalWorkouts(prevWorkouts.current.map((w) => ({...w})));
+      }
       toast.error("Update failed");
       console.log("Error occurred while trying to update workouts: ", err);
+    } finally {
+      prevWorkouts.current = null;
     }
   };
 
@@ -150,6 +160,16 @@ export function useProgramPageActions(programId: number) {
     }
   };
 
+  const deleteWeek = async (weekNumber: number) => {
+    try {
+      await deleteWeekFromProgram(programId, weekNumber);
+      toast.success("Week removed");
+    } catch (err) {
+      console.error("Error occurred while trying to remove week: ", err);
+      toast.error("Failed to remove week");
+    }
+  }
+
   // 9) Add / remove empty week
   const addWeek = async () => {
     try {
@@ -195,6 +215,7 @@ export function useProgramPageActions(programId: number) {
     deleteSelected,
     copyLastWeek,
     addWeek,
+    deleteWeek,
     removeWeek,
     handleSelectAll: () => setSelectedWorkoutIds(program!.program_workouts.map(w => w.id)),
     handleShiftSelect,

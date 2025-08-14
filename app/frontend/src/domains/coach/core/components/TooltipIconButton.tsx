@@ -11,7 +11,7 @@ interface TooltipIconButtonProps
   "aria-label": string;
   buttonClassName?: string;
   tooltipPosition?: TooltipPosition;
-  placementOffset: [number, number];
+  placementOffset?: [number, number];
   disabled?: boolean;
   children: React.ReactNode;     
 }

@@ -2,6 +2,17 @@ module Coaches
   class ProgramsController < ApplicationController
     before_action -> { doorkeeper_authorize! :coach }
 
+    PROGRAM_JSON_INCLUDES = {
+      tags: {},
+      program_workouts: {
+        include: {
+          warmup:   { include: :exercises },
+          cooldown: { include: :exercises },
+          program_workout_exercises: { include: :exercise }
+        }
+      }
+    }.freeze
+
     # GET /coaches/programs
     def index
       programs = current_coach.programs.includes(:tags)
@@ -13,19 +24,8 @@ module Coaches
       program = current_coach.programs
         .includes(:tags, program_workouts: [:warmup, :cooldown, program_workout_exercises: :exercise])
         .find(params[:id])
-
-      render json: program.as_json(
-        include: {
-          tags: {},
-          program_workouts: {
-            include: {
-              warmup:  { include: :exercises },
-              cooldown:{ include: :exercises },
-              program_workout_exercises: { include: :exercise }
-            }
-          }
-        }
-      )
+  
+      render_program(program)
     end
 
     # POST /coaches/programs
@@ -52,7 +52,7 @@ module Coaches
     def update_positions
       result = Coaches::Programs::UpdateWorkoutPositions.call(current_coach, params[:id], params[:program_workouts])
       if result[:success]
-        render json: result[:program]
+        render_program(result[:program].reload)
       else
         render json: { errors: result[:errors] }, status: :unprocessable_entity
       end
@@ -84,10 +84,25 @@ module Coaches
       head :no_content
     end
 
+    # DELETE /coaches/programs/:id/delete_week/:week_num
+    def delete_week
+      result = Coaches::Programs::DeleteWeek.call(current_coach, params[:id], params[:week_num])
+      if result[:success]
+        render_program(result[:program].reload)
+      else
+        render json: { errors: result.errors }, status: :unprocessable_entity
+      end
+    end
+
     private
 
     def program_params
       params.require(:program).permit(:name, :num_weeks, :description)
     end
+
+    def render_program(program)
+      render json: program.as_json(include: PROGRAM_JSON_INCLUDES)
+    end
+
   end
 end
