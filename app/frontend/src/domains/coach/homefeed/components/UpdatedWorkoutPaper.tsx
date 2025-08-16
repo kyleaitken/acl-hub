@@ -78,7 +78,7 @@ const UpdatedWorkoutPaper = ({ workout }: UpdatedWorkoutProps) => {
     <Paper
       elevation={4}
       sx={{
-        width: '850px',
+        width: '750px',
         mb: '50px',
       }}
     >
@@ -90,7 +90,7 @@ const UpdatedWorkoutPaper = ({ workout }: UpdatedWorkoutProps) => {
           dueDate={formattedDate}
         />
         <div id="workout-content-container" className="mr-10 ml-6">
-          <p className="m-5 ml-0 text-xl font-bold">
+          <p className="mt-5 mb-2 ml-0 text-lg font-semibold">
             {workout.workout.name || 'Workout'}
           </p>
           <Divider />
@@ -132,10 +132,10 @@ const WarmupSection = ({ warmup }: WarmupSectionProps) => {
   return (
     <div className="flex flex-col" id="warmup-wrapper">
       <div id="warmup" className="mt-5 flex items-center">
-        <LocalFireDepartmentIcon sx={{ fontSize: '25px' }} />
+        <LocalFireDepartmentIcon sx={{ fontSize: '20px' }} />
         <button
           type="button"
-          className="flex cursor-pointer justify-items-center hover:underline"
+          className="flex cursor-pointer justify-center items-center hover:underline"
           onClick={() => setWarmupExpanded((prev) => !prev)}
         >
           {warmupExpanded ? (
@@ -143,11 +143,11 @@ const WarmupSection = ({ warmup }: WarmupSectionProps) => {
           ) : (
             <KeyboardArrowRightIcon />
           )}
-          <p className="font-bold">Warmup</p>
+          <p className="font-semibold text-sm">Warmup</p>
         </button>
       </div>
       {warmupExpanded && (
-        <p className="mt-4 ml-12 whitespace-pre-line">
+        <p className="mt-4 ml-12 whitespace-pre-line text-sm">
           {warmup || 'Squats x 10\n Push up x 10'}
         </p>
       )}

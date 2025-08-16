@@ -34,6 +34,7 @@ function stringAvatar(name: string, height: number) {
       bgcolor: stringToColor(name),
       width: height,
       height: height,
+      fontSize: height * 0.5
     },
     children: `${name.split(' ')[0][0].toUpperCase()}${name.split(' ')[1][0].toUpperCase()}`,
   };
