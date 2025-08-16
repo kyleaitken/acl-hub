@@ -106,7 +106,7 @@ const WorkoutFormWarmupOrCooldown = ({type,
         {showSaveNewRoutine && instructions.length > 1 &&
         <div ref={buttonRef}>
           <TooltipIconButton
-            title={`Save ${type}`}
+            tooltipContent={`Save ${type}`}
             onClick={() => setShowSaveRoutineeDialog(true)}
             aria-label={`Save ${type}`}
             buttonClassName={"cursor-pointer"}

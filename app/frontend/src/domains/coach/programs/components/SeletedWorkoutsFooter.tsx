@@ -45,7 +45,7 @@ const SelectedWorkoutsFooter = ({
   }
 
   const numSelected = selectedWorkoutIds.length;
-  const deleteString = `Delete ${numSelected} workout ${numSelected > 1 ? 's' : ''} from the program?`
+  const deleteString = `Delete ${numSelected} workout${numSelected > 1 ? 's' : ' '} from the program?`
     
   return (
     <div id="selected-workouts-footer" className="bottom-0 border-t-1 flex items-center sticky w-full z-100 h-[80px] p-5 bg-white">
@@ -77,7 +77,7 @@ const SelectedWorkoutsFooter = ({
       <div id="middle-footer-buttons" className="flex items-center flex-1 justify-center">
         {numSelected === 1 &&
         <TooltipIconButton 
-          title="Assign workout"
+          tooltipContent="Assign workout"
           onClick={() => console.log("assign workout clicked")}
           aria-label="Assign workout"
           buttonClassName={"cursor-pointer mr-3"}
@@ -88,7 +88,7 @@ const SelectedWorkoutsFooter = ({
         }
 
         <TooltipIconButton 
-          title="Copy workouts"
+          tooltipContent="Copy workouts"
           onClick={() => {
             setCopiedWorkoutIds(selectedWorkoutIds)
             setSelectedWorkoutIds([]);

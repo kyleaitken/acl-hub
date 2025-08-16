@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useOutsideClickDismiss } from "../../core/hooks/useOutsideClickDismiss";
 import { getEmbedUrl } from "../../core/utils/text";
 import { isTrustedVideoUrl } from "../../core/utils/text";
@@ -15,6 +15,7 @@ interface AddNewExerciseDialogProps {
 
 const AddNewExerciseDialog = ({anchorRect, title, handleDismiss, onSaveExercise}: AddNewExerciseDialogProps) => {
   const [videoUrl, setVideoUrl] = useState('');
+  const [showError, setShowError] = useState(false);
   const { addExercise } = useExercisesActions();
 
   const previewRef = useRef<HTMLDivElement>(null);
@@ -23,21 +24,32 @@ const AddNewExerciseDialog = ({anchorRect, title, handleDismiss, onSaveExercise}
     handleDismiss();
   });
 
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') handleDismiss();
+    };
+    document.addEventListener('keydown', handleEsc);
+    return () => document.removeEventListener('keydown', handleEsc);
+  }, []);
+
   const handleSaveExerciseToLibrary = async () => {
+    if (!validUrl) {
+      setShowError(true);
+      return;
+    }
+  
+    setShowError(false);
     try {
-      await addExercise({ name: title.trim(), videoUrl: embedUrl })
-      .then((newEx) => {
-        onSaveExercise(newEx);     
-        handleDismiss();                
-      })
+      const newEx = await addExercise({ name: title.trim(), videoUrl: embedUrl });
+      onSaveExercise(newEx);
+      handleDismiss();
     } catch (e) {
-      toast.error("Unable to save new exercise")
+      toast.error("Unable to save new exercise");
       console.error("Error while trying to save new exercise: ", e);
     }
   };
 
   const embedUrl = getEmbedUrl(videoUrl);
-
   const validUrl = isTrustedVideoUrl(videoUrl);
   
   return (
@@ -58,9 +70,18 @@ const AddNewExerciseDialog = ({anchorRect, title, handleDismiss, onSaveExercise}
         <input 
           id="videoUrl"
           value={videoUrl}
-          onChange={(e) => setVideoUrl(e.target.value)}
-          className="outline-[1.5px] outline-gray-300 rounded hover:outline-gray-700 pl-2 py-1 focus:outline-2 focus:outline-blue-500 focus:shadow-[0_0_6px_2px_rgba(59,130,246,0.5)]"
+          onChange={(e) => {
+            setVideoUrl(e.target.value);
+            setShowError(false);
+          }}
+          className={`outline-[1.5px] rounded pl-2 py-1 
+            ${showError ? "outline-red-500 focus:outline-red-500" : "outline-gray-300 hover:outline-gray-700 focus:outline-blue-500 focus:shadow-[0_0_6px_2px_rgba(59,130,246,0.5)]"}`}
         />
+        {showError && (
+          <div className="text-red-600 text-sm mt-1">
+            Please enter a valid video URL
+          </div>
+        )}
       </div>
       {validUrl&&
         <iframe

@@ -20,8 +20,8 @@ const ConfirmModal = ({confirmHandler, cancelHandler, title, confirmButtonText, 
     }, []);
     
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[rgba(0,0,0,0.3)]">
-            <div className="flex flex-col bg-white p-6 rounded-md shadow-lg min-w-[400px] min-h-[150px]">
+        <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-[rgba(0,0,0,0.3)]">
+            <div className="flex flex-col items-center bg-white p-6 rounded-md shadow-lg min-w-[400px] min-h-[150px]">
                 <p className="text-md font-semibold mb-4">
                     {title}
                 </p>

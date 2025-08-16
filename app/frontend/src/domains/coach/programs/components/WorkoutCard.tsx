@@ -11,6 +11,7 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import OpenWithIcon from '@mui/icons-material/OpenWith';
 import { useProgramStoreActions } from "../hooks/useProgramStoreActions";
 import { useProgramData } from "../hooks/useProgramStoreData";
+import TooltipIconButton from "../../core/components/TooltipIconButton";
 
 export interface DragItem {
   id: number;
@@ -128,18 +129,18 @@ const WorkoutCard = ({
         />
         <span className="text-[17px] font-semibold flex-grow mr-4">{workout.name || `Workout`}</span>
         <div className="copy-and-move-buttons flex items-center">
-          <button
-            type="button"
-            className="cursor-pointer"
-            aria-label="copy-workout"
-            onMouseDown={e => e.stopPropagation()}
-            onClick={e => {
+          <TooltipIconButton
+            tooltipContent="Copy workout"
+            tooltipPosition="bottom"
+            onClick={(e) => {
               e.stopPropagation();
-              setCopiedWorkoutIds([workout.id]);
+              setCopiedWorkoutIds([workout.id])
             }}
+            buttonClassName="cursor-pointer"
+            aria-label="Copy workout"
           >
             <ContentCopyIcon sx={{fontSize: 22}}/>
-          </button>
+          </TooltipIconButton>
           <button 
             ref={handleRef} 
             disabled={!canDrag}

@@ -1,6 +1,7 @@
 import { useRef, useState, forwardRef } from "react";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useOutsideClickDismiss } from "../hooks/useOutsideClickDismiss";
+import { Tooltip } from 'react-tooltip'
 import clsx from "clsx";
 
 export interface ConfirmDeleteButtonProps {
@@ -16,6 +17,7 @@ export interface ConfirmDeleteButtonProps {
   confirmButtonClassName?: string;
   dialogClassName?: string;
   tooltipClassName?: string;
+  tooltipOffset?: number;
 }
 
 /**
@@ -37,7 +39,7 @@ export const ConfirmDeleteButton = forwardRef<
     cancelButtonClassName,
     confirmButtonClassName,
     dialogClassName,
-    tooltipClassName,
+    tooltipOffset = 5
   },
   ref
 ) {
@@ -62,7 +64,7 @@ export const ConfirmDeleteButton = forwardRef<
           setHovered(false);
           setConfirmOpen(true);
         }}
-        className={clsx("cursor-pointer", buttonClassName ?? "p-2")}
+        className={clsx("delete-anchor cursor-pointer", buttonClassName ?? "p-2")}
         aria-label={tooltipText}
       >
         <DeleteIcon
@@ -72,21 +74,23 @@ export const ConfirmDeleteButton = forwardRef<
       </button>
 
       {hovered && !confirmOpen && (
-        <div
-          className={clsx(
-            "absolute bottom-full mb-2 px-2 py-1 bg-black text-white text-sm rounded whitespace-nowrap",
-            tooltipClassName
-          )}
+        <Tooltip 
+          place="top" 
+          anchorSelect=".delete-anchor" 
+          opacity={0.99} 
+          style={{backgroundColor: 'red'}}
+          delayShow={200}
+          offset={tooltipOffset}
         >
           {tooltipText}
-        </div>
+        </Tooltip>
       )}
 
       {confirmOpen && (
         <div
           ref={dialogRef}
           className={clsx(
-            "absolute bottom-full mb-1 w-[240px] p-3 bg-white border rounded shadow-lg",
+            "absolute bottom-full -left-40 mb-1 w-[240px] p-3 bg-white border rounded shadow-lg",
             dialogClassName
           )}
         >

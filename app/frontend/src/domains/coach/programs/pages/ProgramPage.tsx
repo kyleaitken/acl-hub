@@ -43,7 +43,7 @@ const ProgramPage = () => {
         </button>
         <div
           id="program-box"
-          className="flex flex-col w-full bg-white mt-10 py-10 px-8 rounded-md"
+          className="flex flex-col w-full bg-white mt-10 py-10 px-10 rounded-md"
         >
           <div className="flex" id="program-header">
             <div id="program-title-and-description" className="flex flex-col flex-grow">

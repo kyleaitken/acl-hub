@@ -28,7 +28,7 @@ export interface ExerciseStackItem {
   exerciseId?: number;
   customExercise?: boolean;
   programWorkoutExerciseId?: number; 
-  tempId?: number;
+  tempId?: string;
   videoUrl?: string;
 }
 

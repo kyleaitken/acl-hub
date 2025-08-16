@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { SetStateAction, useEffect, useRef, useState } from "react";
 import OpenInFullIcon from '@mui/icons-material/OpenInFull';
 import WorkoutFormExercise from "./WorkoutFormExercise";
 import WorkoutFormWarmupOrCooldown from "./WorkoutFormWarmupOrCooldown";
@@ -8,18 +8,20 @@ import { useCooldownsSearch } from "../../libraries/features/routines/hooks/useC
 import { useWarmupsActions } from "../../libraries/features/routines/hooks/useWarmupsActions";
 import { useCooldownsActions } from "../../libraries/features/routines/hooks/useCooldownsActions";
 import toast from "react-hot-toast";
-import { RawWorkoutData, WorkoutCardItem } from "../types/ui";
+import { ExerciseStackItem, RawWorkoutData, WorkoutCardItem } from "../types/ui";
 import { Exercise } from "../../libraries/features/exercises/types";
 import { mapWorkoutCardToRawFormData, updateRoutineData } from "../utils";
 import { workoutDataEqual } from "../utils/workoutDataEqual";
 import { useOutsideClickDismiss } from "../../core/hooks/useOutsideClickDismiss";
 import { ConfirmDeleteButton } from "../../core/components/ConfirmDeleteButton";
 import ConfirmModal from "../../core/components/ConfirmModal";
+import { dragAndDrop } from '@formkit/drag-and-drop/react';
 
 const initialExerciseStack = [{
   name: '',
   instructions: '',
   order: 'A',
+  _key: crypto.randomUUID()
 }];
 
 const initialRawData: RawWorkoutData = {
@@ -48,11 +50,14 @@ interface WorkoutFormProps {
 }
 
 const WorkoutForm = ({mode, stackIndex, existingCard, onCancel, onSave, isSaving, onDelete}: WorkoutFormProps) => {
-  const originalRef = useRef<RawWorkoutData>(
-    mode === 'edit' && existingCard
-      ? mapWorkoutCardToRawFormData(existingCard)
-      : initialRawData
-  )
+    
+  const originalRaw: RawWorkoutData =
+  mode === 'edit' && existingCard
+    ? mapWorkoutCardToRawFormData(existingCard)
+    : initialRawData;
+
+  const originalRef = useRef<RawWorkoutData>(originalRaw);
+
   const [rawData, setRawData] = useState<RawWorkoutData>(originalRef.current)
   const [hasChanges, setHasChanges] = useState(false);
   const [showConfirmCancel, setShowConfirmCancel] = useState(false);
@@ -135,7 +140,8 @@ const WorkoutForm = ({mode, stackIndex, existingCard, onCancel, onSave, isSaving
     const newItem = {
       name: '',
       instructions: '',
-      order: newOrder
+      order: newOrder,
+      tempId: crypto.randomUUID()
     }
 
     setRawData(prev => ({
@@ -281,6 +287,39 @@ const WorkoutForm = ({mode, stackIndex, existingCard, onCancel, onSave, isSaving
     isExercisesStackEmpty ||
     (mode === "edit" && !hasChanges)
 
+  
+  const listRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!listRef.current) return;
+  
+    dragAndDrop<HTMLDivElement, ExerciseStackItem>({
+      parent: listRef,  
+      state: [
+        rawData.exercisesStack,
+        (next: SetStateAction<ExerciseStackItem[]>) => {
+          setRawData(prev => {
+            const nextArray =
+              typeof next === 'function'
+                ? (next as (p: ExerciseStackItem[]) => ExerciseStackItem[])(prev.exercisesStack)
+                : next;
+  
+            return {
+              ...prev,
+              exercisesStack: relabel(nextArray),
+            };
+          });
+        },
+      ],  
+      dragHandle: ".exercise-drag-handle",
+      draggingClass: "border-1 bg-white py-2 opacity-70",
+      dragPlaceholderClass: "opacity-30",
+    });
+  }, [rawData.exercisesStack]);
+
+  const relabel = (items: ExerciseStackItem[]) =>
+    items.map((it, i) => ({ ...it, order: String.fromCharCode(65 + i) })); 
+
   return (
     <form
       className="mb-5 border-2 py-2 border-blue-500 shadow-md bg-white w-[350px]"
@@ -310,37 +349,39 @@ const WorkoutForm = ({mode, stackIndex, existingCard, onCancel, onSave, isSaving
         saveRoutineToLibrary={handleSaveRoutineToLibrary}
       />
 
-      <div className="divider my-4 w-full border-t border-gray-500" />
-      {rawData.exercisesStack.map((ex, i) => {
-        const stackLength = rawData.exercisesStack.length;
-        const isLast = i === stackLength - 1;
-        return (
-          <div key={i}>
-            <WorkoutFormExercise
-              exerciseItem={ex}
-              stackIndex={i}
-              stackSize={stackLength}
-              onAddLibraryExercise={handleAddLibraryExerciseToStack}
-              onNameChange={(name) => handleExerciseNameChange(i, name)}
-              onInstructionsChange={(inst) => handleExerciseInstructionsChange(i, inst)}
-              addNewlySavedExerciseToWorkout={handleSetNewlySavedExercise}
-              removeExerciseFromWorkout={handleRemoveExerciseFromWorkout}
-            />
-            <div className="relative">
-              <div className="divider w-full border-t border-gray-400 mb-2" />
-              {isLast && (
-                <button
-                  type="button"
-                  onClick={handleAddNewEmptyExerciseToStack}
-                  className="absolute left-1/2 -translate-x-1/2 -top-3 text-xs border-1 rounded-md cursor-pointer bg-white px-2 py-1"
-                >
-                  + Add Exercise
-                </button>
-              )}
+      <div className="divider my-4 w-full border-t border-gray-500"/>
+      <div ref={listRef}>
+        {rawData.exercisesStack.map((ex, i) => {
+          const stackLength = rawData.exercisesStack.length;
+          const isLast = i === stackLength - 1;
+          return (
+            <div key={ex.tempId ?? ex.programWorkoutExerciseId} className="exercise-row group select-none relative">
+              <WorkoutFormExercise
+                exerciseItem={ex}
+                stackIndex={i}
+                stackSize={stackLength}
+                onAddLibraryExercise={handleAddLibraryExerciseToStack}
+                onNameChange={(name) => handleExerciseNameChange(i, name)}
+                onInstructionsChange={(inst) => handleExerciseInstructionsChange(i, inst)}
+                addNewlySavedExerciseToWorkout={handleSetNewlySavedExercise}
+                removeExerciseFromWorkout={handleRemoveExerciseFromWorkout}
+              />
+              <div className="relative">
+                <div className="divider w-full border-t border-gray-400 mb-4" />
+                {isLast && (
+                  <button
+                    type="button"
+                    onClick={handleAddNewEmptyExerciseToStack}
+                    className="absolute left-1/2 -translate-x-1/2 -top-3 text-xs border-1 rounded-md cursor-pointer bg-white px-2 py-1"
+                  >
+                    + Add Exercise
+                  </button>
+                )}
+              </div>
             </div>
-          </div>
-        )
-      })}
+          )
+        })}
+      </div>
 
       <WorkoutFormWarmupOrCooldown
         type="cooldown"
@@ -387,7 +428,7 @@ const WorkoutForm = ({mode, stackIndex, existingCard, onCancel, onSave, isSaving
           >
             <ConfirmDeleteButton
               tooltipText="Delete workout"
-              confirmText="Delete workoutfrom the program?"
+              confirmText="Delete workout from the program?"
               onDeleteConfirmed={() => handleDeleteWorkoutClicked(existingCard.id)}
             />
           </div>

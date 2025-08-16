@@ -19,7 +19,7 @@ const ProgramDayHeader = ({label, isFirstDay, week, onPasteWorkouts, showPasteWo
 
   return (
     <div className="text-md bg-[#d0ccdb] font-semibold px-2 py-1 flex items-center justify-between min-h-9">
-      {isFirstDay &&
+      {isFirstDay ?
       <div className='flex items-center'>
         {!isEditingWorkout &&
         <ConfirmDeleteButton 
@@ -33,15 +33,15 @@ const ProgramDayHeader = ({label, isFirstDay, week, onPasteWorkouts, showPasteWo
         }
         <span>{isFirstDay && `Week ${week} `}</span>
       </div>
+      : <div></div>
       }
       <div className="flex items-center justify-center">
         {showPasteWorkouts &&
           <TooltipIconButton 
-            title="Paste workout(s)"
+            tooltipContent="Paste workout(s)"
             onClick={onPasteWorkouts}
             aria-label="Paste workouts to program"
             buttonClassName={"cursor-pointer pb-0.5 mr-2 disabled:opacity-50 disabled:cursor-not-allowed"}
-            placementOffset={[0, -75]}
           >
             <ContentPasteIcon 
               sx={{
@@ -54,12 +54,11 @@ const ProgramDayHeader = ({label, isFirstDay, week, onPasteWorkouts, showPasteWo
           </TooltipIconButton>
         } 
         <TooltipIconButton 
-          title="Add workout"
+          tooltipContent="Add workout"
           onClick={onAddWorkout}
           aria-label="Add workout to program"
           buttonClassName={"cursor-pointer pb-0.5 mr-2 disabled:opacity-50 disabled:cursor-not-allowed"}
           disabled={isEditingWorkout}
-          placementOffset={[0, -75]}
         >
           <AddCircleIcon 
             sx={{

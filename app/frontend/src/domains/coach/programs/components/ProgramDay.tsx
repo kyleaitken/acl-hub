@@ -56,14 +56,23 @@ const ProgramDay = ({
     onDrop,
   });
 
-  console.log(workouts)
-
+  const sortByOrder = <T extends { order?: string }>(a: T, b: T) =>
+    String(a.order ?? "").localeCompare(String(b.order ?? ""), undefined, {
+      sensitivity: "base",
+  });
+  
   useEffect(() => {
     // early return if editing, don't need to re-render the stack
     if (isEditingWorkout) {
       return;
     }
-    setStack(workouts.map(w => ({ __type: "card", ...w })));
+    setStack(
+      workouts.map(w => ({
+        __type: "card",
+        ...w,
+        program_workout_exercises: [...(w.program_workout_exercises ?? [])].sort(sortByOrder),
+      }))
+    );
   }, [workouts, isEditingWorkout]);
 
   const handleAddNewWorkout = () => {
@@ -124,6 +133,7 @@ const ProgramDay = ({
       console.error("Error occurred while deleting the workout");
     } finally {
       setStack(prev => prev.filter((_, i) => i !== stackIndex));
+      setIsEditingWorkout(false);
     }
   };
 
