@@ -29,6 +29,7 @@ const ProgramDayHeader = ({label, isFirstDay, week, onPasteWorkouts, showPasteWo
           iconSize={17}
           iconColor='black'
           buttonClassName='p-0 mr-1 pb-1'
+          dialogClassName='-left-10 font-normal'
         />
         }
         <span>{isFirstDay && `Week ${week} `}</span>
@@ -42,6 +43,7 @@ const ProgramDayHeader = ({label, isFirstDay, week, onPasteWorkouts, showPasteWo
             onClick={onPasteWorkouts}
             aria-label="Paste workouts to program"
             buttonClassName={"cursor-pointer pb-0.5 mr-2 disabled:opacity-50 disabled:cursor-not-allowed"}
+            placementOffset={5}
           >
             <ContentPasteIcon 
               sx={{
@@ -59,6 +61,7 @@ const ProgramDayHeader = ({label, isFirstDay, week, onPasteWorkouts, showPasteWo
           aria-label="Add workout to program"
           buttonClassName={"cursor-pointer pb-0.5 mr-2 disabled:opacity-50 disabled:cursor-not-allowed"}
           disabled={isEditingWorkout}
+          placementOffset={5}
         >
           <AddCircleIcon 
             sx={{

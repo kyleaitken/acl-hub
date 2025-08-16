@@ -78,7 +78,7 @@ export const ConfirmDeleteButton = forwardRef<
           place="top" 
           anchorSelect=".delete-anchor" 
           opacity={0.99} 
-          style={{backgroundColor: 'red', fontSize: 12}}
+          style={{backgroundColor: 'red', fontSize: 12, fontWeight: 'normal'}}
           delayShow={200}
           offset={tooltipOffset}
         >
@@ -90,7 +90,7 @@ export const ConfirmDeleteButton = forwardRef<
         <div
           ref={dialogRef}
           className={clsx(
-            "text-[12px] absolute bottom-full -left-40 mb-1 w-[240px] p-3 bg-white border rounded shadow-lg",
+            "text-[12px] absolute bottom-full mb-1 w-[240px] p-3 bg-white border rounded shadow-lg",
             dialogClassName
           )}
         >

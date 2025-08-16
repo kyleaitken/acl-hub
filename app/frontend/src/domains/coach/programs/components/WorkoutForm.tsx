@@ -457,6 +457,7 @@ const WorkoutForm = ({
               onDeleteConfirmed={() => handleDeleteWorkoutClicked(existingCard.id)}
               iconSize={20}
               buttonClassName="py-1"
+              dialogClassName="-left-40"
             />
           </div>
         }
