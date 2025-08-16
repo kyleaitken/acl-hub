@@ -57,8 +57,8 @@ const CoachHomePage = () => {
         id="today-workouts-container"
         className="sticky top-0 max-h-screen px-8 py-10"
       >
-        <p className="text-md">{dayOfWeek}</p>
-        <p className="mb-4 text-[24px] leading-[1.1] font-bold">
+        <p className="text-sm">{dayOfWeek}</p>
+        <p className="mb-4 text-lg leading-[1.1] font-bold">
           {month} {dayOfMonth}
           {daySuffix}
         </p>
@@ -74,7 +74,7 @@ const CoachHomePage = () => {
             ) : (
               <ExpandLessIcon sx={{ pb: '1px', mr: '5px' }} />
             )}
-            <p className="mr-6 font-medium hover:underline">Today's Workouts</p>
+            <p className="mr-3 font-medium text-sm hover:underline">Today's Workouts</p>
           </div>
           <div className="rounded-lg bg-[var(--button-highlight)] px-2.5 py-0.5">
             <p className="text-sm font-medium">{todayWorkouts?.length ?? 0}</p>
@@ -118,7 +118,7 @@ const CoachHomePage = () => {
           id="workouts"
           className="pt-[30px] pb-[40px]"
         >
-          <p className="mt-2 mb-8 text-2xl font-bold self-start">
+          <p className="mt-2 mb-8 text-xl font-bold self-start">
             Good {timeOfDay},{' '}
             {firstName.charAt(0).toUpperCase() + firstName.slice(1)}!
           </p>
