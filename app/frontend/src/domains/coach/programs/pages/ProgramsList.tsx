@@ -231,19 +231,19 @@ const ProgramsList = () => {
           message={error}
         />
         <div id="programs-header" className="flex w-full items-center">
-          <p className="flex-grow text-2xl font-bold">Programs</p>
+          <p className="flex-grow text-xl font-semibold">Programs</p>
           <div>
             <button
               onClick={() => handleStartCreateProgram()}
               type="button"
-              className="h-[45px] w-[170px] rounded-md bg-[var(--blue-button)] px-3 py-2 text-white cursor-pointer"
+              className="text-sm h-[40px] w-[170px] rounded-md bg-[var(--blue-button)] px-3 py-2 text-white cursor-pointer"
             >
               + Create Program
             </button>
             <button
               type="button"
               style={{ cursor: 'pointer' }}
-              className="ml-5 h-[45px] w-[170px] cursor-pointer rounded-md border bg-white px-3 py-2"
+              className="text-sm ml-5 h-[40px] w-[170px] cursor-pointer rounded-md border bg-white px-3 py-2"
               onClick={() => setTagManagerOpen(true)}
             >
               Manage Tags
@@ -263,7 +263,7 @@ const ProgramsList = () => {
             startAdornment={
               <InputAdornment position="start">
                 <SearchIcon
-                  sx={(theme) => ({ color: theme.palette.grey[400] })}
+                  sx={(theme) => ({ color: theme.palette.grey[400], fontSize: 20 })}
                 />
               </InputAdornment>
             }
@@ -273,17 +273,18 @@ const ProgramsList = () => {
               backgroundColor: 'white',
               height: '45px',
               flexGrow: 1,
-              borderRadius: 1
+              borderRadius: 1,
+              fontSize: 14
             }}
           ></Input>
         </div>
         <div className="programs-list-wrapper mt-7 flex w-full flex-col">
           <div
             id="programs-list-header"
-            className="flex h-12 w-full items-center rounded-tl-md rounded-tr-md bg-[#D8D8E0]"
+            className="text-[14px] font-semibold flex h-12 w-full items-center rounded-tl-md rounded-tr-md bg-[#D8D8E0]"
           >
-            <p className="mr-10 ml-6 font-bold">Weeks</p>
-            <p className="font-bold">Name</p>
+            <p className="mr-10 ml-6">Weeks</p>
+            <p>Name</p>
           </div>
           {programsToDisplay.map((program) => (
             <ProgramListItem
@@ -305,16 +306,16 @@ const ProgramsList = () => {
           MenuListProps={{ 'aria-labelledby': 'basic-button' }}
           sx={{rounded: 1, mt: 0.5}}
         >
-          <MenuItem onClick={() => handleStartEditProgram()}>
-            <EditIcon sx={{mr: 2}}/>
+          <MenuItem onClick={() => handleStartEditProgram()} sx={{fontSize: 14}}>
+            <EditIcon sx={{mr: 2, fontSize: 20}}/>
             Edit program
           </MenuItem>
-          <MenuItem onClick={() => handleDuplicateProgram()}>
-            <ContentCopyIcon sx={{mr: 2}}/>
+          <MenuItem onClick={() => handleDuplicateProgram()} sx={{fontSize: 14}}>
+            <ContentCopyIcon sx={{mr: 2, fontSize: 20}}/>
             Duplicate program
           </MenuItem>
-          <MenuItem onClick={() => handleDeleteProgram()} sx={{ color: 'red' }}>
-            <DeleteIcon sx={{mr: 2}}/>
+          <MenuItem onClick={() => handleDeleteProgram()} sx={{ color: 'red', fontSize: 14}}>
+            <DeleteIcon sx={{mr: 2, fontSize: 20}}/>
             Delete program
           </MenuItem>
         </Menu>

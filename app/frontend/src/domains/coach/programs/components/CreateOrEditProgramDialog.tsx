@@ -44,14 +44,14 @@ const CreateOrEditProgramDialog = ({
     <Dialog 
       open={open} 
       fullWidth 
-      maxWidth="lg" 
+      maxWidth="md" 
       onClose={closeDialog} 
       sx={{ml: '200px'}}
       TransitionProps={{
         onExited: onExited
       }}
     >
-      <DialogTitle sx={{ fontWeight: 600, fontSize: '22px' }}>
+      <DialogTitle sx={{ fontWeight: 600, fontSize: '18px' }}>
         {initialValues ? 'Edit program' : 'Create new program'}
       </DialogTitle>
       <form
@@ -62,35 +62,35 @@ const CreateOrEditProgramDialog = ({
           closeDialog();
         }}
       >
-        <p className="font-bold">Program name</p>
+        <p className="text-[14px] font-semibold">Program name</p>
         <input
           placeholder="Enter a name"
           required
           type="text"
           onChange={(e) => setProgramName(e.target.value)}
           value={programName}
-          className="mb-5 min-h-[45px] w-[90%] border p-2 pl-3 rounded-sm"
+          className="text-sm mb-5 min-h-[40px] w-[90%] border p-2 pl-3 rounded-sm"
         />
-        <p className="font-bold">{'Program length (weeks)'}</p>
+        <p className="text-[14px] font-semibold">{'Program length (weeks)'}</p>
         <input
           placeholder="Enter the number of weeks"
           type="number"
           required
           onChange={(e) => setProgramWeeks(e.target.value)}
           value={programWeeks}
-          className="mb-5 min-h-[45px] w-[90%] border p-2 pl-3 rounded-sm"
+          className="text-sm mb-5 min-h-[40px] w-[90%] border p-2 pl-3 rounded-sm"
         />
-        <p className="font-bold">Program description (optional)</p>
+        <p className="text-[14px] font-semibold">Program description (optional)</p>
         <textarea
           placeholder="Enter a description"
           onChange={(e) => setProgramDescription(e.target.value)}
           value={programDescription}
-          className="min-h-[45px] w-[90%] border p-2 pl-3 rounded-sm"
+          className="text-sm min-h-[40px] w-[90%] border p-2 pl-3 rounded-sm"
         />
         <div className="mt-5">
           <button
             type="submit"
-            className="mr-5 h-[40px] w-[150px] rounded-md border bg-[var(--blue-button)] px-3 py-2 text-white cursor-pointer"
+            className="text-sm mr-5 h-[40px] w-[150px] rounded-md border bg-[var(--blue-button)] px-3 py-2 text-white cursor-pointer"
           >
             Save Program
           </button>
@@ -99,7 +99,7 @@ const CreateOrEditProgramDialog = ({
               closeDialog();
             }}
             type="button"
-            className="mr-10 h-[40px] w-[110px] rounded-md border bg-red-500 px-3 py-2 text-white cursor-pointer"
+            className="text-sm mr-10 h-[40px] w-[110px] rounded-md border bg-red-500 px-3 py-2 text-white cursor-pointer"
           >
             Cancel
           </button>
