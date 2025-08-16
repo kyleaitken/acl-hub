@@ -119,7 +119,7 @@ const WorkoutCard = ({
         <Checkbox 
           checked={isSelected}
           disableRipple 
-          size="large" 
+          size="medium" 
           sx={{p:0, pb: 1, pr: 0.5}} 
           onClick={(e) => {
             e.stopPropagation();
@@ -127,7 +127,7 @@ const WorkoutCard = ({
             onSelect(workout.id, e.shiftKey, clickedPosition);
           }}
         />
-        <span className="text-[17px] font-semibold flex-grow mr-3">{workout.name || `Workout`}</span>
+        <span className="text-[15px] font-semibold flex-grow mr-3">{workout.name || `Workout`}</span>
         <div className="copy-and-move-buttons flex items-center">
           <TooltipIconButton
             tooltipContent="Copy workout"
@@ -139,7 +139,7 @@ const WorkoutCard = ({
             buttonClassName="cursor-pointer"
             aria-label="Copy workout"
           >
-            <ContentCopyIcon sx={{fontSize: 22}}/>
+            <ContentCopyIcon sx={{fontSize: 18}}/>
           </TooltipIconButton>
           <button 
             ref={handleRef} 
@@ -147,17 +147,29 @@ const WorkoutCard = ({
             aria-label="move workout"
             className={`ml-1 ${canDrag ? 'cursor-move' : 'cursor-not-allowed opacity-50'}`}
           >
-            <OpenWithIcon sx={{ fontSize: 22 }} />
+            <OpenWithIcon sx={{ fontSize: 18 }} />
           </button>
         </div>
       </div>
 
       {workout.warmup?.instructions && 
         <div className="flex flex-col px-2">
-          <div className="text-xs text-gray-600 whitespace-pre-line">
+          <div 
+            className="text-[10px] text-gray-600"
+            style={{
+              display: "-webkit-box",
+              WebkitLineClamp: 3,
+              WebkitBoxOrient: "vertical" as const,
+              overflow: "hidden",
+              wordBreak: "break-word",
+              whiteSpace: "pre-line"
+            }}
+          >
             {workout.warmup.instructions}
           </div>
-          <div className="divider mt-1 w-full border-t border-gray-400" />
+          <div 
+            className="divider mt-1 w-full border-t border-gray-400" 
+          />
         </div>
       }
 
@@ -173,10 +185,10 @@ const WorkoutCard = ({
                 onEditWorkout(index, idx); // tells form to focus exercise idx
               }}
             >
-              <div className="exercise-title font-semibold">
+              <div className="exercise-title text-[13px] font-semibold">
                 {`${ex.order}) ${ex.exercise.name}`}
               </div>
-              <p className="text-sm text-gray-600">
+              <p className="text-xs text-gray-600">
                 {ex.instructions}
               </p>
             </button>
@@ -187,7 +199,17 @@ const WorkoutCard = ({
       {workout.cooldown?.instructions && 
         <div className="flex flex-col px-2 pb-8">
           <div className="divider mb-1 w-full border-t border-gray-400" />
-          <div className="text-xs text-gray-600 whitespace-pre-line">
+          <div 
+            className="text-[10px] text-gray-600"
+            style={{
+              display: "-webkit-box",
+              WebkitLineClamp: 3,
+              WebkitBoxOrient: "vertical" as const,
+              overflow: "hidden",
+              wordBreak: "break-word",
+              whiteSpace: "pre-line"
+            }}
+          >
             {workout.cooldown.instructions}
           </div>
         </div>

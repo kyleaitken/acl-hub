@@ -18,7 +18,7 @@ const ProgramDayHeader = ({label, isFirstDay, week, onPasteWorkouts, showPasteWo
   const { isEditingWorkout } = useProgramData();
 
   return (
-    <div className="text-md bg-[#d0ccdb] font-semibold px-2 py-1 flex items-center justify-between min-h-9">
+    <div className="text-[13px] bg-[#d0ccdb] font-semibold px-2 py-1 flex items-center justify-between min-h-9">
       {isFirstDay ?
       <div className='flex items-center'>
         {!isEditingWorkout &&
@@ -26,9 +26,9 @@ const ProgramDayHeader = ({label, isFirstDay, week, onPasteWorkouts, showPasteWo
           onDeleteConfirmed={() => onDeleteWeek()}
           tooltipText='Delete week'
           confirmText='Delete this week and its workouts?'
-          iconSize={20}
+          iconSize={17}
           iconColor='black'
-          buttonClassName='p-0 mr-2 pb-1'
+          buttonClassName='p-0 mr-1 pb-1'
         />
         }
         <span>{isFirstDay && `Week ${week} `}</span>
@@ -45,7 +45,7 @@ const ProgramDayHeader = ({label, isFirstDay, week, onPasteWorkouts, showPasteWo
           >
             <ContentPasteIcon 
               sx={{
-                fontSize: '18px',
+                fontSize: 16,
                 "&:hover": {
                   color: "#757575" 
                 }
@@ -62,7 +62,7 @@ const ProgramDayHeader = ({label, isFirstDay, week, onPasteWorkouts, showPasteWo
         >
           <AddCircleIcon 
             sx={{
-              fontSize: '20px',
+              fontSize: 16,
               "&:hover": {
                 color: "#757575" 
               }

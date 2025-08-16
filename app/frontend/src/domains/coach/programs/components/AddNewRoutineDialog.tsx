@@ -19,7 +19,7 @@ const AddNewRoutineDialog = ({anchorRect, handleDismiss, handleSave}: AddNewRout
   return (
     <div
       ref={dialogRef}
-      className="fixed flex px-5 py-4 flex-col z-[100] border rounded bg-white shadow-lg"
+      className="fixed flex px-5 pb-4 pt-2 flex-col z-[100] border rounded bg-white shadow-lg"
       style={{
         top: anchorRect.bottom + window.scrollY + 4,
         left: anchorRect.left + window.scrollX,
@@ -35,7 +35,7 @@ const AddNewRoutineDialog = ({anchorRect, handleDismiss, handleSave}: AddNewRout
           id="routineName"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="outline-[1.5px] outline-gray-300 rounded hover:outline-gray-700 pl-2 py-1 focus:outline-2 focus:outline-blue-500 focus:shadow-[0_0_6px_2px_rgba(59,130,246,0.5)]"
+          className="text-sm outline-[1.5px] outline-gray-300 rounded hover:outline-gray-700 pl-2 py-1 focus:outline-2 focus:outline-blue-500 focus:shadow-[0_0_6px_2px_rgba(59,130,246,0.5)]"
         />
       </div>
       <div className="flex mt-3">

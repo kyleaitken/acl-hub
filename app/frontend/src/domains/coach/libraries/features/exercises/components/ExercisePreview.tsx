@@ -35,7 +35,7 @@ const ExercisePreview = ({anchorRect, name, url, exerciseId, handleDismissPrevie
         height: 300,
       }}
     >
-      <p className='font-bold text-lg'>{name}</p>
+      <p className='font-bold text-md'>{name}</p>
       <iframe
         title="Exercise Video Preview"
         src={url}

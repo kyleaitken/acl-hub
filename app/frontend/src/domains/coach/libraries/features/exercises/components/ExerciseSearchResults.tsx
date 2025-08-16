@@ -20,7 +20,7 @@ const ExerciseSearchResults = ({searchResults, searchString, handleAddExercise, 
 
   return (
     <div className="absolute top-full -translate-y-5 left-0 right-0 flex flex-col z-50 pointer-events-none">
-      <div className="flex justify-center self-end bg-black text-white text-xs px-2 py-1 rounded-md w-[100px] pointer-events-none">
+      <div className="flex justify-center self-end bg-black text-white text-[10px] px-2 py-1 rounded-md w-[100px] pointer-events-none">
         esc to close
       </div>
       <div className="shadow-md max-h-60 border rounded overflow-y-auto bg-white pointer-events-auto" >
@@ -28,7 +28,7 @@ const ExerciseSearchResults = ({searchResults, searchString, handleAddExercise, 
           searchResults.map((exercise) => (
             <div
               key={exercise.id}
-              className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm"
+              className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-xs"
               onClick={() => {
                 handleAddExercise(exercise)
               }}

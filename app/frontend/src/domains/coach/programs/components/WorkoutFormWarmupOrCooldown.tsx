@@ -100,7 +100,7 @@ const WorkoutFormWarmupOrCooldown = ({type,
             setShowSaveNewRoutine(true);
             onChange(type, e.target.value);
           }}
-          className="text-sm border-0 outline-none w-full resize-none"
+          className="text-[11px] border-0 outline-none w-full resize-none"
         />
 
         {showSaveNewRoutine && instructions.length > 1 &&
@@ -110,9 +110,9 @@ const WorkoutFormWarmupOrCooldown = ({type,
             onClick={() => setShowSaveRoutineeDialog(true)}
             aria-label={`Save ${type}`}
             buttonClassName={"cursor-pointer"}
-            tooltipPosition="bottom"
+            tooltipPosition="top"
           >
-            <BookmarkIcon sx={{fontSize: 20, ml: 1, color: '#5e748b'}}/>
+            <BookmarkIcon sx={{fontSize: 18, color: '#5e748b'}}/>
           </TooltipIconButton>  
         </div>
         }
@@ -160,7 +160,7 @@ const WorkoutFormWarmupOrCooldown = ({type,
             <div className="divider my-2 w-full border-t border-gray-500" />
             <input
               placeholder="Link demo video"
-              className="text-sm outline-none w-full pr-6"
+              className="text-[11px] outline-none w-full pr-6"
               value={exerciseSearchString}
               onChange={e => {
                 setIsSearchingExercises(true);

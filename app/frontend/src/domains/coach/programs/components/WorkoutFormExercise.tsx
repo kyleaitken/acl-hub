@@ -82,7 +82,7 @@ const WorkoutFormExercise = forwardRef<HTMLTextAreaElement | null, WorkoutFormEx
   return (
     <div className="flex flex-col px-3">
       <div
-        className="absolute -left-7 -top-4 z-10 flex flex-col space-y-1
+        className="absolute -left-7 -top-2 z-10 flex flex-col space-y-0
                   bg-[#242526]/90 px-2 py-1 rounded-xl
                   opacity-0 group-hover:opacity-100 transition-opacity"
         hidden={stackSize === 1}
@@ -93,21 +93,21 @@ const WorkoutFormExercise = forwardRef<HTMLTextAreaElement | null, WorkoutFormEx
             className="pointer-events-none"
             aria-label="Drag to reorder"
           >
-            <OpenWithIcon sx={{ color: 'white', fontSize: 20 }} />
+            <OpenWithIcon sx={{ color: 'white', fontSize: 18 }} />
           </button>
         </div>
         <ConfirmDeleteButton
           tooltipText="Delete workout item"
           confirmText="Delete this workout item?"
           onDeleteConfirmed={() => removeExerciseFromWorkout(stackIndex)}
-          iconSize={20}
+          iconSize={18}
           iconColor="white"
           buttonClassName="p-0"
           tooltipOffset={10}
         />
       </div>
       <div ref={searchRef} className="flex relative">
-        <div className="flex items-center text-[15px] flex-1">
+        <div className="flex items-center text-[13px] flex-1 mr-1">
           <span className="font-semibold mr-1">{`${exerciseItem.order})`}</span>
           <input
             ref={titleInputRef}
@@ -140,11 +140,12 @@ const WorkoutFormExercise = forwardRef<HTMLTextAreaElement | null, WorkoutFormEx
             onClick={() => setShowPreview(true)}
             aria-label="Show exercise preview"
             buttonClassName="p-0 cursor-pointer"
+            placementOffset={0}
           >
-            <VideocamIcon sx={{ fontSize: 24}} />
+            <VideocamIcon sx={{ fontSize: 20}} />
           </TooltipIconButton>
         </div>
-        : (!exerciseItem.exerciseId && searchResults.length === 0 && exerciseItem.name.length > 2) ?
+        : (!exerciseItem.exerciseId && exerciseItem.name.length > 2) ?
         <div
           ref={buttonRef}
         >
@@ -153,8 +154,9 @@ const WorkoutFormExercise = forwardRef<HTMLTextAreaElement | null, WorkoutFormEx
             onClick={() => setShowSaveExerciseDialog(true)}
             aria-label="Create new library exercise"
             buttonClassName={"cursor-pointer p-0"}
+            placementOffset={0}
           >
-            <VideoCallIcon sx={{ fontSize: 26, color: '#5e748b'}} />
+            <VideoCallIcon sx={{ fontSize: 22, color: '#5e748b'}} />
           </TooltipIconButton>
         </div>
         : <></>
@@ -187,7 +189,7 @@ const WorkoutFormExercise = forwardRef<HTMLTextAreaElement | null, WorkoutFormEx
           placeholder="Sets Reps Tempo Rest etc"
           value={exerciseItem.instructions}
           onChange={(e) => onInstructionsChange(e.target.value)}
-          className="text-sm border-0 outline-none w-full resize-none my-2"
+          className="text-[11px] border-0 outline-none w-full resize-none my-1"
         />
       </div>
     </div>

@@ -346,7 +346,7 @@ const WorkoutForm = ({
 
   return (
     <form
-      className="mb-5 border-2 py-2 border-blue-500 shadow-md bg-white w-[350px]"
+      className="mb-5 border-2 py-2 border-blue-500 shadow-md bg-white w-[280px]"
       ref={formRef}
     >
       <div id="workout-form-header" className="flex items-center mb-3 px-3">
@@ -356,9 +356,9 @@ const WorkoutForm = ({
           placeholder="Name (optional)"
           value={rawData.name}
           onChange={(e) => setRawData(prev => ({...prev, name: e.target.value}))}
-          className="outline-none font-semibold flex-1"
+          className="text-[14px] outline-none font-semibold flex-1"
         />
-        <button><OpenInFullIcon/></button>
+        <button type="button" className="cursor-pointer"><OpenInFullIcon sx={{fontSize: 18}}/></button>
       </div>
 
       <WorkoutFormWarmupOrCooldown
@@ -373,7 +373,7 @@ const WorkoutForm = ({
         saveRoutineToLibrary={handleSaveRoutineToLibrary}
       />
 
-      <div className="divider my-4 w-full border-t border-gray-500"/>
+      <div className="divider my-2 w-full border-t border-gray-500"/>
       <div ref={listRef}>
         {rawData.exercisesStack.map((ex, i) => {
           const stackLength = rawData.exercisesStack.length;
@@ -392,12 +392,12 @@ const WorkoutForm = ({
                 removeExerciseFromWorkout={handleRemoveExerciseFromWorkout}
               />
               <div className="relative">
-                <div className="divider w-full border-t border-gray-400 mb-4" />
+                <div className="divider w-full border-t border-gray-400 mb-2" />
                 {isLast && (
                   <button
                     type="button"
                     onClick={handleAddNewEmptyExerciseToStack}
-                    className="absolute left-1/2 -translate-x-1/2 -top-3 text-xs border-1 rounded-md cursor-pointer bg-white px-2 py-1"
+                    className="text-[10px] absolute left-1/2 -translate-x-1/2 -top-2 border-1 rounded-md cursor-pointer bg-white px-1 py-1 hover:bg-gray-100"
                   >
                     + Add Exercise
                   </button>
@@ -427,7 +427,7 @@ const WorkoutForm = ({
         <div className="flex flex-1">
           <button
             type="button"
-            className="rounded bg-[var(--blue-button)] text-white text-sm px-2 py-1 cursor-pointer mr-2 hover:bg-blue-800
+            className="text-xs rounded bg-[var(--blue-button)] text-white px-2 py-1 cursor-pointer mr-2 hover:bg-blue-800
               disabled:opacity-50 
               disabled:cursor-not-allowed 
             "
@@ -438,7 +438,7 @@ const WorkoutForm = ({
           </button>
           <button
             type="button"
-            className="rounded bg-white text-sm px-2 py-1 cursor-pointer mr-2 hover:bg-gray-200"
+            className="text-xs rounded bg-white px-2 py-1 cursor-pointer mr-2 hover:bg-gray-200"
             onClick={() => {
               (!isSaveDisabled) ? setShowConfirmCancel(true) : onCancel(stackIndex)
             }}
@@ -455,6 +455,8 @@ const WorkoutForm = ({
               tooltipText="Delete workout"
               confirmText="Delete workout from the program?"
               onDeleteConfirmed={() => handleDeleteWorkoutClicked(existingCard.id)}
+              iconSize={20}
+              buttonClassName="py-1"
             />
           </div>
         }

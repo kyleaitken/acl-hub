@@ -41,7 +41,7 @@ export default function TooltipIconButton({
       >
         {children}
       </button>
-      <Tooltip id={tooltipId} style={{fontWeight: "normal", backgroundColor: 'black', opacity: 0.99, zIndex: 20000}}/>
+      <Tooltip id={tooltipId} style={{fontSize: 12, fontWeight: "normal", backgroundColor: 'black', opacity: 0.99, zIndex: 20000}}/>
     </>
   );
 }

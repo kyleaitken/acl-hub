@@ -58,17 +58,17 @@ const SelectedWorkoutsFooter = ({
             disableFocusRipple 
             disableTouchRipple 
             disabled={selectAllSelected}
-            size="large" 
+            size="medium" 
             id="select-all-workouts-checkbox"
             onChange={() => handleToggleSelect()}
           />
         </Tooltip>
-        <div className="ml-5">
-          <span className="bg-blue-400 text-white py-1 px-3 rounded-lg mr-2 font-bold">{numSelected}</span>
-          <span className="font-semibold text-md">WORKOUTS SELECTED</span>
+        <div className="ml-3">
+          <span className="text-sm bg-blue-400 text-white py-1 px-3 rounded-lg mr-2 font-bold">{numSelected}</span>
+          <span className="font-semibold text-sm">WORKOUTS SELECTED</span>
         </div>
         <button 
-          className="hover:underline cursor-pointer text-sm text-blue-800 ml-5"
+          className="hover:underline cursor-pointer text-xs text-blue-800 ml-5"
           onClick={() => setSelectedWorkoutIds([])}
         >
           Clear Selection
@@ -83,7 +83,7 @@ const SelectedWorkoutsFooter = ({
           buttonClassName={"cursor-pointer mr-3"}
           tooltipPosition="top"
         >
-          <PeopleIcon sx={{fontSize: '28px'}}/>
+          <PeopleIcon sx={{fontSize: 22}}/>
         </TooltipIconButton>
         }
 
@@ -97,7 +97,7 @@ const SelectedWorkoutsFooter = ({
           buttonClassName={"cursor-pointer mx-3"}
           tooltipPosition="top"
         >
-          <ContentCopyIcon sx={{fontSize: '28px'}}/>
+          <ContentCopyIcon sx={{fontSize: 20}}/>
         </TooltipIconButton>
       
         <div
@@ -108,6 +108,8 @@ const SelectedWorkoutsFooter = ({
             tooltipText="Delete workouts"
             confirmText={deleteString}
             onDeleteConfirmed={handleDeleteWorkoutsClicked}
+            iconSize={22}
+            tooltipOffset={0}
           />
         </div>
       </div>
