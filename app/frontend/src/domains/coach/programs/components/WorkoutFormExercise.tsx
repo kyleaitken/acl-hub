@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, forwardRef, useState, useImperativeHandle } from "react";
 import ExerciseSearchResults from "../../libraries/features/exercises/components/ExerciseSearchResults";
 import { useExerciseSearch } from "../../libraries/features/exercises/hooks/useExerciseSearch";
 import { useOutsideClickDismiss } from "../../core/hooks/useOutsideClickDismiss";
@@ -26,21 +26,24 @@ interface WorkoutFormExerciseProps {
   removeExerciseFromWorkout: (index: number) => void;
 }
 
-const WorkoutFormExercise = ({
-  stackIndex,
-  stackSize,
-  exerciseItem, 
-  onAddLibraryExercise, 
-  onNameChange,
-  onInstructionsChange,
-  addNewlySavedExerciseToWorkout,
-  removeExerciseFromWorkout,
-}: WorkoutFormExerciseProps) => {
+const WorkoutFormExercise = forwardRef<HTMLTextAreaElement | null, WorkoutFormExerciseProps>(
+  (props, ref) => {
+    const {
+      stackIndex,
+      stackSize,
+      exerciseItem,
+      onAddLibraryExercise,
+      onNameChange,
+      onInstructionsChange,
+      addNewlySavedExerciseToWorkout,
+      removeExerciseFromWorkout,
+    } = props;
+    
   const [isSearching, setIsSearching] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const [showSaveExerciseDialog, setShowSaveExerciseDialog] = useState(false);
 
-  const searchRef = useRef<HTMLInputElement>(null);
+  const searchRef = useRef<HTMLDivElement | null>(null);
   const titleInputRef = useRef<HTMLInputElement>(null);
   const instrRef      = useRef<HTMLTextAreaElement>(null);
   const buttonRef = useRef<HTMLDivElement>(null);
@@ -71,6 +74,8 @@ const WorkoutFormExercise = ({
     titleInputRef.current?.blur();
     instrRef.current?.focus();
   };  
+
+  useImperativeHandle<HTMLTextAreaElement, HTMLTextAreaElement>(ref, () => instrRef.current!, []);
 
   const anchorRect = buttonRef.current ? buttonRef.current.getBoundingClientRect() : null;
 
@@ -187,7 +192,7 @@ const WorkoutFormExercise = ({
       </div>
     </div>
   )
-};
+});
 
 export default WorkoutFormExercise;
 

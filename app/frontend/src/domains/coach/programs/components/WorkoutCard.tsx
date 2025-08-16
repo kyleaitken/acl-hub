@@ -35,7 +35,7 @@ interface ProgramWorkoutCardProps {
   ) => void;
   onDrop: () => void;
   onSelect: (workoutId: number, shiftKey: boolean, clickedPosition: number) => void;
-  onEditWorkout: (index: number) => void;
+  onEditWorkout: (index: number, exerciseIndex?: number) => void;
 }
 
 const WorkoutCard = ({
@@ -50,7 +50,7 @@ const WorkoutCard = ({
   onSelect,
   onEditWorkout
 }: ProgramWorkoutCardProps) => {
-  const cardRef = useRef<HTMLDivElement>(null);
+  const cardRef = useRef<HTMLButtonElement>(null);
   const handleRef = useRef<HTMLButtonElement>(null);
 
   const { setCopiedWorkoutIds } = useProgramStoreActions();
@@ -109,10 +109,10 @@ const WorkoutCard = ({
   }
 
   return (
-    <div
+    <button
       ref={cardRef}
       style={{ opacity: isDragging ? 0.5 : 1 }}
-      className={`border-b py-1 bg-white cursor-pointer pb-0 ${isLastWorkout ? 'flex-grow border-b-0' : ''}`}
+      className={`text-start border-b py-1 bg-white cursor-pointer pb-0 ${isLastWorkout ? 'border-b-0' : ''}`}
       onClick={() => onEditWorkout(index)}
     >
       <div className="workout-card-header flex items-start mt-1 mb-2 mx-1">
@@ -127,7 +127,7 @@ const WorkoutCard = ({
             onSelect(workout.id, e.shiftKey, clickedPosition);
           }}
         />
-        <span className="text-[17px] font-semibold flex-grow mr-4">{workout.name || `Workout`}</span>
+        <span className="text-[17px] font-semibold flex-grow mr-3">{workout.name || `Workout`}</span>
         <div className="copy-and-move-buttons flex items-center">
           <TooltipIconButton
             tooltipContent="Copy workout"
@@ -164,14 +164,22 @@ const WorkoutCard = ({
       {workout.program_workout_exercises?.length > 0 && (
         <div>
           {workout.program_workout_exercises.map((ex, idx) => (
-            <div key={ex.id ?? idx} className="flex flex-col py-2 px-2 min-h-15 hover:bg-gray-200">
+            <button 
+              type="button"
+              key={ex.id ?? idx} 
+              className="text-start w-full flex flex-col py-2 px-2 min-h-15 hover:bg-gray-200"
+              onClick={(e) => {
+                e.stopPropagation();
+                onEditWorkout(index, idx); // tells form to focus exercise idx
+              }}
+            >
               <div className="exercise-title font-semibold">
                 {`${ex.order}) ${ex.exercise.name}`}
               </div>
               <p className="text-sm text-gray-600">
                 {ex.instructions}
               </p>
-            </div>
+            </button>
           ))}
         </div>
       )}
@@ -184,7 +192,7 @@ const WorkoutCard = ({
           </div>
         </div>
       }
-    </div>
+    </button>
   );
 };
 

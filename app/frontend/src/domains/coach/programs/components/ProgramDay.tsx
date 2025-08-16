@@ -94,7 +94,7 @@ const ProgramDay = ({
     ]);
   };
 
-  const handleEditWorkout = (index: number) => {
+  const handleEditWorkout = (index: number, exerciseIndex?: number) => {
     const card = stack[index];
     if (!isCardItem(card) || isEditingWorkout) return;
     setIsEditingWorkout(true);
@@ -103,6 +103,7 @@ const ProgramDay = ({
       __type: "form",
       mode: "edit",
       existingCard: card,
+      focusExerciseIndex: exerciseIndex ?? null
     }
 
     setStack(s => s.map((w,i) => i === index ? editForm : w));
@@ -178,6 +179,7 @@ const ProgramDay = ({
                 mode="edit"
                 stackIndex={i}
                 existingCard={w.existingCard}
+                focusExerciseIndex={w.focusExerciseIndex}
                 onCancel={handleCancelCreateOrEditWorkout}
                 onSave={submitWorkoutEdits} 
                 isSaving={isSaving}
@@ -206,7 +208,7 @@ const ProgramDay = ({
 
         <div
           ref={dropPlaceholder}
-          style={{ height: 50 }}
+          style={{ height: stack.length === 0 ? "50%" : 50 }}
           className="mt-2"
         />
       </div>

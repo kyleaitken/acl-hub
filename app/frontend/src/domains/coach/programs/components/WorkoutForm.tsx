@@ -43,13 +43,22 @@ interface WorkoutFormProps {
   mode: "create" | "edit";
   stackIndex: number;
   existingCard?: WorkoutCardItem;
+  focusExerciseIndex?: number | null;
   onCancel: (index: number) => void;
   onSave: (raw: RawWorkoutData) => void;
   isSaving: boolean;
   onDelete?: (id: number, index: number) => void;
 }
 
-const WorkoutForm = ({mode, stackIndex, existingCard, onCancel, onSave, isSaving, onDelete}: WorkoutFormProps) => {
+const WorkoutForm = ({
+  mode, 
+  stackIndex, 
+  existingCard, 
+  focusExerciseIndex, 
+  isSaving,
+  onCancel, 
+  onSave, 
+  onDelete}: WorkoutFormProps) => {
     
   const originalRaw: RawWorkoutData =
   mode === 'edit' && existingCard
@@ -70,6 +79,7 @@ const WorkoutForm = ({mode, stackIndex, existingCard, onCancel, onSave, isSaving
   const titleRef = useRef<HTMLInputElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
   const deleteButtonRef = useRef<HTMLDivElement>(null);
+  const exerciseRefs = useRef<Array<HTMLTextAreaElement | null>>([]);
 
   useOutsideClickDismiss([formRef], () => {
     if (isSaveDisabled) {
@@ -320,6 +330,20 @@ const WorkoutForm = ({mode, stackIndex, existingCard, onCancel, onSave, isSaving
   const relabel = (items: ExerciseStackItem[]) =>
     items.map((it, i) => ({ ...it, order: String.fromCharCode(65 + i) })); 
 
+  useEffect(() => {
+    if (focusExerciseIndex != null) {
+      const el = exerciseRefs.current[focusExerciseIndex];
+      if (el) {
+        el.focus();
+        const len = el.value.length;
+        el.setSelectionRange(len, len);
+      }
+
+    } else {
+      titleRef.current?.focus();
+    }
+  }, [focusExerciseIndex]);
+
   return (
     <form
       className="mb-5 border-2 py-2 border-blue-500 shadow-md bg-white w-[350px]"
@@ -357,6 +381,7 @@ const WorkoutForm = ({mode, stackIndex, existingCard, onCancel, onSave, isSaving
           return (
             <div key={ex.tempId ?? ex.programWorkoutExerciseId} className="exercise-row group select-none relative">
               <WorkoutFormExercise
+                ref={(el) => (exerciseRefs.current[i] = el)}
                 exerciseItem={ex}
                 stackIndex={i}
                 stackSize={stackLength}

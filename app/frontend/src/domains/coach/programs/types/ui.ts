@@ -9,6 +9,7 @@ export interface EditFormItem {
   __type: "form";
   mode: "edit";
   existingCard: WorkoutCardItem;
+  focusExerciseIndex: number | null;
 }
 
 export interface CreateFormItem {
