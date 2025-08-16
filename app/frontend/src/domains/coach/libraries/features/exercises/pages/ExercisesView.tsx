@@ -57,7 +57,7 @@ const ExercisesView = () => {
     }, [loading, hasMore, page]);
 
     return (
-        <div className='flex flex-col pl-15 py-10 pr-40'>
+        <div className='flex flex-col pl-25 py-10 pr-80'>
             <LibraryHeader 
                 title={"Exercises"}
                 subtitle={"Use the exercises library to add demo videos for your clients"}
@@ -71,7 +71,7 @@ const ExercisesView = () => {
                 className='mt-10'
             />
             <div className="mt-6">
-                <div className="grid grid-cols-3 gap-4 border rounded-t-md bg-[#eaeafe] px-2 py-4 font-semibold text-sm text-gray-700">
+                <div className="grid grid-cols-3 gap-4 border rounded-t-md bg-[#eaeafe] px-2 py-3 font-semibold text-[14px] text-gray-700">
                     <p>Exercise Name</p>
                     <p>Category</p>
                     <p>Primary Muscle Group</p>
@@ -79,10 +79,10 @@ const ExercisesView = () => {
                 {exercisesToDisplay.map((exercise) => (
                     <div
                         key={exercise.id}
-                        className="grid grid-cols-3 gap-4 py-3 px-2 border border-t-0 text-sm bg-white cursor-pointer hover:bg-gray-100"
+                        className="grid grid-cols-3 gap-4 py-3 px-2 border border-t-0 text-[12px] bg-white cursor-pointer hover:bg-gray-100"
                         onClick={() => navigate(`/coach/library/exercises/${exercise.id}/edit`)}
                     >
-                        <p className='font-semibold'>
+                        <p className='font-semibold truncate pr-3'>
                             {highlightQuery(exercise.name, searchString)}
                         </p>
                         <p>{highlightQuery(exercise.category, searchString)}</p>

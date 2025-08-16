@@ -22,7 +22,7 @@ const SearchBar = ({searchString, searchHandler, placeholder, className}: Search
                 startAdornment={
                     <InputAdornment position="start">
                     <SearchIcon
-                        sx={{color: grey[400] }}
+                        sx={{color: grey[400], fontSize: 20}}
                     />
                     </InputAdornment>
                 }
@@ -32,7 +32,8 @@ const SearchBar = ({searchString, searchHandler, placeholder, className}: Search
                     backgroundColor: 'white',
                     height: '45px',
                     flexGrow: 1,
-                    borderRadius: 1
+                    borderRadius: 1,
+                    fontSize: 14
                 }}
             />
         </div>

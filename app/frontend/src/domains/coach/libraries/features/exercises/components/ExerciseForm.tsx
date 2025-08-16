@@ -80,13 +80,13 @@ const ExerciseForm = ({
   }
 
   return (
-    <div className="flex flex-col pl-15 py-10 pr-40 mb-30">
-      <p className="font-semibold text-2xl">{formTitle}</p>
+    <div className="flex flex-col pl-25 py-10 pr-80 mb-30">
+      <p className="font-semibold text-xl">{formTitle}</p>
       <form onSubmit={handleSubmit} className="w-full bg-white rounded-md shadow-xl mt-6 pt-5">
         <FormField label="Exercise Name" id="exercise-name" required>
           <input
             id="exercise-name"
-            className="border mt-1 py-2 px-3 rounded-sm"
+            className="border mt-1 py-2 px-3 rounded-sm text-sm"
             placeholder="Enter an exercise name"
             value={name}
             onChange={(e) => setName(e.target.value)}
@@ -97,7 +97,7 @@ const ExerciseForm = ({
         <FormField label="Link to Video" id="video-url">
           <input
             id="video-url"
-            className="border mt-1 py-2 px-3 rounded-sm"
+            className="border mt-1 py-2 px-3 rounded-sm text-sm"
             placeholder="Enter video URL (Optional)"
             value={url}
             onChange={(e) => {
@@ -107,7 +107,7 @@ const ExerciseForm = ({
           />
         </FormField>
 
-        <div className="px-5 pb-5 h-[700px]">
+        <div className="px-5 pb-5 h-[600px]">
           {embedUrl ? (
             <iframe
               title="Video Preview"
@@ -125,7 +125,7 @@ const ExerciseForm = ({
         <FormField label="Description" id="exercise-description">
           <textarea
             id="exercise-description"
-            className="border mt-1 py-2 px-3 rounded-sm"
+            className="border mt-1 py-2 px-3 rounded-sm text-sm"
             placeholder="Enter a description (Optional)"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
@@ -136,7 +136,7 @@ const ExerciseForm = ({
           <FormField label="Primary Muscles" id="muscle-group">
             <select
               id="muscle-group"
-              className="border mt-1 py-2 px-3 rounded-sm w-[400px]"
+              className="border mt-1 py-2 px-3 rounded-sm w-[400px] text-sm"
               value={muscleGroup}
               onChange={(e) => setMuscleGroup(e.target.value)}
             >
@@ -152,7 +152,7 @@ const ExerciseForm = ({
           <FormField label="Category" id="category">
             <select
               id="category"
-              className="border mt-1 py-2 px-3 rounded-sm w-[400px]"
+              className="border mt-1 py-2 px-3 rounded-sm w-[400px] text-sm"
               value={category}
               onChange={(e) => setCategory(e.target.value)}
             >
@@ -174,14 +174,14 @@ const ExerciseForm = ({
           <button
             type="submit"
             disabled={!name.trim()}
-            className={`h-[45px] w-[170px] rounded-md px-3 py-2 text-white flex items-center justify-center mr-5
+            className={`text-sm h-[40px] w-[170px] rounded-md px-3 py-2 text-white flex items-center justify-center mr-5
               ${name.trim() ? 'bg-[var(--blue-button)] cursor-pointer hover:bg-blue-800' : 'bg-gray-400 cursor-not-allowed'}`}
           >
             {submitLabel}
           </button>
           <button
             type="button"
-            className="h-[45px] w-[170px] rounded-md bg-white px-3 py-2 text-blue-500 border-1 border-blue-500 cursor-pointer flex items-center justify-center mr-5 hover:bg-gray-100"
+            className="text-sm h-[40px] w-[170px] rounded-md bg-white px-3 py-2 text-blue-500 border-1 border-blue-500 cursor-pointer flex items-center justify-center mr-5 hover:bg-gray-100"
             onClick={() => navigate("/coach/library/exercises")}
           >
             Cancel
@@ -190,7 +190,7 @@ const ExerciseForm = ({
             <div className='ml-auto'>
               <button
                 type="button"
-                className="self-end h-[45px] w-[170px] rounded-md bg-red-500 px-3 py-2 text-white cursor-pointer flex items-center justify-center mr-5 hover:bg-red-700"
+                className="text-sm self-end h-[40px] w-[170px] rounded-md bg-red-500 px-3 py-2 text-white cursor-pointer flex items-center justify-center mr-0 hover:bg-red-700"
                 onClick={() => setShowConfirmDelete(true)}
               >
                 Delete
