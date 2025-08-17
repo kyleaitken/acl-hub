@@ -11,7 +11,7 @@ import toast from "react-hot-toast";
 import { ExerciseStackItem, RawWorkoutData, WorkoutCardItem } from "../types/ui";
 import { Exercise } from "../../libraries/features/exercises/types";
 import { mapWorkoutCardToRawFormData, updateRoutineData } from "../utils";
-import { workoutDataEqual } from "../utils/workoutDataEqual";
+import { workoutDataEqual } from "../utils/workoutUtils";
 import { useOutsideClickDismiss } from "../../core/hooks/useOutsideClickDismiss";
 import { ConfirmDeleteButton } from "../../core/components/ConfirmDeleteButton";
 import ConfirmModal from "../../core/components/ConfirmModal";

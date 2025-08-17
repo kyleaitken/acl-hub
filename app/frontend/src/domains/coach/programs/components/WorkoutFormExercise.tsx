@@ -107,12 +107,12 @@ const WorkoutFormExercise = forwardRef<HTMLTextAreaElement | null, WorkoutFormEx
         />
       </div>
       <div ref={searchRef} className="flex relative">
-        <div className="flex items-center text-[13px] flex-1 mr-1">
+        <div className="flex items-center text-[13px] flex-1 mr-1 pt-1">
           <span className="font-semibold mr-1">{`${exerciseItem.order})`}</span>
           <input
             ref={titleInputRef}
             placeholder="Exercise title (required)"
-            className=" outline-none font-semibold w-full"
+            className="outline-none font-semibold w-full"
             value={exerciseItem.name}
             onChange={e => {
               onNameChange(e.target.value);

@@ -19,7 +19,7 @@ const ExerciseSearchResults = ({searchResults, searchString, handleAddExercise, 
   }, []);
 
   return (
-    <div className="absolute top-full -translate-y-5 left-0 right-0 flex flex-col z-50 pointer-events-none">
+    <div className="absolute top-full -translate-y-5 left-0 right-0 flex flex-col pointer-events-none z-10000">
       <div className="flex justify-center self-end bg-black text-white text-[10px] px-2 py-1 rounded-md w-[100px] pointer-events-none">
         esc to close
       </div>
