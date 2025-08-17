@@ -75,3 +75,8 @@ export function workoutDataEqual(
 
 export const recalculateExerciseOrders = (arr: ExerciseStackItem[]) =>
   arr.map((it, i) => ({ ...it, order: String.fromCharCode(65 + i) }));
+
+export const sortExercisesByOrder = <T extends { order?: string }>(a: T, b: T) =>
+  String(a.order ?? "").localeCompare(String(b.order ?? ""), undefined, {
+    sensitivity: "base",
+});

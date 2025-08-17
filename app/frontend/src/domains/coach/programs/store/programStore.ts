@@ -22,7 +22,7 @@ interface ProgramStore {
   error?: string;
 
   fetchPrograms: (token: string) => Promise<void>;
-  fetchProgram: (token: string, programId: number) => Promise<void>;
+  fetchProgram: (token: string, programId: number) => Promise<ProgramDetails>;
   updateProgramDetails: (
     token: string,
     programData: UpdateProgramDTO,
@@ -52,7 +52,7 @@ interface ProgramStore {
   resetError: () => void;
 }
 
-export const useProgramStore = create<ProgramStore>((set) => ({
+export const useProgramStore = create<ProgramStore>((set, get) => ({
   programs: {},
   detailedPrograms: {},
   selectedWorkoutIds: [],
@@ -73,6 +73,11 @@ export const useProgramStore = create<ProgramStore>((set) => ({
     }
   },
   fetchProgram: async (token: string, programId: number) => {
+    const state = get();
+    const cached = state.detailedPrograms[programId];
+    if (cached) {
+      return cached;
+    }
     set({ loading: true });
     try {
       const program = await programsService.fetchProgram(token, programId);
@@ -83,11 +88,13 @@ export const useProgramStore = create<ProgramStore>((set) => ({
         },
         loading: false
       }));
+      return program;
     } catch (err) {
       set({
         error: `Failed to fetch program with id: ${programId}`,
         loading: false,
       });
+      throw err;
     }
   },
   updateProgramDetails: async (token: string, programData: UpdateProgramDTO) => {

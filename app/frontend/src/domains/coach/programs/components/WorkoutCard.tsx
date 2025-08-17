@@ -184,10 +184,10 @@ const WorkoutCard = ({
               className="text-start w-full flex flex-col py-2 px-2 min-h-15 hover:bg-gray-200"
               onClick={(e) => {
                 e.stopPropagation();
-                onEditWorkout(index, idx); // tells form to focus exercise idx
+                onEditWorkout(index, idx);
               }}
             >
-              <div className="exercise-title text-[13px] font-semibold line-clamp-2 break-words max-w-40">
+              <div className="exercise-title text-[13px] font-semibold line-clamp-2 break-words">
                 {`${ex.order}) ${ex.exercise.name}`}
               </div>
               <p className="text-xs text-gray-600 line-clamp-3 break-words max-w-45 whitespace-pre-line">

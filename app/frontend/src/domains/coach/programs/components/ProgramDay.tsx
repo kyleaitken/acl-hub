@@ -10,6 +10,7 @@ import ProgramDayHeader from "./ProgramDayHeader";
 import { useProgramDayActions } from "../hooks/useProgramDayActions";
 import { isCardItem, isCreateForm, isEditForm } from "../utils";
 import toast from "react-hot-toast";
+import { sortExercisesByOrder } from "../utils/workoutUtils";
 
 interface ProgramDayProps {
   programId: number;
@@ -41,8 +42,15 @@ const ProgramDay = ({
   onSelectWorkout,
   onDeleteWeek
 }: ProgramDayProps) => {
-  const [stack, setStack] = useState<WorkoutStackItem[]>(() => workouts.map(w => ({ __type: 'card', ...w })));
-  const { copiedWorkoutIds, isEditingWorkout } = useProgramData(); // TODO maybe have a flag in state like idsCopied so that I don't need to pull this into each program day
+
+  const makeCard = (w: ProgramWorkout) => ({
+    __type: "card" as const,
+    ...w,
+    program_workout_exercises: [...(w.program_workout_exercises ?? [])].sort(sortExercisesByOrder),
+  });
+
+  const [stack, setStack] = useState<WorkoutStackItem[]>(() => workouts.map(makeCard));
+  const { copiedWorkoutIds, isEditingWorkout } = useProgramData();
   const {setIsEditingWorkout} = useProgramStoreActions();
   const { isSaving, pasteCopied, submitNewWorkout, submitWorkoutEdits } 
     = useProgramDayActions({ programId: programId, week, day: dayIndex+1 });
@@ -55,24 +63,10 @@ const ProgramDay = ({
     moveWorkout,
     onDrop,
   });
-
-  const sortByOrder = <T extends { order?: string }>(a: T, b: T) =>
-    String(a.order ?? "").localeCompare(String(b.order ?? ""), undefined, {
-      sensitivity: "base",
-  });
   
   useEffect(() => {
-    // early return if editing, don't need to re-render the stack
-    if (isEditingWorkout) {
-      return;
-    }
-    setStack(
-      workouts.map(w => ({
-        __type: "card",
-        ...w,
-        program_workout_exercises: [...(w.program_workout_exercises ?? [])].sort(sortByOrder),
-      }))
-    );
+    if (isEditingWorkout) return;
+    setStack(workouts.map(makeCard));
   }, [workouts, isEditingWorkout]);
 
   const handleAddNewWorkout = () => {
@@ -147,7 +141,7 @@ const ProgramDay = ({
     <div
       ref={dropContainer}            
       id={`day-${dayIndex + 1}`}
-      className={`flex flex-col flex-1 min-h-[450px] border border-gray-400 ${borderRight} ${borderBottom}`}
+      className={`flex flex-col flex-1 min-h-80 border border-gray-400 ${borderRight} ${borderBottom}`}
       onMouseEnter={() => onHover(week, dayIndex + 1)}
     >
       <ProgramDayHeader 

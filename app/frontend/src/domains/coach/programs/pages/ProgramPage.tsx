@@ -12,7 +12,10 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import SelectedWorkoutsFooter from "../components/SelectedWorkoutsFooter";
 import { useProgramPageActions } from "../hooks/useProgramPageActions";
 import { useProgramMetaData } from "../hooks/useProgramMetaData";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useProgramStore } from "../store/programStore";
+
+const MIN_SKELETON_MS = 400;
 
 const ProgramPage = () => {
   const navigate = useNavigate();
@@ -28,9 +31,31 @@ const ProgramPage = () => {
     handleSelectAll, handleShiftSelect, deleteWeek
   } = useProgramPageActions(id);
 
+  const { loading } = useProgramData();
   const { name, description, numWeeks } = useProgramMetaData(id);
 
-  if (name === undefined) return <ProgramSkeleton />;
+  const hasData = useProgramStore(s => !!s.detailedPrograms[id]);
+  const [initialized, setInitialized] = useState(false);
+  
+  useEffect(() => { 
+    if (hasData) setInitialized(true); 
+  }, [hasData]);
+
+  const [delayDone, setDelayDone] = useState(false);
+  const startedRef = useRef(false);
+
+  useEffect(() => {
+    // start the delay ONLY the first time we'd render the skeleton
+    if (!initialized && loading && !startedRef.current) {
+      startedRef.current = true;
+      const t = setTimeout(() => setDelayDone(true), MIN_SKELETON_MS);
+      return () => clearTimeout(t);
+    }
+  }, [initialized, loading]);
+
+  // show until BOTH min time elapsed AND data arrived
+  const showSkeleton = !initialized && (!delayDone || loading);
+  if (showSkeleton) return <ProgramSkeleton />;
 
   return (
     <>
