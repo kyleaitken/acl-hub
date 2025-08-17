@@ -45,7 +45,9 @@ const WorkoutFormWarmupOrCooldown = ({type,
   const buttonRef = useRef<HTMLDivElement>(null);
 
   const { results: searchResults, search } = useExerciseSearch();
-  useDisableScroll(showSaveRoutineDialog);
+
+  const scrollEl = typeof window !== "undefined" ? document.getElementById("program-scroll") : null;
+  useDisableScroll(showSaveRoutineDialog, scrollEl);
   
   useOutsideClickDismiss(
     [exerciseContainerRef, instructionsContainerRef],
@@ -121,7 +123,10 @@ const WorkoutFormWarmupOrCooldown = ({type,
         <AddNewRoutineDialog 
           anchorRect={anchorRect}
           handleDismiss={() => setShowSaveRoutineeDialog(false)}
-          handleSave={(name: string) => saveRoutineToLibrary(type, name.trim(), instructions, Array.from(exerciseIdSet))}
+          handleSave={(name: string) => {
+            saveRoutineToLibrary(type, name.trim(), instructions, Array.from(exerciseIdSet));
+            setShowSaveNewRoutine(false);
+          }}
         />
         }
 

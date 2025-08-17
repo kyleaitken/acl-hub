@@ -12,12 +12,14 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import SelectedWorkoutsFooter from "../components/SelectedWorkoutsFooter";
 import { useProgramPageActions } from "../hooks/useProgramPageActions";
 import { useProgramMetaData } from "../hooks/useProgramMetaData";
+import { useRef } from "react";
 
 const ProgramPage = () => {
   const navigate = useNavigate();
   const { programId } = useParams<{ programId: string }>();
   const id = Number(programId);
   const { selectedWorkoutIds } = useProgramData();
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   const {
     workoutsByWeek,
@@ -33,7 +35,7 @@ const ProgramPage = () => {
   return (
     <>
     <DndProvider backend={HTML5Backend}>
-      <div className="p-5 pb-0 bg-gray-100 h-screen overflow-y-auto">
+      <div id="program-scroll" ref={scrollRef} className="p-5 pb-0 bg-gray-100 h-screen overflow-y-auto">
         <button
           className="flex cursor-pointer hover:underline text-blue-600 items-center"
           onClick={() => navigate("/coach/programs")}

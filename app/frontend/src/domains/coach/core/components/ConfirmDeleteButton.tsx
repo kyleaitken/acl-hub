@@ -3,6 +3,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { useOutsideClickDismiss } from "../hooks/useOutsideClickDismiss";
 import { Tooltip } from 'react-tooltip'
 import clsx from "clsx";
+import { useDisableScroll } from "../hooks/useDisableScroll";
 
 export interface ConfirmDeleteButtonProps {
   tooltipText: string;
@@ -50,6 +51,8 @@ export const ConfirmDeleteButton = forwardRef<
   useOutsideClickDismiss([dialogRef], () => {
     setConfirmOpen(false);
   });
+
+  useDisableScroll(confirmOpen);
 
   return (
     <div

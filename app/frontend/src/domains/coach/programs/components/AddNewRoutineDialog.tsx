@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useOutsideClickDismiss } from "../../core/hooks/useOutsideClickDismiss";
 
 interface AddNewRoutineDialogProps {
@@ -15,6 +15,14 @@ const AddNewRoutineDialog = ({anchorRect, handleDismiss, handleSave}: AddNewRout
   useOutsideClickDismiss([dialogRef], () => {
     handleDismiss();
   });
+
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') handleDismiss();
+    };
+    document.addEventListener('keydown', handleEsc);
+    return () => document.removeEventListener('keydown', handleEsc);
+  }, []);
   
   return (
     <div
@@ -27,7 +35,7 @@ const AddNewRoutineDialog = ({anchorRect, handleDismiss, handleSave}: AddNewRout
       }}
     >
       <div className="flex flex-col mt-2">
-        <label htmlFor="routineName" className="text-sm font-semibold mb-1">
+        <label htmlFor="routineName" className="text-[13px] font-semibold mb-1">
           Name
         </label>
         <input 
@@ -35,13 +43,13 @@ const AddNewRoutineDialog = ({anchorRect, handleDismiss, handleSave}: AddNewRout
           id="routineName"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="text-sm outline-[1.5px] outline-gray-300 rounded hover:outline-gray-700 pl-2 py-1 focus:outline-2 focus:outline-blue-500 focus:shadow-[0_0_6px_2px_rgba(59,130,246,0.5)]"
+          className="text-[13px] outline-[1.5px] outline-gray-300 rounded hover:outline-gray-700 pl-2 py-1 focus:outline-2 focus:outline-blue-500 focus:shadow-[0_0_6px_2px_rgba(59,130,246,0.5)]"
         />
       </div>
       <div className="flex mt-3">
         <button
           type="button"
-          className="rounded bg-[var(--blue-button)] text-white text-sm px-2 py-1 cursor-pointer mr-2 hover:bg-blue-800"
+          className="rounded bg-[var(--blue-button)] text-white text-[12px] px-2 py-1 cursor-pointer mr-2 hover:bg-blue-800"
           onClick={() => {
             handleSave(name)
             handleDismiss();
@@ -50,7 +58,7 @@ const AddNewRoutineDialog = ({anchorRect, handleDismiss, handleSave}: AddNewRout
           Save to Library
         </button>
         <button
-          className="rounded bg-white text-sm px-2 py-1 cursor-pointer hover:bg-gray-200"
+          className="rounded bg-white text-[12px] px-2 py-1 cursor-pointer hover:bg-gray-200"
           onClick={handleDismiss}
         >
           Cancel

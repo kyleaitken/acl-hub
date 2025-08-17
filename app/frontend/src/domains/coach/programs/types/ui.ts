@@ -31,6 +31,7 @@ export interface ExerciseStackItem {
   programWorkoutExerciseId?: number; 
   tempId?: string;
   videoUrl?: string;
+  _key?: string;
 }
 
 export interface RawWorkoutData {

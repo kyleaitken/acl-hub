@@ -62,9 +62,9 @@ const AddNewExerciseDialog = ({anchorRect, title, handleDismiss, onSaveExercise}
         width: 400,
       }}
     >
-      <p className='font-bold text-lg'>{title}</p>
+      <p className='font-bold text-[14px]'>{title}</p>
       <div className="flex flex-col mt-2">
-        <label htmlFor="videoUrl" className="text-sm font-semibold mb-1">
+        <label htmlFor="videoUrl" className="font-semibold text-[13px] mb-1">
           Video url
         </label>
         <input 
@@ -74,11 +74,11 @@ const AddNewExerciseDialog = ({anchorRect, title, handleDismiss, onSaveExercise}
             setVideoUrl(e.target.value);
             setShowError(false);
           }}
-          className={`outline-[1.5px] rounded pl-2 py-1 
+          className={`text-[13px] outline-[1.5px] rounded pl-2 py-1 
             ${showError ? "outline-red-500 focus:outline-red-500" : "outline-gray-300 hover:outline-gray-700 focus:outline-blue-500 focus:shadow-[0_0_6px_2px_rgba(59,130,246,0.5)]"}`}
         />
         {showError && (
-          <div className="text-red-600 text-sm mt-1">
+          <div className="text-red-600 text-[11px] mt-1">
             Please enter a valid video URL
           </div>
         )}
@@ -94,13 +94,13 @@ const AddNewExerciseDialog = ({anchorRect, title, handleDismiss, onSaveExercise}
       <div className="flex mt-3">
         <button
           type="button"
-          className="rounded bg-[var(--blue-button)] text-white text-sm px-2 py-1 cursor-pointer mr-2 hover:bg-blue-800"
+          className="text-xs rounded bg-[var(--blue-button)] text-white px-2 py-1 cursor-pointer mr-2 hover:bg-blue-800"
           onClick={handleSaveExerciseToLibrary}
         >
           Save to Library
         </button>
         <button
-          className="rounded bg-white text-sm px-2 py-1 cursor-pointer hover:bg-gray-200"
+          className="text-xs rounded bg-white px-2 py-1 cursor-pointer hover:bg-gray-200"
           onClick={handleDismiss}
         >
           Cancel

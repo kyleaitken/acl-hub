@@ -127,7 +127,9 @@ const WorkoutCard = ({
             onSelect(workout.id, e.shiftKey, clickedPosition);
           }}
         />
-        <span className="text-[15px] font-semibold flex-grow mr-3">{workout.name || `Workout`}</span>
+        <div className="text-[15px] font-semibold mr-3 w-30 line-clamp-2 break-words">
+          {workout.name || `Workout`}
+        </div>
         <div className="copy-and-move-buttons flex items-center">
           <TooltipIconButton
             tooltipContent="Copy workout"
@@ -185,10 +187,10 @@ const WorkoutCard = ({
                 onEditWorkout(index, idx); // tells form to focus exercise idx
               }}
             >
-              <div className="exercise-title text-[13px] font-semibold">
+              <div className="exercise-title text-[13px] font-semibold line-clamp-2 break-words max-w-40">
                 {`${ex.order}) ${ex.exercise.name}`}
               </div>
-              <p className="text-xs text-gray-600">
+              <p className="text-xs text-gray-600 line-clamp-3 break-words max-w-45 whitespace-pre-line">
                 {ex.instructions}
               </p>
             </button>
