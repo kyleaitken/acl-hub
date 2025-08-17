@@ -53,7 +53,6 @@ const ProgramPage = () => {
     }
   }, [initialized, loading]);
 
-  // show until BOTH min time elapsed AND data arrived
   const showSkeleton = !initialized && (!delayDone || loading);
   if (showSkeleton) return <ProgramSkeleton />;
 
