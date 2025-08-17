@@ -1,9 +1,6 @@
-// src/components/ProgramWeek.tsx
 import { useMemo } from "react";
 import ProgramDay from "./ProgramDay";
 import { ProgramWorkout } from "../types/models";
-import DeleteIcon from '@mui/icons-material/Delete';
-import { useProgramData } from "../hooks/useProgramStoreData";
 
 interface ProgramWeekProps {
   programId: number;
@@ -19,7 +16,7 @@ interface ProgramWeekProps {
   onDrop: () => void;
   onDayHover: (week: number, day: number) => void;
   onSelectWorkout: (workoutId: number, shiftKey: boolean, clickedPosition: number) => void;
-  deleteLastWeek: () => void;
+  deleteWeek: (week: number) => void;
 }
 
 const ProgramWeek = ({
@@ -31,9 +28,8 @@ const ProgramWeek = ({
   onDrop,
   onDayHover,
   onSelectWorkout,
-  deleteLastWeek
+  deleteWeek
 }: ProgramWeekProps) => {
-  const { isEditingWorkout } = useProgramData();
   
   const byDay = useMemo(() => {
     const groupedWorkouts: Record<number, ProgramWorkout[]> = {};
@@ -45,8 +41,6 @@ const ProgramWeek = ({
     );
     return groupedWorkouts;
   }, [workouts]);
-
-  const showDeleteWeekButton = isLastWeek && !isEditingWorkout && workouts.length === 0;
 
   return (
     <div className="w-full relative" id={`week-${week}`}>
@@ -63,22 +57,10 @@ const ProgramWeek = ({
             onDrop={onDrop}
             onHover={onDayHover}
             onSelectWorkout={onSelectWorkout}
+            onDeleteWeek={() => deleteWeek(week)}
           />
         ))}
       </div>
-      {showDeleteWeekButton &&
-        <div
-          className="flex flex-col absolute top-45 -left-5 justify-center h-25 w-10 bg-[#242526]/90 px-1 py-3 rounded"
-        >
-          <button
-            type="button"
-            className="cursor-pointer py-5"
-            onClick={deleteLastWeek}
-          >
-            <DeleteIcon sx={{color: 'white', fontSize: '30px'}}/>
-          </button>
-        </div>
-      }
     </div>
   );
 };

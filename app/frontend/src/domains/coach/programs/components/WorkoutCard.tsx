@@ -11,6 +11,7 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import OpenWithIcon from '@mui/icons-material/OpenWith';
 import { useProgramStoreActions } from "../hooks/useProgramStoreActions";
 import { useProgramData } from "../hooks/useProgramStoreData";
+import TooltipIconButton from "../../core/components/TooltipIconButton";
 
 export interface DragItem {
   id: number;
@@ -34,7 +35,7 @@ interface ProgramWorkoutCardProps {
   ) => void;
   onDrop: () => void;
   onSelect: (workoutId: number, shiftKey: boolean, clickedPosition: number) => void;
-  onEditWorkout: (index: number) => void;
+  onEditWorkout: (index: number, exerciseIndex?: number) => void;
 }
 
 const WorkoutCard = ({
@@ -49,7 +50,7 @@ const WorkoutCard = ({
   onSelect,
   onEditWorkout
 }: ProgramWorkoutCardProps) => {
-  const cardRef = useRef<HTMLDivElement>(null);
+  const cardRef = useRef<HTMLButtonElement>(null);
   const handleRef = useRef<HTMLButtonElement>(null);
 
   const { setCopiedWorkoutIds } = useProgramStoreActions();
@@ -108,17 +109,17 @@ const WorkoutCard = ({
   }
 
   return (
-    <div
+    <button
       ref={cardRef}
       style={{ opacity: isDragging ? 0.5 : 1 }}
-      className={`border-b py-1 bg-white cursor-pointer pb-0 ${isLastWorkout ? 'flex-grow border-b-0' : ''}`}
+      className={`text-start border-b py-1 bg-white cursor-pointer pb-0 ${isLastWorkout ? 'border-b-0' : ''}`}
       onClick={() => onEditWorkout(index)}
     >
       <div className="workout-card-header flex items-start mt-1 mb-2 mx-1">
         <Checkbox 
           checked={isSelected}
           disableRipple 
-          size="large" 
+          size="medium" 
           sx={{p:0, pb: 1, pr: 0.5}} 
           onClick={(e) => {
             e.stopPropagation();
@@ -126,51 +127,73 @@ const WorkoutCard = ({
             onSelect(workout.id, e.shiftKey, clickedPosition);
           }}
         />
-        <span className="text-[17px] font-semibold flex-grow mr-4">{workout.name || `Workout`}</span>
+        <div className="text-[15px] font-semibold mr-3 w-30 line-clamp-2 break-words">
+          {workout.name || `Workout`}
+        </div>
         <div className="copy-and-move-buttons flex items-center">
-          <button
-            type="button"
-            className="cursor-pointer"
-            aria-label="copy-workout"
-            onMouseDown={e => e.stopPropagation()}
-            onClick={e => {
+          <TooltipIconButton
+            tooltipContent="Copy workout"
+            tooltipPosition="bottom"
+            onClick={(e) => {
               e.stopPropagation();
-              setCopiedWorkoutIds([workout.id]);
+              setCopiedWorkoutIds([workout.id])
             }}
+            buttonClassName="cursor-pointer"
+            aria-label="Copy workout"
           >
-            <ContentCopyIcon sx={{fontSize: 22}}/>
-          </button>
+            <ContentCopyIcon sx={{fontSize: 18}}/>
+          </TooltipIconButton>
           <button 
             ref={handleRef} 
             disabled={!canDrag}
             aria-label="move workout"
             className={`ml-1 ${canDrag ? 'cursor-move' : 'cursor-not-allowed opacity-50'}`}
           >
-            <OpenWithIcon sx={{ fontSize: 22 }} />
+            <OpenWithIcon sx={{ fontSize: 18 }} />
           </button>
         </div>
       </div>
 
       {workout.warmup?.instructions && 
         <div className="flex flex-col px-2">
-          <div className="text-xs text-gray-600 whitespace-pre-line">
+          <div 
+            className="text-[10px] text-gray-600"
+            style={{
+              display: "-webkit-box",
+              WebkitLineClamp: 3,
+              WebkitBoxOrient: "vertical" as const,
+              overflow: "hidden",
+              wordBreak: "break-word",
+              whiteSpace: "pre-line"
+            }}
+          >
             {workout.warmup.instructions}
           </div>
-          <div className="divider mt-1 w-full border-t border-gray-400" />
+          <div 
+            className="divider mt-1 w-full border-t border-gray-400" 
+          />
         </div>
       }
 
       {workout.program_workout_exercises?.length > 0 && (
         <div>
           {workout.program_workout_exercises.map((ex, idx) => (
-            <div key={ex.id ?? idx} className="flex flex-col py-2 px-2 min-h-15 hover:bg-gray-200">
-              <div className="exercise-title font-semibold">
+            <button 
+              type="button"
+              key={ex.id ?? idx} 
+              className="text-start w-full flex flex-col py-2 px-2 min-h-15 hover:bg-gray-200"
+              onClick={(e) => {
+                e.stopPropagation();
+                onEditWorkout(index, idx); // tells form to focus exercise idx
+              }}
+            >
+              <div className="exercise-title text-[13px] font-semibold line-clamp-2 break-words max-w-40">
                 {`${ex.order}) ${ex.exercise.name}`}
               </div>
-              <p className="text-sm text-gray-600">
+              <p className="text-xs text-gray-600 line-clamp-3 break-words max-w-45 whitespace-pre-line">
                 {ex.instructions}
               </p>
-            </div>
+            </button>
           ))}
         </div>
       )}
@@ -178,12 +201,22 @@ const WorkoutCard = ({
       {workout.cooldown?.instructions && 
         <div className="flex flex-col px-2 pb-8">
           <div className="divider mb-1 w-full border-t border-gray-400" />
-          <div className="text-xs text-gray-600 whitespace-pre-line">
+          <div 
+            className="text-[10px] text-gray-600"
+            style={{
+              display: "-webkit-box",
+              WebkitLineClamp: 3,
+              WebkitBoxOrient: "vertical" as const,
+              overflow: "hidden",
+              wordBreak: "break-word",
+              whiteSpace: "pre-line"
+            }}
+          >
             {workout.cooldown.instructions}
           </div>
         </div>
       }
-    </div>
+    </button>
   );
 };
 

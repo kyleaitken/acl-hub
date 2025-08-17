@@ -25,7 +25,7 @@ const Cooldowns = () => {
     }
 
     return (
-        <div className='flex flex-col pl-15 py-10 pr-40'>
+        <div className='flex flex-col pl-25 py-10 pr-80'>
             <LibraryHeader 
                 title={"Cooldowns"}
                 subtitle={"Use the cooldown library to create commonly used cooldown protocols."}

@@ -1,4 +1,3 @@
-
 import { useAuthenticatedUser } from '../../../shared/auth/hooks/useAuthenticatedUser';
 import { useProgramStore } from '../store/programStore';
 import { curryToken } from '../../core/utils/curryToken';
@@ -20,6 +19,7 @@ export const useProgramStoreActions = () => {
     updateWorkout: curryToken(store.updateWorkout, token),
     deleteWorkoutsFromProgram: curryToken(store.deleteWorkoutsFromProgram, token),
     bulkCopyWorkoutsToProgram: curryToken(store.bulkCopyWorkoutsToProgram, token),
+    deleteWeekFromProgram: curryToken(store.deleteWeekFromProgram, token),
 
     // Non curried state setters
     setCopiedWorkoutIds: store.setCopiedWorkoutIds,

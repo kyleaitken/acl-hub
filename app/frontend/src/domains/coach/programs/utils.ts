@@ -14,8 +14,8 @@ import {
   CreateFormItem,
   EditFormItem,
   WorkoutCardItem,
-  RawWorkoutData
- } from './types/ui'
+  RawWorkoutData,
+} from './types/ui'
 
 /*
   Builds the payload for createing a new workout in a program

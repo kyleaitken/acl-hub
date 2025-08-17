@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useOutsideClickDismiss } from "../../../../core/hooks/useOutsideClickDismiss";
 
 interface ExercisePreviewProps {
@@ -16,6 +16,14 @@ const ExercisePreview = ({anchorRect, name, url, exerciseId, handleDismissPrevie
     handleDismissPreview();
   });
 
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') handleDismissPreview();
+    };
+    document.addEventListener('keydown', handleEsc);
+    return () => document.removeEventListener('keydown', handleEsc);
+  }, []);
+
   return (
     <div
       ref={previewRef}
@@ -27,7 +35,7 @@ const ExercisePreview = ({anchorRect, name, url, exerciseId, handleDismissPrevie
         height: 300,
       }}
     >
-      <p className='font-bold text-lg'>{name}</p>
+      <p className='font-bold text-md'>{name}</p>
       <iframe
         title="Exercise Video Preview"
         src={url}

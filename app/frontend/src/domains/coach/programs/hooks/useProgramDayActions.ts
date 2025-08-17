@@ -5,6 +5,7 @@ import { useProgramData } from "./useProgramStoreData";
 import { useProgramStoreActions } from "./useProgramStoreActions";
 import { buildNewWorkoutPayload, buildUpdateWorkoutPayload } from "../utils";
 import toast from "react-hot-toast";
+import { useProgramStore } from "../store/programStore";
 
 export function useProgramDayActions(opts: {
   programId: number;
@@ -19,6 +20,8 @@ export function useProgramDayActions(opts: {
     setIsEditingWorkout,
     updateWorkout
   } = useProgramStoreActions();
+
+  const isSaving = useProgramStore(s => s.updatingWorkout);
 
   const pasteCopied = useCallback(async () => {
     if (!copiedWorkoutIds.length) return;
@@ -44,9 +47,8 @@ export function useProgramDayActions(opts: {
   ]);
 
   const submitNewWorkout = useCallback(async (raw: RawWorkoutData) => {
-      setIsEditingWorkout(false);
       const payload = buildNewWorkoutPayload(raw, week, day, 0);
-      console.log("create new workout payload", payload);
+
       try {
         await addWorkoutToProgram({
           programId,
@@ -56,28 +58,31 @@ export function useProgramDayActions(opts: {
       } catch (err) {
         console.error(err);
         toast.error("Error adding workout.");
+      } finally {
+        setIsEditingWorkout(false);
       }
     },
     [programId, week, day, addWorkoutToProgram, setIsEditingWorkout]
   );
 
   const submitWorkoutEdits = useCallback(async (raw: RawWorkoutData) => {
-    setIsEditingWorkout(false);
     if (!raw.workoutId) return;
-
     const workoutId = raw.workoutId;
     const payload = buildUpdateWorkoutPayload(raw);
-    console.log('edit workout payload', payload)
+
     try {
       await updateWorkout({workoutId, programId, program_workout: payload});
       toast.success("Workout updated!");
     } catch (err) {
       console.error(err);
       toast.error("Error updating workout.");
+    } finally {
+      setIsEditingWorkout(false);
     }
   }, [updateWorkout, setIsEditingWorkout]);
 
   return {
+    isSaving,
     pasteCopied,
     submitNewWorkout,
     submitWorkoutEdits

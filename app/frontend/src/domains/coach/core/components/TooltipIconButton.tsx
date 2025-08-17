@@ -1,67 +1,47 @@
-import React from "react";
-import { Tooltip, TooltipProps } from "@mui/material";
+import React, { useId } from "react";
+import { Tooltip, PlacesType } from "react-tooltip";
 
-type Omitted = "title" | "children" | "onClick";
-type TooltipPosition = "top" | "bottom" | "left" | "right";
-
-interface TooltipIconButtonProps
-  extends Omit<TooltipProps, Omitted> {
-  title: React.ReactNode;
+interface TooltipIconButtonProps {
+  tooltipContent: string;
   onClick?: React.MouseEventHandler<HTMLButtonElement>;
   "aria-label": string;
   buttonClassName?: string;
-  tooltipPosition?: TooltipPosition;
+  tooltipPosition?: PlacesType;      
+  placementOffset?: number;   
   disabled?: boolean;
   children: React.ReactNode;
-  placementOffset?: [number, number];
 }
 
-const offsetMap: Record<TooltipPosition, [number, number]> = {
-  top: [0, -2],
-  bottom: [0, -8],
-  left: [8, 0],
-  right: [-8, 0],
-};
-
-const TooltipIconButton = ({
-  title,
+export default function TooltipIconButton({
+  tooltipContent,
   onClick,
   "aria-label": ariaLabel,
   buttonClassName,
   children,
   tooltipPosition = "top",
-  placementOffset,
   disabled = false,
-  ...tooltipProps
-}: TooltipIconButtonProps) => {
+  placementOffset = 10,
+}: TooltipIconButtonProps) {
+  const tooltipId = useId();
+
   return (
-    <Tooltip
-      title={title}
-      slotProps={{
-        tooltip: { sx: { fontSize: "1em", backgroundColor: "black" } },
-        popper: {
-          style: { pointerEvents: 'none' }, 
-          modifiers: [
-            {
-              name: "offset",
-              options: { offset: placementOffset ?? offsetMap[tooltipPosition] },
-            },
-          ],
-        },
-      }}
-      {...tooltipProps}
-    >
+    <>
       <button
         type="button"
         aria-label={ariaLabel}
         onClick={onClick}
-        className={`${buttonClassName}`}
+        className={buttonClassName}
         disabled={disabled}
+
+        // attach tooltip to this element
+        data-tooltip-id={tooltipId}
+        data-tooltip-content={tooltipContent}
+        data-tooltip-place={tooltipPosition}
+        data-tooltip-offset={placementOffset}
       >
         {children}
       </button>
-    </Tooltip>
+      <Tooltip id={tooltipId} style={{fontSize: 12, fontWeight: "normal", backgroundColor: 'black', opacity: 0.99, zIndex: 20000}}/>
+    </>
   );
-};
-
-export default TooltipIconButton;
+}

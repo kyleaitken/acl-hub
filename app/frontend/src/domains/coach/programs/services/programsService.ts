@@ -144,12 +144,25 @@ const bulkCopyWorkoutsToProgram = (
   );
 };
 
+const deleteWeekFromProgram = (
+  token: string,
+  programId: number,
+  week: number
+): Promise<ProgramDetails> => {
+  return apiRequest(
+    `${baseUrl}/${programId}/delete_week/${week}`,
+    "DELETE",
+    token
+  );
+};
+
 export default {
   fetchPrograms,
   fetchProgram,
   addProgram,
   deleteProgram,
   updateProgramDetails,
+  deleteWeekFromProgram,
   updateWorkoutPositions,
   bulkCopyWorkoutsToProgram,
   addTagToProgram,

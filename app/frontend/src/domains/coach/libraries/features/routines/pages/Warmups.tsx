@@ -25,7 +25,7 @@ const Warmups = () => {
     }
 
     return (
-        <div className='flex flex-col pl-15 py-10 pr-40'>
+        <div className='flex flex-col pl-25 py-10 pr-80'>
             <LibraryHeader 
                 title={"Warmups"}
                 subtitle={"Use the warmup library to create commonly used warmup protocols."}

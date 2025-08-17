@@ -9,6 +9,7 @@ import { useWorkoutDrop } from '../hooks/useWorkoutDrop';
 import ProgramDayHeader from "./ProgramDayHeader";
 import { useProgramDayActions } from "../hooks/useProgramDayActions";
 import { isCardItem, isCreateForm, isEditForm } from "../utils";
+import toast from "react-hot-toast";
 
 interface ProgramDayProps {
   programId: number;
@@ -25,6 +26,7 @@ interface ProgramDayProps {
   onDrop: () => void;
   onHover: (week: number, day: number) => void;
   onSelectWorkout: (workoutId: number, shiftKey: boolean, clickedPosition: number) => void;
+  onDeleteWeek: () => void;
 }
 
 const ProgramDay = ({
@@ -36,13 +38,15 @@ const ProgramDay = ({
   moveWorkout,
   onDrop,
   onHover,
-  onSelectWorkout
+  onSelectWorkout,
+  onDeleteWeek
 }: ProgramDayProps) => {
   const [stack, setStack] = useState<WorkoutStackItem[]>(() => workouts.map(w => ({ __type: 'card', ...w })));
   const { copiedWorkoutIds, isEditingWorkout } = useProgramData(); // TODO maybe have a flag in state like idsCopied so that I don't need to pull this into each program day
   const {setIsEditingWorkout} = useProgramStoreActions();
-  const { pasteCopied, submitNewWorkout, submitWorkoutEdits } 
+  const { isSaving, pasteCopied, submitNewWorkout, submitWorkoutEdits } 
     = useProgramDayActions({ programId: programId, week, day: dayIndex+1 });
+  const { deleteWorkoutsFromProgram } = useProgramStoreActions();
 
   const { dropContainer, dropPlaceholder } = useWorkoutDrop({
     week,
@@ -52,12 +56,23 @@ const ProgramDay = ({
     onDrop,
   });
 
+  const sortByOrder = <T extends { order?: string }>(a: T, b: T) =>
+    String(a.order ?? "").localeCompare(String(b.order ?? ""), undefined, {
+      sensitivity: "base",
+  });
+  
   useEffect(() => {
     // early return if editing, don't need to re-render the stack
     if (isEditingWorkout) {
       return;
     }
-    setStack(workouts.map(w => ({ __type: "card", ...w })));
+    setStack(
+      workouts.map(w => ({
+        __type: "card",
+        ...w,
+        program_workout_exercises: [...(w.program_workout_exercises ?? [])].sort(sortByOrder),
+      }))
+    );
   }, [workouts, isEditingWorkout]);
 
   const handleAddNewWorkout = () => {
@@ -79,7 +94,7 @@ const ProgramDay = ({
     ]);
   };
 
-  const handleEditWorkout = (index: number) => {
+  const handleEditWorkout = (index: number, exerciseIndex?: number) => {
     const card = stack[index];
     if (!isCardItem(card) || isEditingWorkout) return;
     setIsEditingWorkout(true);
@@ -88,6 +103,7 @@ const ProgramDay = ({
       __type: "form",
       mode: "edit",
       existingCard: card,
+      focusExerciseIndex: exerciseIndex ?? null
     }
 
     setStack(s => s.map((w,i) => i === index ? editForm : w));
@@ -105,6 +121,20 @@ const ProgramDay = ({
       );
     } else {
       setStack(prev => prev.filter((_, i) => i !== index));
+    }
+  };
+
+  const handleDeleteWorkoutClicked = (workoutId: number, stackIndex: number) => {
+    try {
+      deleteWorkoutsFromProgram(programId, [workoutId]);
+      toast.success("Workout deleted")
+    } catch (err) {
+      handleCancelCreateOrEditWorkout(stackIndex);
+      toast.error("Error deleting workout");
+      console.error("Error occurred while deleting the workout");
+    } finally {
+      setStack(prev => prev.filter((_, i) => i !== stackIndex));
+      setIsEditingWorkout(false);
     }
   };
 
@@ -127,6 +157,7 @@ const ProgramDay = ({
         showPasteWorkouts={copiedWorkoutIds.length > 0}
         onPasteWorkouts={pasteCopied}
         onAddWorkout={handleAddNewWorkout}
+        onDeleteWeek={onDeleteWeek}
       />
       <div className="flex-grow bg-white flex flex-col py-0 px-0">
         {stack.map((w, i) => {
@@ -138,6 +169,7 @@ const ProgramDay = ({
                 stackIndex={i}
                 onCancel={handleCancelCreateOrEditWorkout}
                 onSave={submitNewWorkout}
+                isSaving={isSaving}
               />
             )
           } else if (isEditForm(w)) {
@@ -147,8 +179,11 @@ const ProgramDay = ({
                 mode="edit"
                 stackIndex={i}
                 existingCard={w.existingCard}
+                focusExerciseIndex={w.focusExerciseIndex}
                 onCancel={handleCancelCreateOrEditWorkout}
                 onSave={submitWorkoutEdits} 
+                isSaving={isSaving}
+                onDelete={handleDeleteWorkoutClicked}
               />
             )
           }
@@ -173,7 +208,7 @@ const ProgramDay = ({
 
         <div
           ref={dropPlaceholder}
-          style={{ height: 50 }}
+          style={{ height: stack.length === 0 ? "50%" : 50 }}
           className="mt-2"
         />
       </div>

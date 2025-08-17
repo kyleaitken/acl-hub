@@ -117,10 +117,10 @@ const WorkoutCommentBox = (props: WorkoutCommentBoxProps) => {
     }
   }, [editCommentContent]);
 
-  const buttonBase = 'h-9 w-20 cursor-pointer rounded-sm py-1';
+  const buttonBase = 'text-sm h-8 w-20 cursor-pointer rounded-sm py-1';
   const buttonVariants = {
     cancel: `${buttonBase} border border-blue-500 text-blue-500 px-2`,
-    save: `${buttonBase} bg-[#4e4eff] text-white`,
+    save: `${buttonBase} bg-[var(--blue-button)] text-white`,
     delete: `${buttonBase} bg-red-500 text-white`,
   };
 
@@ -133,12 +133,12 @@ const WorkoutCommentBox = (props: WorkoutCommentBoxProps) => {
               userType={comment.user_type}
               userId={getCommentUserId(comment.user_type)}
               name={getCommentName(comment.user_type)}
-              height={38}
+              height={28}
             />
           </div>
           <div className="comment-content-box mr-10 flex-grow">
             <div className="comment-header flex items-center">
-              <p className="comment-username font-bold">
+              <p className="comment-username font-semibold text-sm">
                 {getCommentName(comment.user_type)}
               </p>
               <p className="comment-date ml-3 flex-grow text-xs text-gray-500">
@@ -153,7 +153,7 @@ const WorkoutCommentBox = (props: WorkoutCommentBoxProps) => {
                     handleEditComment(comment.id, comment.content);
                   }}
                 >
-                  <EditIcon sx={{ color: 'black', fontSize: 20 }} />
+                  <EditIcon sx={{ color: 'black', fontSize: 18 }} />
                 </button>
               )}
             </div>
@@ -163,7 +163,7 @@ const WorkoutCommentBox = (props: WorkoutCommentBoxProps) => {
                   ref={inputRef}
                   value={editCommentContent}
                   onChange={(e) => setEditCommentContent(e.target.value)}
-                  className="mt-1 min-h-[70px] resize-y rounded-md border border-gray-300 px-4 py-4 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  className=" text-sm mt-1 min-h-[70px] resize-y rounded-md border border-gray-300 px-4 py-4 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                 />
                 <div className="comment-buttons mt-3 flex flex-grow items-center">
                   <button
@@ -191,7 +191,7 @@ const WorkoutCommentBox = (props: WorkoutCommentBoxProps) => {
                 </div>
               </div>
             ) : (
-              <p className="mt-1.5">{comment.content}</p>
+              <p className="mt-1.5 text-sm">{comment.content}</p>
             )}
           </div>
         </div>
@@ -236,7 +236,7 @@ const WorkoutCommentBox = (props: WorkoutCommentBoxProps) => {
       >
         <textarea
           placeholder="Write a comment..."
-          className="mt-5 mr-0 mb-3 ml-6 min-h-[80px] w-[90%] outline-0"
+          className="mt-5 mr-0 mb-3 ml-6 min-h-[80px] w-[90%] outline-0 text-sm"
           value={newComment}
           onChange={(e) => setNewComment(e.target.value)}
           onKeyDown={(e) => {
@@ -246,7 +246,7 @@ const WorkoutCommentBox = (props: WorkoutCommentBoxProps) => {
             }
           }}
         />
-        <div className="mr-9 flex justify-end">
+        <div className="mr-9 flex justify-end text-sm">
           <button type="submit" className={buttonVariants.save}>
             Send
           </button>

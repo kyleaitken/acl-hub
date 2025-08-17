@@ -109,7 +109,7 @@ const TagManager = ({ isOpen, handleClose, selectedProgram, handleAddTagToProgra
           onChange={(e) => setTagSearchString(e.target.value)}
           startAdornment={
             <InputAdornment position="start">
-              <SearchIcon />
+              <SearchIcon sx={{fontSize: 20}}/>
             </InputAdornment>
           }
           sx={{
@@ -119,7 +119,7 @@ const TagManager = ({ isOpen, handleClose, selectedProgram, handleAddTagToProgra
             border: '1px solid #ccc',
             backgroundColor: 'white',
             borderRadius: 1,
-            fontSize: '15px'
+            fontSize: 14
           }}
         />
 
@@ -167,7 +167,7 @@ const TagManager = ({ isOpen, handleClose, selectedProgram, handleAddTagToProgra
                       <div>
                         <button
                           type="button"
-                          className="w-[140px] rounded-md bg-[#4e4eff] px-3 py-2 text-white cursor-pointer text-sm"
+                          className="w-[140px] rounded-md bg-[var(--blue-button)] px-3 py-2 text-white cursor-pointer text-sm"
                           onClick={() => {
                             handleAddTagToProgram(activeProgram.id, tag.id)
                             setAddedTagIds((prev) => new Set(prev).add(tag.id));
@@ -207,16 +207,16 @@ const TagManager = ({ isOpen, handleClose, selectedProgram, handleAddTagToProgra
               onChange={(e) => setNewTagName(e.target.value)}
               sx={{
                 px: 1,
-                py: 1,
+                py: 0.5,
                 border: '1px solid #ccc',
                 backgroundColor: 'white',
                 borderRadius: '5px',
-                fontSize: '15px'
+                fontSize: 14
               }}
             />
             <button 
               type='button' onClick={handleAddTag}
-              className="h-[45px] w-[100px] rounded-md bg-[#4e4eff] px-3 py-2 text-white cursor-pointer"
+              className="text-sm h-[38px] w-[100px] rounded-md bg-[var(--blue-button)] px-3 py-2 text-white cursor-pointer"
             >
               Add Tag
             </button>

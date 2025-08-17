@@ -57,7 +57,7 @@ const NavigationBar = () => {
   ]
 
   return (
-    <div className="navBarWrapper sticky text-sm top-0 max-h-screen flex flex-col items-center bg-[var(--color-secondary)] text-[var(--color-text-light)]">
+    <div className="navBarWrapper sticky text-xs top-0 max-h-screen flex flex-col items-center bg-[var(--color-secondary)] text-[var(--color-text-light)]">
       <Link to="/coach" onClick={() => setTabSelected('')}>
         <img
           style={{
@@ -84,7 +84,7 @@ const NavigationBar = () => {
               onClick={() => setTabSelected(tab.id)}
               className={className}
             >
-              <Icon sx={{ marginRight: '10px' }} />
+              <Icon sx={{ marginRight: 1, fontSize: 18 }} />
               {tab.name}
             </Link>
           );
@@ -106,7 +106,7 @@ const NavigationBar = () => {
             onClick={handleLogout}
           >
             <span>
-              <LogoutIcon />
+              <LogoutIcon sx={{fontSize: 18}}/>
             </span>{' '}
             Logout
           </button>
@@ -117,7 +117,7 @@ const NavigationBar = () => {
 };
 
 const ButtonView = ({ children }: { children: React.ReactNode }) => (
-  <div className="mb-5 ml-5 flex w-[150px] items-center font-semibold text-[var(--color-text-light)]">
+  <div className="mb-5 ml-5 flex w-[130px] items-center font-semibold text-[var(--color-text-light)]">
     {children}
   </div>
 );

@@ -19,15 +19,15 @@ const WorkoutHeader = ({
     {/* TODO: ADD LINK TO CLIENT PAGE */}
     <ProfilePictureBubble
       userType="client"
-      height={50}
+      height={40}
       userId={clientId}
       name={`${firstName} ${lastName}`}
     />
-    <div className="ml-5">
-      <p className="text-lg font-bold">
+    <div className="ml-5 text-md">
+      <p className="font-semibold">
         {capitalize(firstName)} {capitalize(lastName)}
       </p>
-      <p>Due {dueDate}</p>
+      <p className='text-sm'>Due {dueDate}</p>
     </div>
   </div>
 );

@@ -9,7 +9,7 @@ const tabs = [
 
 const LibraryNavigation = () => {
   return (
-    <div className="sticky top-0 max-h-screen flex flex-col items-start bg-white text-[var(--color-text)] w-[180px]">
+    <div className="sticky top-0 max-h-screen flex flex-col items-start bg-white text-[var(--color-text)] min-w-[180px]">
       {tabs.map((tab) => (
         <NavLink
           key={tab.id}
@@ -28,6 +28,6 @@ const LibraryNavigation = () => {
 export default LibraryNavigation;
 
 const baseTabClasses =
-  'no-underline text-[15px] px-4 py-3.5 hover:bg-gray-200 flex items-center gap-2 w-full cursor-pointer';
+  'no-underline text-[13px] px-4 py-3.5 hover:bg-gray-200 flex items-center gap-2 w-full cursor-pointer';
 
 const activeTabExtra = 'bg-gray-200 border-r-5 border-r-blue-500';

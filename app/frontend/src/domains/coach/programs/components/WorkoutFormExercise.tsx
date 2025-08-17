@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, forwardRef, useState, useImperativeHandle } from "react";
 import ExerciseSearchResults from "../../libraries/features/exercises/components/ExerciseSearchResults";
 import { useExerciseSearch } from "../../libraries/features/exercises/hooks/useExerciseSearch";
 import { useOutsideClickDismiss } from "../../core/hooks/useOutsideClickDismiss";
@@ -11,8 +11,9 @@ import { getEmbedUrl } from "../../core/utils/text";
 import AddNewExerciseDialog from "./AddNewExerciseDialog";
 import { useDisableScroll } from "../../core/hooks/useDisableScroll";
 import { ExerciseStackItem } from "../types/ui";
-import DeleteIcon from '@mui/icons-material/Delete';
 import OpenWithIcon from '@mui/icons-material/OpenWith';
+import { ConfirmDeleteButton } from "../../core/components/ConfirmDeleteButton";
+import TooltipIconButton from "../../core/components/TooltipIconButton";
 
 interface WorkoutFormExerciseProps {
   stackIndex: number;
@@ -25,23 +26,24 @@ interface WorkoutFormExerciseProps {
   removeExerciseFromWorkout: (index: number) => void;
 }
 
-const WorkoutFormExercise = ({
-  stackIndex,
-  stackSize,
-  exerciseItem, 
-  onAddLibraryExercise, 
-  onNameChange,
-  onInstructionsChange,
-  addNewlySavedExerciseToWorkout,
-  removeExerciseFromWorkout,
-}: WorkoutFormExerciseProps) => {
-  const [hovered, setHovered] = useState(false);
+const WorkoutFormExercise = forwardRef<HTMLTextAreaElement | null, WorkoutFormExerciseProps>(
+  (props, ref) => {
+    const {
+      stackIndex,
+      stackSize,
+      exerciseItem,
+      onAddLibraryExercise,
+      onNameChange,
+      onInstructionsChange,
+      addNewlySavedExerciseToWorkout,
+      removeExerciseFromWorkout,
+    } = props;
+    
   const [isSearching, setIsSearching] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const [showSaveExerciseDialog, setShowSaveExerciseDialog] = useState(false);
 
-  const containerRef = useRef<HTMLDivElement>(null);
-  const searchRef = useRef<HTMLInputElement>(null);
+  const searchRef = useRef<HTMLDivElement | null>(null);
   const titleInputRef = useRef<HTMLInputElement>(null);
   const instrRef      = useRef<HTMLTextAreaElement>(null);
   const buttonRef = useRef<HTMLDivElement>(null);
@@ -73,40 +75,44 @@ const WorkoutFormExercise = ({
     instrRef.current?.focus();
   };  
 
+  useImperativeHandle<HTMLTextAreaElement, HTMLTextAreaElement>(ref, () => instrRef.current!, []);
+
   const anchorRect = buttonRef.current ? buttonRef.current.getBoundingClientRect() : null;
 
   return (
-    <div 
-      className="flex flex-col px-3 relative"
-      ref={containerRef}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-    >
-      {hovered && stackSize !== 1 && (
-        <div
-          className="flex flex-col absolute -left-5 -top-1 justify-center space-y-2 bg-[#242526]/90 px-1 py-3 rounded"
-        >
+    <div className="flex flex-col px-3">
+      <div
+        className="absolute -left-7 -top-2 z-10 flex flex-col space-y-0
+                  bg-[#242526]/90 px-2 py-1 rounded-xl
+                  opacity-0 group-hover:opacity-100 transition-opacity"
+        hidden={stackSize === 1}
+      >
+        <div className="exercise-drag-handle cursor-pointer">
           <button
             type="button"
-            className="cursor-pointer"
-            onClick={() => removeExerciseFromWorkout(stackIndex)}
+            className="pointer-events-none"
+            aria-label="Drag to reorder"
           >
-            <DeleteIcon sx={{color: 'white', fontSize: '20px'}}/>
-          </button>
-          <button
-            className="cursor-pointer"
-          >
-            <OpenWithIcon sx={{color: 'white', fontSize: '20px'}}/>
+            <OpenWithIcon sx={{ color: 'white', fontSize: 18 }} />
           </button>
         </div>
-      )}
+        <ConfirmDeleteButton
+          tooltipText="Delete workout item"
+          confirmText="Delete this workout item?"
+          onDeleteConfirmed={() => removeExerciseFromWorkout(stackIndex)}
+          iconSize={18}
+          iconColor="white"
+          buttonClassName="p-0"
+          tooltipOffset={10}
+        />
+      </div>
       <div ref={searchRef} className="flex relative">
-        <div className="flex items-center text-[15px] flex-1">
+        <div className="flex items-center text-[13px] flex-1 mr-1 pt-1">
           <span className="font-semibold mr-1">{`${exerciseItem.order})`}</span>
           <input
             ref={titleInputRef}
             placeholder="Exercise title (required)"
-            className=" outline-none font-semibold w-full"
+            className="outline-none font-semibold w-full"
             value={exerciseItem.name}
             onChange={e => {
               onNameChange(e.target.value);
@@ -120,6 +126,7 @@ const WorkoutFormExercise = ({
               handleAddExercise={ex => {
                 handleSelectExercise(ex);
               }}
+              onEscape={() => setIsSearching(false)}
             />
           )}
         </div>
@@ -128,28 +135,29 @@ const WorkoutFormExercise = ({
         <div
           ref={buttonRef}
         >
-          <button
-            type="button"
-            className="p-0 cursor-pointer"
-            aria-label="Show exercise video"
+          <TooltipIconButton
+            tooltipContent="Open exercise preview"
             onClick={() => setShowPreview(true)}
+            aria-label="Show exercise preview"
+            buttonClassName="p-0 cursor-pointer"
+            placementOffset={0}
           >
-            <VideocamIcon sx={{ fontSize: 24}} />
-          </button>
+            <VideocamIcon sx={{ fontSize: 20}} />
+          </TooltipIconButton>
         </div>
-        : (!exerciseItem.exerciseId && searchResults.length === 0 && exerciseItem.name.length > 2) ?
+        : (!exerciseItem.exerciseId && exerciseItem.name.length > 2) ?
         <div
           ref={buttonRef}
         >
-          <button
-            id="add-new-exercise-button"
-            type="button"
-            className="p-0 cursor-pointer"
-            aria-label="Add new exercise"
+          <TooltipIconButton
+            tooltipContent="Create new library exercise"
             onClick={() => setShowSaveExerciseDialog(true)}
+            aria-label="Create new library exercise"
+            buttonClassName={"cursor-pointer p-0"}
+            placementOffset={0}
           >
-            <VideoCallIcon sx={{ fontSize: 24, color: '#5e748b'}} />
-          </button>
+            <VideoCallIcon sx={{ fontSize: 22, color: '#5e748b'}} />
+          </TooltipIconButton>
         </div>
         : <></>
         }
@@ -181,12 +189,12 @@ const WorkoutFormExercise = ({
           placeholder="Sets Reps Tempo Rest etc"
           value={exerciseItem.instructions}
           onChange={(e) => onInstructionsChange(e.target.value)}
-          className="text-sm border-0 outline-none w-full resize-none my-2"
+          className="text-[11px] border-0 outline-none w-full resize-none my-1"
         />
       </div>
     </div>
   )
-};
+});
 
 export default WorkoutFormExercise;
 

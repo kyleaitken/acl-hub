@@ -55,10 +55,10 @@ const CoachHomePage = () => {
     >
       <div
         id="today-workouts-container"
-        className="sticky top-0 max-h-screen px-8 py-10"
+        className="sticky top-0 max-h-screen px-5 py-10"
       >
-        <p className="text-md">{dayOfWeek}</p>
-        <p className="mb-4 text-[24px] leading-[1.1] font-bold">
+        <p className="text-sm">{dayOfWeek}</p>
+        <p className="mb-4 text-lg leading-[1.1] font-bold">
           {month} {dayOfMonth}
           {daySuffix}
         </p>
@@ -74,33 +74,33 @@ const CoachHomePage = () => {
             ) : (
               <ExpandLessIcon sx={{ pb: '1px', mr: '5px' }} />
             )}
-            <p className="mr-6 font-medium hover:underline">Today's Workouts</p>
+            <p className="mr-3 font-medium text-sm hover:underline">Today's Workouts</p>
           </div>
           <div className="rounded-lg bg-[var(--button-highlight)] px-2.5 py-0.5">
             <p className="text-sm font-medium">{todayWorkouts?.length ?? 0}</p>
           </div>
         </button>
         <Collapse in={collapseOpen}>
-          <List sx={{ overflowY: 'auto', maxHeight: '80vh' }}>
+          <List sx={{ overflowY: 'auto', maxHeight: '80vh', pt: 0 }}>
             {/* TODO: Make the today workout a link to the client workout and make this scrollable */}
             {todayWorkouts.map((workoutItem, index) => (
               <ListItem
                 key={index}
-                sx={{ display: 'flex', alignItems: 'center' }}
+                sx={{ display: 'flex', alignItems: 'center', px: 1, width: '250px' }}
               >
                 <div className="flex items-center">
                   <ProfilePictureBubble
                     userType="client"
-                    height={40}
+                    height={35}
                     userId={workoutItem.client_id}
                     name={`${workoutItem.first_name} ${workoutItem.last_name}`}
                   />
-                  <div className="ml-3 flex flex-col">
-                    <p className="font-medium">
+                  <div className="ml-3 text-sm flex flex-col">
+                    <p className="font-semibold">
                       {capitalize(workoutItem.first_name)}{' '}
                       {capitalize(workoutItem.last_name)}
                     </p>
-                    <p className="font-medium">
+                    <p >
                       {workoutItem.workout_name || 'Workout'}
                     </p>
                   </div>
@@ -112,13 +112,13 @@ const CoachHomePage = () => {
       </div>
       <div
         id="updated-workouts-wrapper"
-        className="flex flex-grow items-start justify-start px-40 bg-[#F3F4F6]"
+        className="flex flex-grow items-start justify-start px-30 bg-[#F3F4F6]"
       >
         <div
           id="workouts"
           className="pt-[30px] pb-[40px]"
         >
-          <p className="mt-2 mb-8 text-2xl font-bold self-start">
+          <p className="mt-5 mb-10 text-xl font-semibold self-start">
             Good {timeOfDay},{' '}
             {firstName.charAt(0).toUpperCase() + firstName.slice(1)}!
           </p>

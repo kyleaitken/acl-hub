@@ -9,6 +9,7 @@ export interface EditFormItem {
   __type: "form";
   mode: "edit";
   existingCard: WorkoutCardItem;
+  focusExerciseIndex: number | null;
 }
 
 export interface CreateFormItem {
@@ -28,8 +29,9 @@ export interface ExerciseStackItem {
   exerciseId?: number;
   customExercise?: boolean;
   programWorkoutExerciseId?: number; 
-  tempId?: number;
+  tempId?: string;
   videoUrl?: string;
+  _key?: string;
 }
 
 export interface RawWorkoutData {

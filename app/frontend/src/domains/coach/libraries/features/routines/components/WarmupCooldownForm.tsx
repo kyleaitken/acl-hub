@@ -97,13 +97,13 @@ const WarmupCooldownForm = ({
   }
 
   return (
-    <div className="flex flex-col pl-15 py-10 pr-40 mb-30">
-      <p className="font-semibold text-2xl">{formTitle}</p>
+    <div className="flex flex-col pl-25 py-10 pr-80 mb-30">
+      <p className="font-semibold text-xl">{formTitle}</p>
       <form onSubmit={handleSubmit} className="w-full bg-white rounded-md shadow-xl mt-6 pt-5">
         <FormField label={`${formType} Name`} id={`${formType}-name`} required>
           <input
             id={`${formType}-name`} 
-            className="border mt-1 py-2 px-3 rounded-sm"
+            className="border mt-1 py-2 px-3 rounded-sm text-sm"
             placeholder={`Enter a ${formType.toLowerCase()} name`}
             value={name}
             onChange={(e) => setName(e.target.value)}
@@ -114,7 +114,7 @@ const WarmupCooldownForm = ({
         <FormField label="Instructions" id="instructions">
           <textarea
             id="instructions"
-            className="border mt-1 py-2 px-3 rounded-sm"
+            className="border mt-1 py-2 px-3 rounded-sm text-sm"
             placeholder="Enter some instructions (Optional)"
             value={instructions}
             onChange={(e) => setInstructions(e.target.value)}
@@ -129,20 +129,21 @@ const WarmupCooldownForm = ({
         <ExerciseTagsContainer 
           addedExercises={addedExercises}
           onRemoveExercise={(ex) => setExerciseIds(exerciseIds.filter((id) => id !== ex.id))}
+          size='medium'
         />
 
         <div className="flex px-5 pb-6 pt-2">
           <button
             type="submit"
             disabled={!name.trim()}
-            className={`h-[45px] w-[170px] rounded-md px-3 py-2 text-white flex items-center justify-center mr-5
-              ${name.trim() ? 'bg-[#4e4eff] cursor-pointer hover:bg-blue-800' : 'bg-gray-400 cursor-not-allowed'}`}
+            className={`text-sm h-[40px] w-[170px] rounded-md px-3 py-2 text-white flex items-center justify-center mr-5
+              ${name.trim() ? 'bg-[var(--blue-button)] cursor-pointer hover:bg-blue-800' : 'bg-gray-400 cursor-not-allowed'}`}
           >
             {submitLabel}
           </button>
           <button
             type="button"
-            className="h-[45px] w-[170px] rounded-md bg-white px-3 py-2 text-blue-500 border-1 border-blue-500 cursor-pointer flex items-center justify-center mr-5 hover:bg-gray-100"
+            className="text-sm h-[40px] w-[170px] rounded-md bg-white px-3 py-2 text-blue-500 border-1 border-blue-500 cursor-pointer flex items-center justify-center mr-5 hover:bg-gray-100"
             onClick={() => navigate(`/coach/library/${formType.toLowerCase()}s`)}
           >
             Cancel
@@ -151,7 +152,7 @@ const WarmupCooldownForm = ({
             <div className='ml-auto'>
               <button
                 type="button"
-                className="self-end h-[45px] w-[170px] rounded-md bg-red-500 px-3 py-2 text-white cursor-pointer flex items-center justify-center mr-5 hover:bg-red-700"
+                className="text-sm self-end h-[40px] w-[170px] rounded-md bg-red-500 px-3 py-2 text-white cursor-pointer flex items-center justify-center hover:bg-red-700"
                 onClick={() => setShowConfirmDelete(true)}
               >
                 Delete
