@@ -18,7 +18,7 @@ const ProgramDayHeader = ({label, isFirstDay, week, onPasteWorkouts, showPasteWo
   const { isEditingWorkout } = useProgramData();
 
   return (
-    <div className="text-[13px] bg-[#d0ccdb] font-semibold px-2 py-1 flex items-center justify-between min-h-9">
+    <div className="text-[12px] bg-[#d0ccdb] font-semibold px-2 py-1 flex items-center justify-between min-h-9">
       {isFirstDay ?
       <div className='flex items-center'>
         {!isEditingWorkout &&

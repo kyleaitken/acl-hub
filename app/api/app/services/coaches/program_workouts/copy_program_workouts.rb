@@ -13,10 +13,12 @@ module Coaches
       end
 
       def call
-        source = @program.program_workouts
-                        .where(id: @ids)
-                        .order(:week, :day, :order)
-                        .to_a
+        source = ProgramWorkout
+          .includes(:warmup, :cooldown, program_workout_exercises: :exercise)
+          .joins(:program)
+          .where(id: @ids, programs: { coach_id: @coach.id }) 
+          .order(:week, :day, :order)
+          .to_a
 
         return Failure(errors: ["No workouts to copy"]) if source.empty?
 

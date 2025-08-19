@@ -11,6 +11,8 @@ import { useProgramDayActions } from "../hooks/useProgramDayActions";
 import { isCardItem, isCreateForm, isEditForm } from "../utils";
 import toast from "react-hot-toast";
 import { sortExercisesByOrder } from "../utils/workoutUtils";
+import AddIcon from '@mui/icons-material/Add';
+import ContentPasteIcon from '@mui/icons-material/ContentPaste';
 
 interface ProgramDayProps {
   programId: number;
@@ -49,6 +51,7 @@ const ProgramDay = ({
     program_workout_exercises: [...(w.program_workout_exercises ?? [])].sort(sortExercisesByOrder),
   });
 
+  const [hovered, setHovered] = useState(false);
   const [stack, setStack] = useState<WorkoutStackItem[]>(() => workouts.map(makeCard));
   const { copiedWorkoutIds, isEditingWorkout } = useProgramData();
   const {setIsEditingWorkout} = useProgramStoreActions();
@@ -142,7 +145,11 @@ const ProgramDay = ({
       ref={dropContainer}            
       id={`day-${dayIndex + 1}`}
       className={`flex flex-col flex-1 min-h-80 border border-gray-400 ${borderRight} ${borderBottom}`}
-      onMouseEnter={() => onHover(week, dayIndex + 1)}
+      onMouseEnter={() => {
+        setHovered(true);
+        onHover(week, dayIndex + 1);
+      }}
+      onMouseLeave={() => setHovered(false)}
     >
       <ProgramDayHeader 
         label={label}
@@ -204,7 +211,33 @@ const ProgramDay = ({
           ref={dropPlaceholder}
           style={{ height: stack.length === 0 ? "50%" : 50 }}
           className="mt-2"
-        />
+        >
+          {stack.length === 0 &&
+            <div className="empty-program-day-buttons flex justify-center items-center mt-20" hidden={!hovered}>
+              <button
+                aria-label="Add new workout"
+                type="button"
+                className="h-12 w-15 bg-gray-600 rounded-sm cursor-pointer hover:opacity-40 opacity-20"
+                onClick={handleAddNewWorkout}
+              >
+                <AddIcon sx={{fontSize: 30, color: 'white'}}/>
+              </button>
+
+              {copiedWorkoutIds.length > 0 &&
+                <button
+                  aria-label="Paste workouts"
+                  type="button"
+                  className="h-12 w-15 bg-gray-600 rounded-sm cursor-pointer hover:opacity-40 opacity-20 ml-2"
+                  onClick={pasteCopied}
+                >
+                  <ContentPasteIcon sx={{fontSize: 30, color: 'white'}}/>
+                </button>
+              }
+
+            </div>
+          }
+
+        </div>
       </div>
     </div>
   );

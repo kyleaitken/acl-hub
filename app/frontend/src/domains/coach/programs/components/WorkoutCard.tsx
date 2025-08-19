@@ -50,7 +50,7 @@ const WorkoutCard = ({
   onSelect,
   onEditWorkout
 }: ProgramWorkoutCardProps) => {
-  const cardRef = useRef<HTMLButtonElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
   const handleRef = useRef<HTMLButtonElement>(null);
 
   const { setCopiedWorkoutIds } = useProgramStoreActions();
@@ -109,11 +109,19 @@ const WorkoutCard = ({
   }
 
   return (
-    <button
+    <div
       ref={cardRef}
+      role="button"
+      tabIndex={0}
       style={{ opacity: isDragging ? 0.5 : 1 }}
       className={`text-start border-b py-1 bg-white cursor-pointer pb-0 ${isLastWorkout ? 'border-b-0' : ''}`}
       onClick={() => onEditWorkout(index)}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onEditWorkout(index);
+        }
+      }}
     >
       <div className="workout-card-header flex items-start mt-1 mb-2 mx-1">
         <Checkbox 
@@ -181,7 +189,7 @@ const WorkoutCard = ({
             <button 
               type="button"
               key={ex.id ?? idx} 
-              className="text-start w-full flex flex-col py-2 px-2 min-h-15 hover:bg-gray-200"
+              className="text-start cursor-pointer w-full flex flex-col py-2 px-2 min-h-15 hover:bg-gray-200"
               onClick={(e) => {
                 e.stopPropagation();
                 onEditWorkout(index, idx);
@@ -216,7 +224,7 @@ const WorkoutCard = ({
           </div>
         </div>
       }
-    </button>
+    </div>
   );
 };
 
